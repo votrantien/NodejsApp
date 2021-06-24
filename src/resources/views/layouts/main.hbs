@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}}</title>
+
+    <link rel="stylesheet" type="text/css" href="/bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" type="text/css" href="/font-awesome/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="/css/local.css" />
+
+    <script type="text/javascript" src="/js/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript" src="/bootstrap/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/vendor/validate.js"></script>
+
+    <!-- you need to include the shieldui css and js assets in order for the charts to work -->
+    <link rel="stylesheet" type="text/css" href="/vendor/light_bootstrap/all.min.css" />
+    <link id="gridcss" rel="stylesheet" type="text/css" href="/vendor/dark_boostrap/all.min.css" />
+
+    <script type="text/javascript" src="/vendor/shieldui-all.min.js"></script>
+    <script type="text/javascript" src="/vendor/gridData.js"></script>
+    <script type="text/javascript" src="/js/main.js"></script>
+</head>
+
+<body>
+    <div class="popup-container">
+        {{!-- notification success popup --}}
+        <div class="alert alert-success" id="success-alert" style="display: none;">
+            <button type="button" class="close" data-dismiss="alert">x</button>
+            <p id="success-content">thành công</p>
+        </div>
+
+        {{!-- notification failure popup --}}
+        <div class="alert alert-danger" id="failure-alert" style="display: none;">
+            <button type="button" class="close" data-dismiss="alert">x</button>
+            <p id="failure-content">ko Thành công</p>
+        </div>
+    </div>
+    {{>header}}
+
+    {{#if username}}
+    {{>nav-bar}}
+    {{/if}}
+
+    {{{body}}}
+    {{!--
+    <script type="text/javascript" src="/js/main.js"></script> --}}
+
+    {{>footer}}
+    
+
+
+    <div id="mask" style="display: none;">
+        <div id="loader"></div>
+    </div>
+</body>
+
+</html>

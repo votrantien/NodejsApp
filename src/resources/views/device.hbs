@@ -1,0 +1,398 @@
+<div class="container-lg">
+    <div class="table-responsive">
+        <div class="table-wrapper">
+            <div class="table-title">
+                <div class="row">
+                    <div class="col-sm-8">
+                        <h2>Quản lý thiết bị</h2>
+                    </div>
+                    <div class="col-sm-4">
+                        <button type="button" class="btn btn-info add-new" data-toggle="modal"
+                            data-target="#createModal"><i class="fa fa-plus"></i> Add New</button>
+                    </div>
+                </div>
+            </div>
+            <table class="table table-bordered" id="deviceTable">
+                <thead>
+                    <tr>
+                        <th nowrap>Mã</th>
+                        <th nowrap>Loại</th>
+                        <th nowrap>Tên</th>
+                        <th nowrap>Model</th>
+                        <th nowrap>SN</th>
+                        <th nowrap>FW</th>
+                        <th nowrap>MFG</th>
+                        {{!-- <th nowrap>Vị trí</th> --}}
+                        <th nowrap>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{!-- <tr>
+                        <td>devcode13</td>
+                        <td>typecode</td>
+                        <td>DEVNAME</td>
+                        <td>devmodel</td>
+                        <td>12345678913</td>
+                        <td>987654321</td>
+                        <td>mfg</td>
+                        <td>8</td>
+                        <td nowrap>
+                            <a class="add" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a>
+                            <a class="edit" title="Edit" data-toggle="tooltip"><i
+                                    class="material-icons">&#xE254;</i></a>
+                            <a class="delete" title="Delete" data-toggle="tooltip"><i
+                                    class="material-icons">&#xE872;</i></a>
+                        </td>
+                    </tr> --}}
+
+                    {{#each devices}}
+                    <tr id="{{this._id}}">
+                        <td class="device_code">{{this.device_code}}</td>
+                        <td class="device_type">{{this.device_type.device_type}}</td>
+                        <input type="hidden" class="device_type_id" value="{{this.device_type._id}}">
+                        <td class="device_name">{{this.device_name}}</td>
+                        <td class="device_model">{{this.device_model}}</td>
+                        <td class="sn_number">{{this.sn_number}}</td>
+                        <td class="fw_number">{{this.fw_number}}</td>
+                        <td class="mfg">{{this.mfg}}</td>
+                        {{!-- <td>{{this.location}}</td> --}}
+                        <td nowrap>
+                            <a class="edit" id-dev="{{this._id}}" title="Edit" data-toggle="tooltip"><i
+                                    class="material-icons">&#xE254;</i></a>
+                            <a class="delete" id-dev="{{this._id}}" title="Delete" data-toggle="tooltip"><i
+                                    class="material-icons">&#xE872;</i></a>
+                        </td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{{!-- Create modal --}}
+
+<!-- Button trigger modal -->
+
+<input type="hidden" id="idUser" value="{{idUser}}">
+<!-- add, edit Modal -->
+<div class="modal fade" id="createModal" tabindex="-1" role="dialog" aria-labelledby="createModalTitle"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createModalTitle">Thêm thiết bị</h5>
+            </div>
+            <div class="modal-body">
+                <form id="createModalForm">
+                    <div class="input-group">
+                        <label class="input-group-addon" for="device_type_id">Loại thiết bị</label>
+                        <select id="device_type_id" class="form-control text-primary">
+                            <option value="">Loại TB</option>
+                            {{#each device_types}}
+                            <option value="{{this._id}}">{{this.device_type}}</option>
+                            {{/each}}
+                        </select>
+                    </div>
+                    <p class="text-danger err-input" id="err_device_type_id"></p>
+                    <div class="input-group">
+                        <label class="input-group-addon" for="device_code">Mã thiết bị</label>
+                        <input type="text" class="form-control text-primary" id="device_code" placeholder="Mã thiết bị">
+                    </div>
+                    <p class="text-danger err-input" id="err_device_code"></p>
+                    <div class="input-group">
+                        <label class="input-group-addon" for="device_name">Tên thiết bị</label>
+                        <input type="text" class="form-control text-primary" id="device_name"
+                            placeholder="Tên thiết bị">
+                    </div>
+                    <p class="text-danger err-input" id="err_device_name"></p>
+                    <div class="input-group">
+                        <label class="input-group-addon" for="device_model">Model thiết bị</label>
+                        <input type="text" class="form-control text-primary" id="device_model"
+                            placeholder="Model thiết bị">
+                    </div>
+                    <p class="text-danger err-input" id="err_device_model"></p>
+                    <div class="input-group">
+                        <label class="input-group-addon" for="sn_number">Serial thiết bị</label>
+                        <input type="text" class="form-control text-primary" id="sn_number" placeholder="SN number">
+                    </div>
+                    <p class="text-danger err-input" id="err_sn_number"></p>
+                    <div class="input-group">
+                        <label class="input-group-addon" for="fw_number">Firmware thiết bị</label>
+                        <input type="text" class="form-control text-primary" id="fw_number" placeholder="FW number">
+                    </div>
+                    <p class="text-danger err-input" id="err_fw_number"></p>
+                    <div class="input-group">
+                        <label class="input-group-addon" for="mfg">Mfg</label>
+                        <input type="text" class="form-control text-primary" id="mfg" placeholder="MFG">
+                    </div>
+                    <p class="text-danger err-input" id="err_mfg"></p>
+                    <div class="input-group">
+                        <label class="input-group-addon" for="location">Vị trí</label>
+                        <select id="location" class="form-control text-primary">
+                            <option value="{{farm}}">{{farm}}</option>
+                        </select>
+                    </div>
+                    <p class="text-danger err-input" id="err_location"></p>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-primary" id="addDeviceBtn">Thêm</button>
+                <button type="button" class="btn btn-primary" id="updateDeviceBtn">Sửa</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{!-- end --}}
+
+
+{{!-- model thong bao --}}
+
+<div class="modal fade" id="notificationModal" tabindex="-1" role="dialog" aria-labelledby="notificationModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="notificationModalLabel">Thông báo</h5>
+            </div>
+            <div class="modal-body" id="notificationContent">
+                ...
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal"
+                    id="notificationCancel">Đóng</button>
+                <button type="button" class="btn btn-primary" id="notificationOK">Xác nhận</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{!-- end --}}
+<script>
+    async function fetchData(url = '', method = 'POST', data = {}) {
+        // Default options are marked with *
+        const response = await fetch(url, {
+            method: method, // *GET, POST, PUT, DELETE, etc.
+            mode: 'cors', // no-cors, *cors, same-origin
+            cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+            credentials: 'same-origin', // include, *same-origin, omit
+            headers: {
+                'Content-Type': 'application/json'
+                //'Content-Type': 'application/x-www-form-urlencoded',
+                //'Accept': 'application/json'
+            },
+            redirect: 'follow', // manual, *follow, error
+            referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+            body: JSON.stringify(data) // body data type must match "Content-Type" header
+        });
+        var resultData = await response.json();
+        return { status: response.status, data: resultData }; // parses JSON response into native JavaScript objects
+    }
+    $(document).ready(function () {
+        var constraints = {
+            device_code: {
+                presence: { allowEmpty: false, message: ': Mã thiết bị không được để trống' },
+                length: { minimum: 5, message: ': Mã thiết bị phải từ 5 ký tự' },
+            },
+            device_name: {
+                presence: { allowEmpty: false, message: ': Tên thiết bị không được để trống' },
+                length: { minimum: 5, message: ': Tên thiết bị phải từ 5 ký tự' },
+            },
+            device_type_id: {
+                presence: { allowEmpty: false, message: ': Phải chọn loại thiết bị' },
+            },
+            device_model: {
+                presence: { allowEmpty: false, message: ': Model thiết bị không được để trống' },
+            },
+            sn_number: {
+                presence: { allowEmpty: false, message: ': Serial thiết bị không được để trống' },
+                length: { minimum: 5, message: ': Serial thiết bị phải từ 5 ký tự' },
+            },
+            fw_number: {
+                presence: { allowEmpty: false, message: ': Firmware thiết bị không được để trống' },
+            },
+            mfg: {
+                presence: { allowEmpty: false, message: ': mfg thiết bị không được để trống' },
+            },
+            location: {
+                presence: { allowEmpty: false, message: ': Vị trí thiết bị không được để trống' },
+            }
+        };
+
+        // create device
+        $('.add-new').click(function () {
+            $('#createModalTitle').html('Thêm thiết bị')
+            $('#updateDeviceBtn').hide();
+            $('#addDeviceBtn').show();
+            $('#device_code').attr('readonly', false);
+            $('#sn_number').attr('readonly', false);
+            $('#createModalForm input').each(function (index, e) {
+                e.value = '';
+            })
+        })
+        $('#addDeviceBtn').click(function (e) {
+            $('.err-input').html('');
+            var device_code = $('#device_code').val();
+            var device_type_id = $('#device_type_id').val();
+            var device_type = $('#device_type_id option:selected').text();
+            var device_name = $('#device_name').val();
+            var device_model = $('#device_model').val();
+            var sn_number = $('#sn_number').val();
+            var fw_number = $('#fw_number').val();
+            var mfg = $('#mfg').val();
+            var id_user_add_device = $('#idUser').val();
+            var location = $('#location').val();
+            var validation = validate({ device_code, device_name, device_type_id, device_model, sn_number, fw_number, mfg, location }, constraints);
+            if (validation) {
+                //console.log(validation)
+                Object.keys(validation).forEach(key => {
+                    $('#err_' + key).html('  *' + validation[key][0]);
+                    console.log(key, validation[key][0]);
+                });
+                return
+            }
+
+            var data = { device_code: device_code, device_type_id: device_type_id, device_name: device_name, device_model: device_model, sn_number: sn_number, fw_number: fw_number, mfg: mfg, id_user_add_device: id_user_add_device, location: location };
+
+            var url = '/device/create';
+            var method = 'POST'
+            $('#mask').show();
+            fetchData(url, method, data).then(data => {
+                if (data.status == 422) {
+                    var err = data.data.errors[0].msg;
+                    alertAction('failure', err);
+                    $('#mask').hide();
+                } else if (data.status == 201) {
+                    var rowHTML = `<tr id="${data.data.device._id}">
+                        <td class="device_code">${data.data.device.device_code}</td>
+                        <td class="device_type">${device_type}</td>
+                        <td class="device_name">${data.data.device.device_name}</td>
+                        <td class="device_model">${data.data.device.device_model}</td>
+                        <td class="sn_number">${data.data.device.sn_number}</td>
+                        <td class="fw_number">${data.data.device.fw_number}</td>
+                        <td class="mfg">${data.data.device.mfg}</td>
+                        <td nowrap>
+                            <a class="edit" title="Edit" data-toggle="tooltip"><i
+                                    class="material-icons">&#xE254;</i></a>
+                            <a class="delete" id-dev="${data.data.device._id}" title="Delete" data-toggle="tooltip"><i
+                                    class="material-icons">&#xE872;</i></a>
+                        </td>
+                    </tr>`;
+                    $("#deviceTable").append(rowHTML);
+                    $('#createModal').modal('hide');
+                    $('#mask').hide();
+                    alertAction('success', 'Thêm thiết bị thành công! ');
+                    //window.location.reload(true);
+                }
+            });
+        })
+        //
+        $('[data-toggle="tooltip"]').tooltip();
+
+        // Edit row on edit button click
+        $(document).on("click", ".edit", function () {
+            $('.err-input').html('');
+            $('#createModalTitle').html('Sửa thiết bị')
+            var idDevice = $(this).attr('id-dev');
+            $('#updateDeviceBtn').attr('id-dev', idDevice);
+            $('#updateDeviceBtn').show();
+            $('#addDeviceBtn').hide();
+            $('#device_code').val($('#' + idDevice + ' .device_code').text());
+            $('#device_code').attr('readonly', 'readonly');
+            $('#sn_number').attr('readonly', 'readonly');
+            $('#device_type_id option[value="' + $('#' + idDevice + ' .device_type_id').val() + '"]').prop('selected', true);
+            $('#device_name').val($('#' + idDevice + ' .device_name').text());
+            $('#device_model').val($('#' + idDevice + ' .device_model').text());
+            $('#sn_number').val($('#' + idDevice + ' .sn_number').text());
+            $('#fw_number').val($('#' + idDevice + ' .fw_number').text());
+            $('#mfg').val($('#' + idDevice + ' .mfg').text());
+            $('#createModal').modal('show');
+        });
+
+        $('#updateDeviceBtn').click(function (e) {
+            $('.err-input').html('');
+            var device_type_id = $('#device_type_id').val();
+            var device_code = $('#device_code').val();
+            var device_type = $('#device_type_id option:selected').text();
+            var device_name = $('#device_name').val();
+            var device_model = $('#device_model').val();
+            var sn_number = $('#sn_number').val();
+            var fw_number = $('#fw_number').val();
+            var mfg = $('#mfg').val();
+            var id_user_add_device = $('#idUser').val();
+            var location = $('#location').val();
+            var validation = validate({ device_code, device_name, device_type_id, device_model, sn_number, fw_number, mfg, location }, constraints);
+            if (validation) {
+                //console.log(validation)
+                Object.keys(validation).forEach(key => {
+                    $('#err_' + key).html('  *' + validation[key][0]);
+                    console.log(key, validation[key][0]);
+                });
+                return
+            }
+
+            var data = { device_code: device_code, device_type_id: device_type_id, device_name: device_name, device_model: device_model, sn_number: sn_number, fw_number: fw_number, mfg: mfg, id_user_add_device: id_user_add_device, location: location };
+            var url = '/device/update/' + $(this).attr('id-dev');
+            var method = 'PUT'
+            $('#mask').show();
+
+            fetchData(url, method, data).then(data => {
+                if (data.status == 422) {
+                    var err = data.data.errors[0].msg;
+                    alertAction('failure', err);
+                    $('#mask').hide();
+                } else if (data.status == 201) {
+                    $('#deviceTable #' + data.data.device._id + ' .device_code').html(device_code);
+                    $('#deviceTable #' + data.data.device._id + ' .device_type').html(device_type);
+                    $('#deviceTable #' + data.data.device._id + ' .device_name').html(device_name);
+                    $('#deviceTable #' + data.data.device._id + ' .device_model').html(device_model);
+                    $('#deviceTable #' + data.data.device._id + ' .sn_number').html(sn_number);
+                    $('#deviceTable #' + data.data.device._id + ' .fw_number').html(fw_number);
+                    $('#deviceTable #' + data.data.device._id + ' .mfg').html(mfg);
+                    $('#createModal').modal('hide');
+                    $('#mask').hide();
+                    alertAction('success', 'Sửa thiết bị thành công! ');
+                    //window.location.reload(true);
+                }
+            });
+        })
+        // Delete row on delete button click
+        $(document).on("click", ".delete", function () {
+            var idDevice = $(this).attr('id-dev');
+            var deleteRow = $(this).parents("tr");
+            var url = '/device/delete/' + idDevice;
+            var method = 'DELETE';
+            $('#notificationContent').html('Xác nhận xoá thiết bị !');
+            $('#notificationOK').click(function () {
+                $('#mask').show();
+                fetchData(url, method).then(data => {
+                    if (data.status == 400) {
+                        var err = data.data.errors[0].msg;
+                        alert(err);
+                        $('#mask').hide();
+                        alertAction('failure', 'Lỗi dũ liệu gửi lên không hợp lệ ! ');
+                        $('#notificationModal').modal('hide');
+                    } else if (data.status == 201) {
+                        deleteRow.remove();
+                        $(".add-new").removeAttr("disabled");
+                        $('#mask').hide();
+                        $('#notificationModal').modal('hide');
+                        alertAction('success', 'Xoá thiết bị thành công ! ');
+                        //window.location.reload(true);
+                    }
+                }).catch(err => {
+                    $('#mask').hide();
+                    alertAction('failure', 'Lỗi dũ liệu gửi lên không hợp lệ ! ');
+                    $('#notificationModal').modal('hide');
+                });
+            });
+
+            $('#notificationCancel').click(function (e) {
+                $('#notificationOK').click(function () { });
+            })
+            $('#notificationModal').modal('show');
+        });
+    });
+</script>
