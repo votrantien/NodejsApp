@@ -2,10 +2,10 @@
 
 ### login
 POST http://localhost:3000/auth/sign-in/ HTTP/1.1
-Content-Type: application/x-www-form-urlencoded
+Content-Type: application/json
 
-username=admin
-&password=123456789
+{"username":"admin","password":"123456789"}
+
 ### logout
 GET http://localhost:3000/auth/sign-out/ HTTP/1.1
 
@@ -21,11 +21,11 @@ GET http://localhost:3000/user/ HTTP/1.1
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwYzQ5MzUyMmVhNDVjMzhkMDUwNDQ2MiIsImlhdCI6MTYyNDMzNDA5OSwiZXhwIjoxNjI0NTkzMjk5fQ.JqkNUJa0ohoPjqQa1-Y86kxlrz5Clx3aICUVoliZKgU
 ### doi mat khau
 
-PUT http://localhost:3000/user/change-password/usertest28 HTTP/1.1
+PUT http://localhost:3000/user/change-password/admin HTTP/1.1
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwYzQ5MzUyMmVhNDVjMzhkMDUwNDQ2MiIsImlhdCI6MTYyNDMzNDA5OSwiZXhwIjoxNjI0NTkzMjk5fQ.JqkNUJa0ohoPjqQa1-Y86kxlrz5Clx3aICUVoliZKgU
 
-{"old_password":"1234567","new_password":"123456789"}
+{"old_password":"12345678","new_password":"123456789"}
 
 
 # -------------- device
@@ -41,7 +41,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwYzQ5MzUyM
 GET http://localhost:3000/device/list HTTP/1.1
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwYzQ5MzUyMmVhNDVjMzhkMDUwNDQ2MiIsImlhdCI6MTYyNDMzNDA5OSwiZXhwIjoxNjI0NTkzMjk5fQ.JqkNUJa0ohoPjqQa1-Y86kxlrz5Clx3aICUVoliZKgU
 ### sua thong tin thiet bi
-PUT http://localhost:3000/device/update/60c8183ab894f82e102991c2 HTTP/1.1
+PUT http://localhost:3000/device/update/60ceb8390674020c8067c158 HTTP/1.1
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwYzQ5MzUyMmVhNDVjMzhkMDUwNDQ2MiIsImlhdCI6MTYyNDMzNDA5OSwiZXhwIjoxNjI0NTkzMjk5fQ.JqkNUJa0ohoPjqQa1-Y86kxlrz5Clx3aICUVoliZKgU
 

@@ -30,14 +30,14 @@ const requireLogin = async (req, res, next) => {
         jwt.verify(token, process.env.JWT_SECRET, (err, decodedToken) => {
             if (err) {
                 console.log(err.message)
-                res.redirect('/auth/login')
+                res.redirect('/auth/sign-in')
             } else {
                 // console.log(decodedToken)
                 next()
             }
         })
     } else {
-        res.redirect('/auth/login')
+        res.redirect('/auth/sign-in')
     }
 }
 
