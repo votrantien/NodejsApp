@@ -18,11 +18,12 @@
     "express-validator": "^6.12.0",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.12.13",
+    "nodemailer": "^6.6.2",
     "nodemon": "^2.0.7",
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
-    "socket.io": "^2.3.0",
+    "socket.io": "^4.1.2",
     "socket.io-client": "^4.1.2"
   }
 }

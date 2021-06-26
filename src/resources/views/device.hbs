@@ -47,14 +47,14 @@
 
                     {{#each devices}}
                     <tr id="{{this._id}}">
-                        <td class="device_code">{{this.device_code}}</td>
-                        <td class="device_type">{{this.device_type.device_type}}</td>
-                        <input type="hidden" class="device_type_id" value="{{this.device_type._id}}">
-                        <td class="device_name">{{this.device_name}}</td>
-                        <td class="device_model">{{this.device_model}}</td>
-                        <td class="sn_number">{{this.sn_number}}</td>
-                        <td class="fw_number">{{this.fw_number}}</td>
-                        <td class="mfg">{{this.mfg}}</td>
+                        <td class="device_code" nowrap>{{this.device_code}}</td>
+                        <td class="device_type" nowrap>{{this.device_type.device_type}}</td>
+                        <input type="hidden" class="device_type_id" value="{{this.device_type._id}}" nowrap>
+                        <td class="device_name" nowrap>{{this.device_name}}</td>
+                        <td class="device_model" nowrap>{{this.device_model}}</td>
+                        <td class="sn_number" nowrap>{{this.sn_number}}</td>
+                        <td class="fw_number" nowrap>{{this.fw_number}}</td>
+                        <td class="mfg" nowrap>{{this.mfg}}</td>
                         {{!-- <td>{{this.location}}</td> --}}
                         <td nowrap>
                             <a class="edit" id-dev="{{this._id}}" title="Edit" data-toggle="tooltip"><i

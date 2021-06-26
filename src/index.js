@@ -1,4 +1,5 @@
 const express = require('express')
+const nodemailer = require("nodemailer");
 const dotenv = require('dotenv').config()
 const mongoose = require('mongoose')
 const path = require("path")
@@ -15,8 +16,10 @@ const server = http.createServer(app);
 // const { Server } = require("socket.io");
 // const io = new Server(server);
 
-const options = { /* ... */ };
-const io = require('socket.io')(server, options);
+const options = { 
+  allowEIO3: true,
+ };
+const io = require("socket.io")(server, options);
 
 
 //connect db

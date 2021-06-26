@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const db = require("../models")
 const User = db.user
 var { validationResult } = require('express-validator')
+const nodemailer = require("nodemailer")
 
 // handle errors
 const handleErrors = (err) => {
@@ -41,13 +42,35 @@ class UserController {
     }
     async get_profile(req, res) {
         const username = res.locals.user.username
-        try{
-            const user = await User.findOne({username: username}).lean()
-            res.render('profile', {username: username, user_info: user})
-        }catch{
+        try {
+            const user = await User.findOne({ username: username }).lean()
+            res.render('profile', { username: username, user_info: user })
+        } catch {
             res.render('home')
         }
-        
+
+    }
+
+    async post_resetPassword(req, res) {
+        let testAccount = await nodemailer.createTestAccount();
+        let transporter = nodemailer.createTransport({
+            service: "Gmail",
+            auth: {
+                user: "fatbearz94@gmail.com",
+                pass: "Tien22081994"
+            }
+        });
+
+        let info = await transporter.sendMail({
+            from: '"Thuỷ canh" <sender@gmail.com>', // sender address
+            to: "votrantienga@gmail.com", // list of receivers
+            subject: "Test send email ✔", // Subject line
+            text: "Hello world?", // plain text body
+            html: "<b>Test chức năng gửi mail ứng dụng Nodejs với Nodemailer</b>" // html body
+        });
+        // console.log("Message sent: %s", info.messageId);
+        // console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
+        res.json(info.messageId)
     }
     async put_changePassword(req, res) {
         const errors = validationResult(req)

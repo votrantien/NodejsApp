@@ -63,6 +63,7 @@ let validateUpdateDevice = [
 
 let validateSignup = [
   body('username', 'Tên user không được để trống').not().isEmpty(),
+  body('email', 'Sai định dạng email').isEmail().normalizeEmail(),
   body('username').custom((value, { req }) => {
     return User.findOne({ username: value }).then(user => {
       if (user) {
