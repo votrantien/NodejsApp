@@ -5,7 +5,7 @@ const DeviceType = db.deviceType
 // handle errors
 const handleErrors = (err) => {
     console.log(err.message, err.code)
-    let errors = { 
+    let errors = {
         device_code: '',
     }
 
@@ -36,11 +36,11 @@ class DeviceTypeController {
         res.render('device_type', { username: res.locals.user.username, farm: res.locals.user.farm })
     }
     async post_create(req, res) {
-        // console.log(req.body)
-        const { device_type_code, prefix, device_type } = req.body
-        const type_properties = JSON.parse(req.body.type_properties)
+        console.log(req.body)
+        const { prefix, device_type, description } = req.body
+        // const type_properties = JSON.parse(req.body.type_properties)
         try {
-            const deviceType = await DeviceType.create({ device_type_code, prefix, device_type, type_properties })
+            const deviceType = await DeviceType.create({ prefix, device_type, description })
             res.status(201).json({ device_type: deviceType._id })
         }
         catch (err) {
@@ -87,7 +87,7 @@ class DeviceTypeController {
                 device_model: req.body.device_model,
                 fw_number: req.body.fw_number,
                 location: req.body.location,
-                })
+            })
             // await device.save()
             // console.log(device)
             res.status(201).json({ device: device })

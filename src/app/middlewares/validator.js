@@ -33,9 +33,32 @@ let validateCreateDevice = [
     });
   }),
   body('fw_number', 'Nhập fw_number thiết bị').not().isEmpty(),
-  body('mfg', 'Nhập mfg thiết bị').not().isEmpty(),
-  body('id_user_add_device', 'Nhập id người dùng thêm thiết bị').not().isEmpty(),
-  body('location', 'Nhập vị trí thiết bị').not().isEmpty(),
+  body('hw_number', 'Nhập hw_number thiết bị').not().isEmpty(),
+  body('mfg_date', 'Nhập mfg_date thiết bị').not().isEmpty(),
+  body('id_user_add_device', 'Nhập id người dùng đăng ký thiết bị').not().isEmpty(),
+  body('group_device', 'Nhập nhóm thiết bị').not().isEmpty(),
+]
+
+let validateRegisterDevice = [
+  body('Serial', 'Nhập sn_number thiết bị').not().isEmpty(),
+  body('Serial').custom(value => {
+    return Device.findOne({ sn_number: value }).then(device => {
+      if (device) {
+        return Promise.reject('Mã sn_number đã tồn tại');
+      }
+    });
+  }),
+  body('Serial').custom((value) => {
+    return DeviceType.findOne({ prefix: value.slice(0,4) }).then(DeviceType => {
+      if (!DeviceType) {
+        return Promise.reject('Model thiết bị không có trong database');
+      }
+    });
+  }),
+  body('Fw', 'Nhập fw_number thiết bị').not().isEmpty(),
+  body('Hw', 'Nhập hw_number thiết bị').not().isEmpty(),
+  body('Date', 'Nhập mfg_date thiết bị').not().isEmpty(),
+  body('Country', 'Nhập Country thiết bị').not().isEmpty(),
 ]
 
 let validateUpdateDevice = [
@@ -99,6 +122,7 @@ let validate = {
   validateUpdateDevice: validateUpdateDevice,
   validateSignup: validateSignup,
   validateChangePassword: validateChangePassword,
+  validateRegisterDevice:validateRegisterDevice,
 };
 
 module.exports = { validate };

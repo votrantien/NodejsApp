@@ -25,13 +25,14 @@ const io = require("socket.io")(server, options);
 //connect db
 const db = require("./app/models")
 const dbConfig = require("./app/config/db")
-
+// `mongodb://${process.env.DB_HOST}:${dbConfig.PORT}/${dbConfig.DB}`
 mongoose.set('useCreateIndex', true)
 db.mongoose
-  .connect(`mongodb://${process.env.DB_HOST}:${dbConfig.PORT}/${dbConfig.DB}`, {
+  .connect(`${process.env.CLOUD_MONGO}/${dbConfig.DB}`, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    useFindAndModify: false
+    useFindAndModify: false,
+    serverSelectionTimeoutMS: 5000,
   })
   .then(() => {
     console.log("Successfully connect to MongoDB.")

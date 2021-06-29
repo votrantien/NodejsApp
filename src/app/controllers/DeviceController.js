@@ -42,6 +42,31 @@ class DeviceController {
         // console.log(device)
         res.render('device', { username: res.locals.user.username, farm: res.locals.user.farm, idUser: res.locals.user.id, devices: device, device_types: device_type })
     }
+
+    async post_RegisterDevice(req, res, next) {
+        const errors = validationResult(req)
+        if (!errors.isEmpty()) {
+            res.status(422).json({ errors: errors.array() })
+            return
+        }
+        try {
+            const {Serial, Fw, Hw, Date, Country } = req.body
+            const device_model = Serial.slice(0, 4)
+            const serial_number = Serial.slice(4)
+            const device_type = await DeviceType.findOne({ prefix: device_model })
+            const device_name = `${device_type.device_type} - ${serial_number}`
+            const id_user_add_device = res.locals.user._id
+            // return res.status(201).json({ Serial, Fw, Hw, Date, Country, device_model, device_type,device_name})
+            const device = await Device.create({ device_type: device_type._id, device_name, device_model, sn_number:Serial, fw_number:Fw, hw_number:Hw, group_device:'null', mfg_date: Date, user_add_device: id_user_add_device, country:Country })
+            res.status(201).json({ device: device })
+        }
+        catch (err) {
+            // console.log(err)
+            const errors = handleErrors(err)
+            res.status(400).json({ errors })
+        }
+    }
+
     async post_create(req, res, next) {
         const errors = validationResult(req)
         if (!errors.isEmpty()) {

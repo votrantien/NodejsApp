@@ -5,6 +5,7 @@ const { requireAuth,requireLogin } = require('../middlewares/authMiddleware')
 const { validate } = require('../middlewares/validator')
 
 router.get('/', requireLogin,deviceController.index)
+router.post('/register-device', requireAuth, validate.validateRegisterDevice,deviceController.post_RegisterDevice)
 router.post('/create', requireAuth, validate.validateCreateDevice,deviceController.post_create)
 router.get('/list', requireAuth,deviceController.get_list)
 router.get('/:id', requireAuth,deviceController.get_device)
