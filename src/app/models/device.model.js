@@ -32,14 +32,16 @@ const deviceSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Xin nhập mfg_date'],
   },
+  token: {
+    type: String,
+    required: [true, 'Xin nhập token'],
+  },
   user_add_device:{ type: Schema.Types.ObjectId, ref: 'User' },
   user_active_device:{ type: Schema.Types.ObjectId, ref: 'User' },
   active_date: {type: Date},
-  group_device:{
-      type: String,
-      default: null,
-  },
   device_property: {},
+  group: {type: Schema.Types.ObjectId, ref: 'GroupDevice', default: null},
+  gateway: {type: String, default: 'none'},
   status: {type: Number, default: 0},
 });
 

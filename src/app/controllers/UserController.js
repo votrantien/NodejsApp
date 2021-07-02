@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt');
 const db = require("../models")
 const User = db.user
+const Group = db.group
 var { validationResult } = require('express-validator')
 const nodemailer = require("nodemailer")
 
@@ -40,6 +41,7 @@ class UserController {
             })
         res.json({ user, token })
     }
+
     async get_profile(req, res) {
         const username = res.locals.user.username
         try {
@@ -47,6 +49,23 @@ class UserController {
             res.render('profile', { username: username, user_info: user })
         } catch {
             res.render('home')
+        }
+
+    }
+
+    async get_user(req, res) {
+        try {
+            const username = req.params.username
+            const userId = req.body.decodedToken.id
+            const user = await User.findOne({ username: username })
+            if (user) {
+                const group_device = await Group.find({ manage_user: username })
+                res.json({ user, group_device })
+            } else {
+                res.json({ msg: 'Không tìm thấy user' })
+            }
+        } catch (err) {
+            res.json({ err })
         }
 
     }

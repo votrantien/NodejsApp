@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
-const siteController = require('../controllers/SiteController')
+const GroupDeviceController = require('../controllers/GroupDeviceController')
 
-router.get('/', siteController.index)
+router.get('/', GroupDeviceController.index)
 
 module.exports = router;

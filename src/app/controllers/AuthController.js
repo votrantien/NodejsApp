@@ -1,5 +1,6 @@
 const db = require("../models")
 const User = db.user
+const Group = db.group
 const jwt = require('jsonwebtoken')
 var { validationResult } = require('express-validator')
 
@@ -61,12 +62,13 @@ module.exports.signup_post = async (req, res) => {
         return
     }
     try {
-        const { username, password, farm, email } = req.body
+        const { username, password, fullname, phone, email, groupname } = req.body
         const role = 'user'
-        const user = await User.create({ username, email, password, farm, role })
+        const user = await User.create({ username, email, password, fullname, phone, role })
+        const default_group = await Group.create({group_name: `${groupname} - ${username}`,manage_user: user.username,access_user:null})
         //const token = createToken(user._id)
         //res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000 })
-        res.status(201).json({ user: user._id })
+        res.status(201).json({ user: user, default_group })
     }
     catch (err) {
         // console.log(err)

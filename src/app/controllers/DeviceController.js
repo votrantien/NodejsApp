@@ -50,15 +50,37 @@ class DeviceController {
             return
         }
         try {
-            const {Serial, Fw, Hw, Date, Country } = req.body
+            const { Serial, Fw, Hw, Date, Country, Token } = req.body
             const device_model = Serial.slice(0, 4)
             const serial_number = Serial.slice(4)
             const device_type = await DeviceType.findOne({ prefix: device_model })
             const device_name = `${device_type.device_type} - ${serial_number}`
-            const id_user_add_device = res.locals.user._id
+            const id_user_add_device = '60c493522ea45c38d0504462'
             // return res.status(201).json({ Serial, Fw, Hw, Date, Country, device_model, device_type,device_name})
-            const device = await Device.create({ device_type: device_type._id, device_name, device_model, sn_number:Serial, fw_number:Fw, hw_number:Hw, group_device:'null', mfg_date: Date, user_add_device: id_user_add_device, country:Country })
+            const device = await Device.create({ device_type: device_type._id, device_name, device_model, sn_number: Serial, token: Token, fw_number: Fw, hw_number: Hw, group_device: 'null', mfg_date: Date, user_add_device: id_user_add_device, country: Country })
             res.status(201).json({ device: device })
+        }
+        catch (err) {
+            // console.log(err)
+            const errors = handleErrors(err)
+            res.status(400).json({ errors })
+        }
+    }
+
+    async get_ActiveDevice(req, res, next) {
+        const errors = validationResult(req)
+        if (!errors.isEmpty()) {
+            res.status(422).json({ errors: errors.array() })
+            return
+        }
+        try {
+            const { token, serial, group, active_user } = req.query
+            const update = await Device.updateOne({ sn_number: serial }, { group, user_active_device: active_user })
+            if(update.nModified == 1){
+                res.status(201).json({ msg : "Active thành công" })
+            }else{
+                res.status(201).json({ msg : "Đã active vào group này" })
+            }
         }
         catch (err) {
             // console.log(err)

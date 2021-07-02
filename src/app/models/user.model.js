@@ -13,12 +13,19 @@ const userSchema = new mongoose.Schema({
     required: [true, 'Please enter an email'],
     unique: true,
   },
+  fullname: {
+    type: String,
+    required: [true, 'Please enter an fullname'],
+  },
+  phone: {
+    type: Number,
+    required: [true, 'Please enter an phone'],
+  },
   password: {
     type: String,
     required: [true, 'Please enter a password'],
     minlength: [6, 'Minimum password length is 6 characters'],
   },
-  farm: {type: String, required: true, trim: true},
   role: {type: String, required: true, trim: true},
   status: {type: Number, default: 1},
 });

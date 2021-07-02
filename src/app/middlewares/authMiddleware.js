@@ -1,19 +1,20 @@
 const jwt = require('jsonwebtoken')
 const User = require('../models/user.model')
 
-const requireAuth = (req, res, next) => {
+const requireAuth = async (req, res, next) => {
     const authHeader = req.headers['authorization'] && req.headers['authorization'].split(' ')[1]
     // console.log(authHeader)
     const token = req.cookies.jwt || authHeader
     // console.log(authHeader.split(' ')[1])
     // check json web token exists & is verified
     if (token) {
-        jwt.verify(token, process.env.JWT_SECRET, (err, decodedToken) => {
+        await jwt.verify(token, process.env.JWT_SECRET, (err, decodedToken) => {
             if (err) {
                 console.log(err.message)
                 res.status(401).json({ errors: 'Unauthorize' })
             } else {
                 // console.log(decodedToken)
+                req.body.decodedToken = decodedToken
                 next()
             }
         })
