@@ -11,12 +11,12 @@ const handleErrors = (err) => {
 
     // incorrect email
     if (err.message === 'incorrect username') {
-        errors.username = 'That username is not registered'
+        errors.username = 'Sai tên đăng nhập hoặc user không tồn tại'
     }
 
     // incorrect password
     if (err.message === 'incorrect password') {
-        errors.password = 'That password is incorrect'
+        errors.password = 'Mật khẩu không đúng'
     }
 
     // duplicate email error
@@ -64,8 +64,11 @@ module.exports.signup_post = async (req, res) => {
     try {
         const { username, password, fullname, phone, email, groupname } = req.body
         const role = 'user'
+        let default_group 
         const user = await User.create({ username, email, password, fullname, phone, role })
-        const default_group = await Group.create({group_name: `${groupname} - ${username}`,manage_user: user.username,access_user:null})
+        if(user){
+            default_group = await Group.create({group_name: `${groupname} - ${username}`,manage_user: user.username,access_user:null})
+        }
         //const token = createToken(user._id)
         //res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000 })
         res.status(201).json({ user: user, default_group })

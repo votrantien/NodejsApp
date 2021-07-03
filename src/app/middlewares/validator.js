@@ -88,9 +88,17 @@ let validateUpdateDevice = [
 
 let validateSignup = [
   body('username', 'Tên user không được để trống').not().isEmpty(),
+  body('username', 'Tên user gồm các chữ cái và số viết liền không dấu').isAlphanumeric(),
   body('email', 'Sai định dạng email').isEmail().normalizeEmail(),
-  body('username').custom((value, { req }) => {
-    return User.findOne({ username: value }).then(user => {
+  body('email').custom( (value) => {
+    return  User.findOne({ email: value }).then(user => {
+      if (user) {
+        return Promise.reject('email đã tồn tại')
+      }
+    })
+  }),
+  body('username').custom( (value) => {
+    return  User.findOne({ username: value }).then(user => {
       if (user) {
         return Promise.reject('User name đã tồn tại')
       }
@@ -99,6 +107,7 @@ let validateSignup = [
   body('password', 'Password không được để trống').not().isEmpty(),
   body('fullname', 'fullname không được để trống').not().isEmpty(),
   body('phone', 'phone không được để trống').not().isEmpty(),
+  body('phone', 'phone phải là số').isInt([{ allow_leading_zeroes: true }]),
   body('groupname', 'groupname không được để trống').not().isEmpty(),
 ]
 
@@ -122,8 +131,8 @@ let validateChangePassword = [
 ]
 
 let validateActiveDevice = [
-  query('serial', 'serial không được để trống').not().isEmpty(),
-  query('serial').custom(async (value) => {
+  body('serial', 'serial không được để trống').not().isEmpty(),
+  body('serial').custom(async (value) => {
     const device = await Device.findOne({ sn_number: value })
     if (!device) {
       return Promise.reject('device active không tồn tại')
@@ -131,8 +140,8 @@ let validateActiveDevice = [
       return true
     }
   }),
-  query('token', 'Token không được để trống').not().isEmpty(),
-  query('token').custom(async (value,{req}) => {
+  body('token', 'Token không được để trống').not().isEmpty(),
+  body('token').custom(async (value,{req}) => {
     const decode = await jwt.verify(value, process.env.JWT_SECRET, async (err, decodedToken) => {
       if (err) {
         return Promise.reject('Token không hợp lệ')
@@ -142,11 +151,11 @@ let validateActiveDevice = [
           return Promise.reject('user active không tồn tại')
         }
       }
-      req.query.active_user = decodedToken.id
+      req.body.active_user = decodedToken.id
     })
   }),
-  query('group', 'group không được để trống').not().isEmpty(),
-  query('group').custom(async (value) => {
+  body('group', 'group không được để trống').not().isEmpty(),
+  body('group').custom(async (value) => {
     try {
       const group = await Group.findById(value)
       if (!group) {

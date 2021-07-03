@@ -67,14 +67,14 @@ class DeviceController {
         }
     }
 
-    async get_ActiveDevice(req, res, next) {
+    async post_ActiveDevice(req, res, next) {
         const errors = validationResult(req)
         if (!errors.isEmpty()) {
             res.status(422).json({ errors: errors.array() })
             return
         }
         try {
-            const { token, serial, group, active_user } = req.query
+            const { token, serial, group, active_user } = req.body
             const update = await Device.updateOne({ sn_number: serial }, { group, user_active_device: active_user })
             if(update.nModified == 1){
                 res.status(201).json({ msg : "Active thành công" })
@@ -111,10 +111,9 @@ class DeviceController {
 
     async get_list(req, res) {
         // console.log(req.params.location)
-        const location = res.locals.user ? res.locals.user.farm : ''
         // console.log(res.locals.user)
         try {
-            const device = await Device.find({ location: location }).populate('device_type').populate('id_user_add_device', 'username').populate('id_user_active_device', 'username')
+            const device = await Device.find().populate('device_type').populate('user_active_device', 'username').populate('user_active_device', 'username').populate('group')
             res.status(201).json({ device: device })
         }
         catch (err) {
@@ -122,6 +121,20 @@ class DeviceController {
             // const errors = handleErrors(err)
             res.status(400).json({ err })
         }
+    }
+
+    get_getTimeServer(req, res) {
+        // console.log(res.locals.user)
+        const today = new Date()
+        const yyyy = today.getFullYear()
+        const MM = String(today.getMonth() + 1).padStart(2, '0')
+        const dd = String(today.getDate()).padStart(2, '0')
+        const hh = String(today.getHours()).padStart(2, '0')
+        const mm = String(today.getMinutes()).padStart(2, '0')
+        const ss = String(today.getSeconds()).padStart(2, '0')
+        const DayOfWeek = today.getDay()
+
+        res.json({Servertime: `${dd}-${MM}-${yyyy}-${hh}-${mm}-${ss}-${DayOfWeek}`})
     }
 
     async get_device(req, res) {
