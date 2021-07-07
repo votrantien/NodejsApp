@@ -1,0 +1,12 @@
+<h1>device_value</h1>
+<p id="value"></p>
+<script src="/socket.io/socket.io.js"></script>
+
+<script type="text/javascript">
+    var socket = io();
+
+
+    socket.on('server_data_sensor', function(data){
+        $('#value').html(data)
+    })
+</script>

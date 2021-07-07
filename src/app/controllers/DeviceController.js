@@ -36,11 +36,20 @@ class DeviceController {
 
     //GET trả về trang home
     async index(req, res) {
-        const location = res.locals.user.farm
-        const device = await Device.find({ location: location }).populate('device_type').populate('id_user_add_device', 'username').populate('id_user_active_device', 'username').lean()
+        const device = await Device.find().populate('device_type').populate('user_active_device', 'username').populate('user_active_device', 'username').populate('group').lean()
         const device_type = await DeviceType.find().lean()
         // console.log(device)
         res.render('device', { username: res.locals.user.username, farm: res.locals.user.farm, idUser: res.locals.user.id, devices: device, device_types: device_type })
+    }
+
+    async get_DeviceValue(req, res) {
+        // console.log(device)
+        res.render('device_value',{username: res.locals.user.username})
+    }
+
+    async post_AddDeviceValue(req, res) {
+        // console.log(device)
+        res.status(201).json({ device: device })
     }
 
     async post_RegisterDevice(req, res, next) {

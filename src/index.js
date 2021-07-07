@@ -76,6 +76,10 @@ io.on("connection", function (Socket) {
   Socket.on('CONFIG_SUCCESS', (data) => {
     io.emit('CONFIG_SUCCESS', data)
   })
+  Socket.on('data_sensor', (data) => {
+    console.log(data)
+    io.emit('server_data_sensor', data)
+  })
 })
 
 route(app)
