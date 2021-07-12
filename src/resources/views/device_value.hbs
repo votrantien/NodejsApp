@@ -1,4 +1,22 @@
-<h1>device_value</h1>
+
+<div class="container">
+    <div class="row">
+        {{#each groups as |group|}}
+        <div class="col-lg-12 group_device">
+            <h4 class="group_name">{{group.group_name}}</h4>
+            {{#each ../devices as |device|}}
+            {{#if_eq group._id device.group._id}}
+            <div class="col-lg-2 device">
+                <p class="value">50 <i class="uom">%</i></p>
+                <p class="serial">{{device.sn_number}}</p>
+                <p class="device_type">{{device.device_type.device_type}}</p>
+            </div>
+            {{/if_eq}}
+            {{/each}}
+        </div>
+        {{/each}}
+    </div>
+</div>
 <p id="value"></p>
 <script src="/socket.io/socket.io.js"></script>
 
@@ -6,7 +24,8 @@
     var socket = io();
 
 
-    socket.on('server_data_sensor', function(data){
+    socket.on('server_data_sensor', function (data) {
         $('#value').html(data)
     })
+
 </script>

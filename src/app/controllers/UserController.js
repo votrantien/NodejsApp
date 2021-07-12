@@ -55,11 +55,12 @@ class UserController {
 
     async get_user(req, res) {
         try {
-            const username = req.params.username
+            // const username = req.params.username
             const userId = req.body.decodedToken.id
-            const user = await User.findOne({ username: username })
+            console.log(userId)
+            const user = await User.findById(userId)
             if (user) {
-                const group_device = await Group.find({ manage_user: username })
+                const group_device = await Group.find({ manage_user: user.username })
                 res.json({ user, group_device })
             } else {
                 res.json({ msg: 'Không tìm thấy user' })

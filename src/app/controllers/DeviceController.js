@@ -2,6 +2,7 @@ const db = require("../models")
 const User = db.user
 const Device = db.device
 const DeviceType = db.deviceType
+const GroupDevice = db.group
 var { validationResult } = require('express-validator')
 
 // handle errors
@@ -36,15 +37,32 @@ class DeviceController {
 
     //GET trả về trang home
     async index(req, res) {
-        const device = await Device.find().populate('device_type').populate('user_active_device', 'username').populate('user_active_device', 'username').populate('group').lean()
+        const user = res.locals.user
+        let device
+        const groups = await GroupDevice.find({ manage_user: user.username }).lean()
+        if (user.role == 'admin') {
+            device = await Device.find().populate('device_type').populate('user_active_device', 'username').populate('user_active_device', 'username').populate('group').lean()
+        } else {
+            const group_id = groups.map((group) => group._id)
+            device = await Device.find({ group: group_id }).populate('device_type').populate('user_active_device', 'username').populate('user_active_device', 'username').populate('group').lean()
+        }
         const device_type = await DeviceType.find().lean()
         // console.log(device)
-        res.render('device', { username: res.locals.user.username, farm: res.locals.user.farm, idUser: res.locals.user.id, devices: device, device_types: device_type })
+        res.render('device', { username: res.locals.user.username, groups, idUser: res.locals.user.id, devices: device, device_types: device_type })
     }
 
     async get_DeviceValue(req, res) {
         // console.log(device)
-        res.render('device_value',{username: res.locals.user.username})
+        const user = res.locals.user
+        let devices
+        const groups = await GroupDevice.find({ manage_user: user.username }).lean()
+        if (user.role == 'admin') {
+            devices = await Device.find().populate('device_type').populate('user_active_device', 'username').populate('user_active_device', 'username').populate('group').lean()
+        } else {
+            const group_id = groups.map((group) => group._id)
+            devices = await Device.find({ group: group_id }).populate('device_type').populate('user_active_device', 'username').populate('user_active_device', 'username').populate('group').lean()
+        }
+        res.render('device_value', { username: res.locals.user.username, devices: devices, groups: groups })
     }
 
     async post_AddDeviceValue(req, res) {
@@ -85,10 +103,10 @@ class DeviceController {
         try {
             const { token, serial, group, active_user } = req.body
             const update = await Device.updateOne({ sn_number: serial }, { group, user_active_device: active_user })
-            if(update.nModified == 1){
-                res.status(201).json({ msg : "Active thành công" })
-            }else{
-                res.status(201).json({ msg : "Đã active vào group này" })
+            if (update.nModified == 1) {
+                res.status(201).json({ msg: "Active thành công" })
+            } else {
+                res.status(201).json({ msg: "Đã active vào group này" })
             }
         }
         catch (err) {
@@ -122,7 +140,15 @@ class DeviceController {
         // console.log(req.params.location)
         // console.log(res.locals.user)
         try {
-            const device = await Device.find().populate('device_type').populate('user_active_device', 'username').populate('user_active_device', 'username').populate('group')
+            const user = res.locals.user
+            let device
+            const groups = await GroupDevice.find({ manage_user: user.username }).lean()
+            if (user.role == 'admin') {
+                device = await Device.find().populate('device_type').populate('user_active_device', 'username').populate('user_active_device', 'username').populate('group').lean()
+            } else {
+                const group_id = groups.map((group) => group._id)
+                device = await Device.find({ group: group_id }).populate('device_type').populate('user_active_device', 'username').populate('user_active_device', 'username').populate('group').lean()
+            }
             res.status(201).json({ device: device })
         }
         catch (err) {
@@ -141,9 +167,9 @@ class DeviceController {
         const hh = String(today.getHours()).padStart(2, '0')
         const mm = String(today.getMinutes()).padStart(2, '0')
         const ss = String(today.getSeconds()).padStart(2, '0')
-        const DayOfWeek = today.getDay()
+        const DayOfWeek = today.getDay() + 1
 
-        res.json({Servertime: `${dd}-${MM}-${yyyy}-${hh}-${mm}-${ss}-${DayOfWeek}`})
+        res.json({ Servertime: `${dd}-${MM}-${yyyy}-${hh}-${mm}-${ss}-${DayOfWeek}` })
     }
 
     async get_device(req, res) {
