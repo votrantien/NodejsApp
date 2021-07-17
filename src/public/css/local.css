@@ -6419,13 +6419,38 @@ table.tablesorter thead tr th:hover {
       }
 
   /* device value */
-  .group_device{
-    padding: 10px;
-  }
+ .btn-on{
+   position: relative;
+ }
+ .btn:focus, .btn:active:focus, .btn.active:focus{
+   outline: none;
+ }
+ .btn-on::after{
+   background-color: #2aff2a;
+   content: "";
+   width: 10px;
+   height: 5px;
+   position: absolute;
+   top: 0;
+   right: 0;
+ }
 
-  .group_device .device{
-    background-color: rgba(46, 46, 46, 0.5);
-    padding: 15px;
-    text-align: center;
-    margin: 15px;
-  }
+ .label-device{
+   font-size: 1.2rem;
+   outline: 2px solid #5dc900;
+   padding: 5px;
+   margin-left: 5px;
+   border-radius: 20%;
+ }
+
+ .label-device p{
+    padding: 0;
+    margin: 0;
+    text-align: left;
+ }
+
+ .label-device .value{
+  font-size: 1.6rem;
+  font-weight: bold;
+  text-align: right;
+}

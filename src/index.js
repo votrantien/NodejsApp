@@ -9,6 +9,8 @@ const app = express()
 const PORT = process.env.PORT || 3000
 var cookieParser = require('cookie-parser')
 app.use(cookieParser())
+//chartjs
+const Chart = require('chart.js');
 
 //socket io
 const http = require('http');
@@ -16,9 +18,9 @@ const server = http.createServer(app);
 // const { Server } = require("socket.io");
 // const io = new Server(server);
 
-const options = { 
+const options = {
   allowEIO3: true,
- };
+};
 const io = require("socket.io")(server, options);
 
 
@@ -57,10 +59,18 @@ app.engine('hbs', handlebars({
 var hbs = require('handlebars');
 
 hbs.registerHelper('if_eq', function (a, b, opts) {
-  if (a.toString() == b.toString()) {
+    if (a.toString() == b.toString()) {
       return opts.fn(this);
-  } else {
+    } else {
       return opts.inverse(this);
+    }
+});
+
+hbs.registerHelper('if_neq', function (a, b, opts) {
+  if (a.toString() != b.toString()) {
+    return opts.fn(this);
+  } else {
+    return opts.inverse(this);
   }
 });
 
@@ -76,6 +86,8 @@ app.use(function (req, res, next) {
 });
 
 io.on("connection", function (Socket) {
+  const socketName = Socket.handshake.query.socketName;
+  // console.log(socketName);
   // console.log(Socket.id)
   Socket.on('WEB_SET_UP_DEVICE', (data) => {
     let datajson = JSON.stringify({ EC_MAX: data.EC_MAX, PH_MAX: data.EC_MAX })
@@ -89,6 +101,26 @@ io.on("connection", function (Socket) {
     console.log(data)
     io.emit('server_data_sensor', data)
   })
+
+  //start real time device
+  Socket.on('start_real_time_device', (data) => {
+    const { list_devices, socketName } = data;
+    //console.log(list_devices, socketName)
+    list_devices.forEach(e => {
+      const dataSend = JSON.stringify({serial: e, socketName})
+      io.emit('start_real_time_device', dataSend)
+    });
+  })
+
+  Socket.on('device_send_value', (data) => {
+    const { serial, socketName, Data } = JSON.parse(data);
+    console.log(serial, socketName, Data)
+    io.emit(socketName, {serial,Data})
+  })
+  //disconnect
+  Socket.on("disconnect", (reason) => {
+    io.emit('end_real_time_device', socketName)
+  });
 })
 
 route(app)

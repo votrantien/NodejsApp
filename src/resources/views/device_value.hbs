@@ -1,5 +1,40 @@
-
-<div class="container">
+<div id="page-wrapper">
+    <div class="row">
+        <input type="hidden" value="{{username}}" id="socketName">
+        {{#each groups as |group|}}
+        <div class="col-lg-12 group_device" id="{{group._id}}">
+            <h4 class="group_name">{{group.group_name}}</h4>
+            {{#each ../device_types as |device_type|}}
+            {{#if_neq device_type.prefix 'AHSD'}}
+            <button type="button" class="btn btn-default sensor-btn" type-id="{{device_type._id}}"
+                dev-type="{{device_type.prefix}}">
+                {{device_type.device_type}}
+            </button>
+            <div class="col-lg-12 device collapse" dev-type="{{device_type.prefix}}">
+                <hr>
+                <h4>{{device_type.device_type}}</h4>
+                {{#each ../../devices as |device|}}
+                {{#if_eq group._id device.group._id}}
+                {{#if_eq device.device_type.prefix device_type.prefix}}
+                <div class="col-lg-2 label-device label-{{device_type.prefix}}" dev-sn="{{device.sn_number}}"
+                    dev-type="{{device_type.prefix}}">
+                    <p class="value" id="val-{{device.sn_number}}">50</p>
+                    <p class="serial">S/n: {{device.sn_number}}</p>
+                    <p class="name">Name: {{device.device_name}}</p>
+                </div>
+                {{/if_eq}}
+                {{/if_eq}}
+                {{/each}}
+                <canvas id="chart-{{group._id}}-{{device_type.prefix}}" width="400" height="150"></canvas>
+            </div>
+            {{/if_neq}}
+            {{/each}}
+        </div>
+        {{/each}}
+    </div>
+    <!-- /.row -->
+</div>
+{{!-- <div class="container">
     <div class="row">
         {{#each groups as |group|}}
         <div class="col-lg-12 group_device">
@@ -16,16 +51,88 @@
         </div>
         {{/each}}
     </div>
-</div>
-<p id="value"></p>
+</div> --}}
 <script src="/socket.io/socket.io.js"></script>
-
+<script src="/js/chart.min.js"></script>
 <script type="text/javascript">
-    var socket = io();
+    $(document).ready(function () {
+        var socketName = $('#socketName').val();
+        var socket = io('', { query: `socketName=${socketName}` });
 
 
-    socket.on('server_data_sensor', function (data) {
-        $('#value').html(data)
+        socket.on('server_data_sensor', function (data) {
+            $('#value').html(data)
+        })
+        //socket start real time device
+        async function StartRealTime() {
+            var list_devices = [];
+            $('.group_device .device').each(function () {
+                list_devices.push($(this).attr('dev-sn'))
+            })
+            //console.log(list_devices)
+            socket.emit('start_real_time_device', { list_devices, socketName });
+        }
+        socket.on(socketName, function (data) {
+            //console.log(data);
+            var serial = data.serial;
+            var value = data.Data;
+            $(`#val-${serial}`).html(value);
+        })
+        StartRealTime();
+
+        //Event menu
+        $(document).on("click", ".sensor-btn", function () {
+            var group_id = $(this).parent().attr('id');
+            var dev_type = $(this).attr('dev-type');
+            var idChart = `chart-${group_id}-${dev_type}`;
+            const chart = Chart.getChart(idChart);
+            if(!chart){
+                DrawChart(idChart);
+            }
+            $(`#${group_id} .sensor-btn[dev-type*="${dev_type}"]`).toggleClass("btn-on");
+            $(`#${group_id} .device[dev-type*="${dev_type}"]`).collapse('toggle');
+        })
     })
+</script>
+
+<script>
+    function DrawChart(idCanvas) {
+        var ctx = document.getElementById(idCanvas);
+        if(ctx)
+        var myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+                datasets: [{
+                    label: '# of Votes',
+                    data: [1, 4, 3, 5, 2, 3],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
 
 </script>

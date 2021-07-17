@@ -55,14 +55,21 @@ class DeviceController {
         // console.log(device)
         const user = res.locals.user
         let devices
-        const groups = await GroupDevice.find({ manage_user: user.username }).lean()
+        let groups
+        const device_types = await DeviceType.find().lean()
         if (user.role == 'admin') {
-            devices = await Device.find().populate('device_type').populate('user_active_device', 'username').populate('user_active_device', 'username').populate('group').lean()
+            groups = await GroupDevice.find().lean()
+            devices = await Device.find().populate('device_type').populate('user_active_device', 'username').populate('group').lean()
         } else {
+            groups = await GroupDevice.find({ manage_user: user.username }).lean()
             const group_id = groups.map((group) => group._id)
-            devices = await Device.find({ group: group_id }).populate('device_type').populate('user_active_device', 'username').populate('user_active_device', 'username').populate('group').lean()
+            devices = await Device.find({ group: group_id }).populate('device_type').populate('user_active_device', 'username').populate('group').lean()
         }
-        res.render('device_value', { username: res.locals.user.username, devices: devices, groups: groups })
+        // devices.sort(function (a, b) {
+        //     return a.device_model.localeCompare(b.device_model);
+        // });
+        console.log(devices)
+        res.render('device_value', { username: res.locals.user.username, devices, groups, device_types })
     }
 
     async post_AddDeviceValue(req, res) {
@@ -84,7 +91,7 @@ class DeviceController {
             const device_name = `${device_type.device_type} - ${serial_number}`
             const id_user_add_device = '60c493522ea45c38d0504462'
             // return res.status(201).json({ Serial, Fw, Hw, Date, Country, device_model, device_type,device_name})
-            const device = await Device.create({ device_type: device_type._id, device_name, device_model, sn_number: Serial, token: Token, fw_number: Fw, hw_number: Hw, group_device: 'null', mfg_date: Date, user_add_device: id_user_add_device, country: Country })
+            const device = await Device.create({ device_type: device_type._id, device_name, device_model, sn_number: Serial, token: Token, fw_number: Fw, hw_number: Hw, group_device: null, mfg_date: Date, user_add_device: id_user_add_device, country: Country, user_active_device: null })
             res.status(201).json({ device: device })
         }
         catch (err) {
@@ -107,6 +114,42 @@ class DeviceController {
                 res.status(201).json({ msg: "Active thành công" })
             } else {
                 res.status(201).json({ msg: "Đã active vào group này" })
+            }
+        }
+        catch (err) {
+            // console.log(err)
+            const errors = handleErrors(err)
+            res.status(400).json({ errors })
+        }
+    }
+
+    async post_InActiveDevice(req, res, next) {
+        const errors = validationResult(req)
+        if (!errors.isEmpty()) {
+            res.status(422).json({ errors: errors.array() })
+            return
+        }
+        try {
+            const { token, serial } = req.body
+            const user = req.body.inactive_user
+            const user_id = user._id
+            const device = await Device.findOne({ sn_number: serial })
+            const user_active_id = device.user_active_device
+            if (user.role != 'admin' && user_active_id) {
+                if (user_active_id.toString() == user_id.toString()) {
+                    const update = await Device.updateOne({ sn_number: serial }, { group: null, user_active_device: null })
+                    if (update.nModified == 1) {
+                        return res.status(201).json({ msg: "Xoá thành công" })
+                    }
+                } else {
+                    return res.status(201).json({ msg: "Không có quyền xoá thiết bị" })
+                }
+            }
+            const update = await Device.updateOne({ sn_number: serial }, { group: null, user_active_device: null })
+            if (update.nModified == 1) {
+                return res.status(201).json({ msg: "Xoá thành công" })
+            } else {
+                return res.status(201).json({ msg: "Device hiện tại không thuộc user nào" })
             }
         }
         catch (err) {

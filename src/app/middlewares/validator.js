@@ -90,15 +90,15 @@ let validateSignup = [
   body('username', 'Tên user không được để trống').not().isEmpty(),
   body('username', 'Tên user gồm các chữ cái và số viết liền không dấu').isAlphanumeric(),
   body('email', 'Sai định dạng email').isEmail().normalizeEmail(),
-  body('email').custom( (value) => {
-    return  User.findOne({ email: value }).then(user => {
+  body('email').custom((value) => {
+    return User.findOne({ email: value }).then(user => {
       if (user) {
         return Promise.reject('email đã tồn tại')
       }
     })
   }),
-  body('username').custom( (value) => {
-    return  User.findOne({ username: value }).then(user => {
+  body('username').custom((value) => {
+    return User.findOne({ username: value }).then(user => {
       if (user) {
         return Promise.reject('User name đã tồn tại')
       }
@@ -141,7 +141,7 @@ let validateActiveDevice = [
     }
   }),
   body('token', 'Token không được để trống').not().isEmpty(),
-  body('token').custom(async (value,{req}) => {
+  body('token').custom(async (value, { req }) => {
     const decode = await jwt.verify(value, process.env.JWT_SECRET, async (err, decodedToken) => {
       if (err) {
         return Promise.reject('Token không hợp lệ')
@@ -169,6 +169,34 @@ let validateActiveDevice = [
   }),
 ]
 
+let validateInActiveDevice = [
+  body('serial', 'serial không được để trống').not().isEmpty(),
+  body('serial').custom(async (value) => {
+    const device = await Device.findOne({ sn_number: value })
+    if (!device) {
+      return Promise.reject('device active không tồn tại')
+    } else {
+      return true
+    }
+  }),
+  body('token', 'Token không được để trống').not().isEmpty(),
+  body('token').custom(async (value, { req }) => {
+    let user
+    const decode = await jwt.verify(value, process.env.JWT_SECRET, async (err, decodedToken) => {
+      if (err) {
+        return Promise.reject('Token không hợp lệ')
+      } else {
+        user = await User.findById(decodedToken.id)
+        if (!user) {
+          return Promise.reject('user inactive không tồn tại')
+        }
+      }
+      req.body.inactive_user = user
+    })
+  }),
+]
+
+
 let validate = {
   validateCreateDevice: validateCreateDevice,
   validateUpdateDevice: validateUpdateDevice,
@@ -176,6 +204,7 @@ let validate = {
   validateChangePassword: validateChangePassword,
   validateRegisterDevice: validateRegisterDevice,
   validateActiveDevice: validateActiveDevice,
+  validateInActiveDevice: validateInActiveDevice,
 }
 
 module.exports = { validate }

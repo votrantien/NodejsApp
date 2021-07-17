@@ -137,7 +137,7 @@ POST http://{{host}}/device/register-device HTTP/1.1
 Content-Type: application/json
 
 {
-   "Serial":"AHSD123456795",
+   "Serial":"NOLX123456794",
    "Action":"registor",
    "Token":"hsvhjv565jhdvzjhv",
    "Fw":"1.00",
@@ -152,9 +152,19 @@ POST http://{{host}}/device/active HTTP/1.1
 Content-Type: application/json
 
 {
-   "serial": "AHSD12345679",
-   "group": "60dfce07ceeb700f240a2c9b",
-   "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwZGU5YTZkMWZjNThhMWNlYzAyMTY0MCIsImlhdCI6MTYyNTIwMTI2NCwiZXhwIjoxNjI1NDYwNDY0fQ.cAUU8AOMwYV3RUWlknsPrld0ihgsZDhRxaa_6hj_q0g"
+   "serial": "NOLX123456794",
+   "group": "60dfdee653d79310d4c4cb2c",
+   "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwZTk3NzQ5NTE3MzIyMTZkOGFjNTQ1OSIsImlhdCI6MTYyNjQwNjc5MywiZXhwIjoxNjI2NjY1OTkzfQ.9ywpI3zMx046y2DX7cQdj_O15T8am5OMTSuTQVLQHHQ"
+}
+
+### xoá tb khỏi user
+
+POST http://{{host}}/device/in-active HTTP/1.1
+Content-Type: application/json
+
+{
+   "serial": "AHSD12345675",
+   "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwZTk3NzQ5NTE3MzIyMTZkOGFjNTQ1OSIsImlhdCI6MTYyNjE3NTc1OSwiZXhwIjoxNjI2NDM0OTU5fQ.mTRt2NG8rRVWpGE1dFNAgxgtNBX7Xb2ojvpejqotWog"
 }
 
 ### lấy thông tin user và group
