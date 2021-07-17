@@ -6419,6 +6419,10 @@ table.tablesorter thead tr th:hover {
       }
 
   /* device value */
+  .sensor-btn{
+    margin: 5px;
+  }
+
  .btn-on{
    position: relative;
  }
@@ -6439,7 +6443,7 @@ table.tablesorter thead tr th:hover {
    font-size: 1.2rem;
    outline: 2px solid #5dc900;
    padding: 5px;
-   margin-left: 5px;
+   margin: 5px;
    border-radius: 20%;
  }
 

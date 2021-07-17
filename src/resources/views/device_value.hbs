@@ -10,13 +10,13 @@
                 dev-type="{{device_type.prefix}}">
                 {{device_type.device_type}}
             </button>
-            <div class="col-lg-12 device collapse" dev-type="{{device_type.prefix}}">
+            <div class="col-lg-12 devices collapse" dev-type="{{device_type.prefix}}">
                 <hr>
                 <h4>{{device_type.device_type}}</h4>
                 {{#each ../../devices as |device|}}
                 {{#if_eq group._id device.group._id}}
                 {{#if_eq device.device_type.prefix device_type.prefix}}
-                <div class="col-lg-2 label-device label-{{device_type.prefix}}" dev-sn="{{device.sn_number}}"
+                <div class="col-lg-2 label-device label-{{device_type.prefix}} device" dev-sn="{{device.sn_number}}"
                     dev-type="{{device_type.prefix}}">
                     <p class="value" id="val-{{device.sn_number}}">50</p>
                     <p class="serial">S/n: {{device.sn_number}}</p>
@@ -66,7 +66,7 @@
         //socket start real time device
         async function StartRealTime() {
             var list_devices = [];
-            $('.group_device .device').each(function () {
+            $('.group_device .devices .device').each(function () {
                 list_devices.push($(this).attr('dev-sn'))
             })
             //console.log(list_devices)
@@ -77,6 +77,8 @@
             var serial = data.serial;
             var value = data.Data;
             $(`#val-${serial}`).html(value);
+
+            console.log(data);
         })
         StartRealTime();
 
@@ -90,7 +92,7 @@
                 DrawChart(idChart);
             }
             $(`#${group_id} .sensor-btn[dev-type*="${dev_type}"]`).toggleClass("btn-on");
-            $(`#${group_id} .device[dev-type*="${dev_type}"]`).collapse('toggle');
+            $(`#${group_id} .devices[dev-type*="${dev_type}"]`).collapse('toggle');
         })
     })
 </script>

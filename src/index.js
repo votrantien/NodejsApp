@@ -105,7 +105,7 @@ io.on("connection", function (Socket) {
   //start real time device
   Socket.on('start_real_time_device', (data) => {
     const { list_devices, socketName } = data;
-    //console.log(list_devices, socketName)
+    // console.log(list_devices, socketName)
     list_devices.forEach(e => {
       const dataSend = JSON.stringify({serial: e, socketName})
       io.emit('start_real_time_device', dataSend)
@@ -114,7 +114,7 @@ io.on("connection", function (Socket) {
 
   Socket.on('device_send_value', (data) => {
     const { serial, socketName, Data } = JSON.parse(data);
-    console.log(serial, socketName, Data)
+    // console.log(serial, socketName, Data)
     io.emit(socketName, {serial,Data})
   })
   //disconnect

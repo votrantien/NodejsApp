@@ -68,7 +68,7 @@ class DeviceController {
         // devices.sort(function (a, b) {
         //     return a.device_model.localeCompare(b.device_model);
         // });
-        console.log(devices)
+        // console.log(devices)
         res.render('device_value', { username: res.locals.user.username, devices, groups, device_types })
     }
 
