@@ -1,4 +1,4 @@
-const { oneOf, body, validationResult, param, query } = require('express-validator')
+const { oneOf, body, validationResult, param, query, check } = require('express-validator')
 const bcrypt = require('bcrypt')
 const db = require("../models")
 const User = db.user
@@ -112,22 +112,9 @@ let validateSignup = [
 ]
 
 let validateChangePassword = [
-  param('username', 'Username không được để trống').not().isEmpty(),
   body('old_password', 'Nhập mật khẩu hiện tại').not().isEmpty(),
   body('new_password', 'Nhập mật khẩu mới').not().isEmpty(),
   body('new_password', 'Mật khẩu phải từ 6 ký tự').isLength({ min: 6 }),
-  param('username').custom((value, { req }) => {
-    return User.findOne({ username: value }).then(async user => {
-      if (!user) {
-        return Promise.reject('user name không tồn tại')
-      } else {
-        const auth = await bcrypt.compare(req.body.old_password, user.password)
-        if (!auth) {
-          return Promise.reject('Mật khẩu hiện tại không đúng !')
-        }
-      }
-    })
-  }),
 ]
 
 let validateActiveDevice = [
@@ -167,6 +154,23 @@ let validateActiveDevice = [
       return Promise.reject('group id không hợp lệ')
     }
   }),
+  body('gate_way', 'gate_way không được để trống').not().isEmpty(),
+  body('gate_way').custom(async (value) => {
+    try {
+      if (value == 'none') {
+        return true
+      } else {
+        const gateway = await Device.findOne({ sn_number: value })
+        if (!gateway) {
+          return Promise.reject('serial gateway active không tồn tại')
+        } else {
+          return true
+        }
+      }
+    } catch {
+      return Promise.reject('gateway id không hợp lệ')
+    }
+  }),
 ]
 
 let validateInActiveDevice = [
@@ -196,6 +200,19 @@ let validateInActiveDevice = [
   }),
 ]
 
+let validateAddDeviceValue = [
+  body('serial', 'serial không được để trống').not().isEmpty(),
+  body('serial').custom(async (value) => {
+    const device = await Device.findOne({ sn_number: value })
+    if (!device) {
+      return Promise.reject('device không tồn tại')
+    } else {
+      return true
+    }
+  }),
+  //body('data', 'data không được để trống').not().isEmpty(),
+]
+
 
 let validate = {
   validateCreateDevice: validateCreateDevice,
@@ -205,6 +222,7 @@ let validate = {
   validateRegisterDevice: validateRegisterDevice,
   validateActiveDevice: validateActiveDevice,
   validateInActiveDevice: validateInActiveDevice,
+  validateAddDeviceValue: validateAddDeviceValue,
 }
 
 module.exports = { validate }

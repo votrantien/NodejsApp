@@ -5,29 +5,47 @@
         <div class="col-lg-12 group_device" id="{{group._id}}">
             <h4 class="group_name">{{group.group_name}}</h4>
             {{#each ../device_types as |device_type|}}
-            {{#if_neq device_type.prefix 'AHSD'}}
+            {{#if_ device_type.prefix 'not_in' 'AHSD,BSGW'}}
             <button type="button" class="btn btn-default sensor-btn" type-id="{{device_type._id}}"
                 dev-type="{{device_type.prefix}}">
                 {{device_type.device_type}}
             </button>
             <div class="col-lg-12 devices collapse" dev-type="{{device_type.prefix}}">
                 <hr>
-                <h4>{{device_type.device_type}}</h4>
+                <h4 class="label-device-type">{{device_type.device_type}}</h4>
                 {{#each ../../devices as |device|}}
-                {{#if_eq group._id device.group._id}}
-                {{#if_eq device.device_type.prefix device_type.prefix}}
+                {{#if_ group._id '==' device.group._id}}
+                {{#if_ device.device_type.prefix '==' device_type.prefix}}
                 <div class="col-lg-2 label-device label-{{device_type.prefix}} device" dev-sn="{{device.sn_number}}"
                     dev-type="{{device_type.prefix}}">
-                    <p class="value" id="val-{{device.sn_number}}">50</p>
+                    
+                    <p class="data" id="data-{{device.sn_number}}">
+                        {{#if_ device.data 'is_exist' 'p_null'}}
+                        {{#data}}
+                        {{#each val}}
+                        <p class="value">{{this}}</p>
+                        {{/each}}
+                        <p class="battery">Battery: {{battery}}</p>
+                        <p class="rssi">Rssi: {{rssi}}</p>
+                        {{/data}}
+                        {{else}}
+                        <p class="value">N/a</p>
+                        <p class="battery">Battery: N/a</p>
+                        <p class="rssi">Rssi: N/a</p>
+                        {{/if_}}
+                    </p>
                     <p class="serial">S/n: {{device.sn_number}}</p>
                     <p class="name">Name: {{device.device_name}}</p>
+                    {{#if_ device.gateway 'not_in' 'none'}}
+                    <p class="gateway">G/w: {{device.gateway}}</p>
+                    {{/if_}}
                 </div>
-                {{/if_eq}}
-                {{/if_eq}}
+                {{/if_}}
+                {{/if_}}
                 {{/each}}
                 <canvas id="chart-{{group._id}}-{{device_type.prefix}}" width="400" height="150"></canvas>
             </div>
-            {{/if_neq}}
+            {{/if_}}
             {{/each}}
         </div>
         {{/each}}

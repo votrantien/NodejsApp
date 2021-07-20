@@ -39,11 +39,13 @@ const deviceSchema = new mongoose.Schema({
   user_add_device:{ type: Schema.Types.ObjectId, ref: 'User' },
   user_active_device:{ type: Schema.Types.ObjectId, ref: 'User' },
   active_date: {type: Date},
-  device_property: {},
   group: {type: Schema.Types.ObjectId, ref: 'GroupDevice', default: null},
   gateway: {type: String, default: 'none'},
+  data: {},
   status: {type: Number, default: 0},
-});
+},
+{ timestamps: true }
+);
 
 const Device = mongoose.model('Device', deviceSchema);
 

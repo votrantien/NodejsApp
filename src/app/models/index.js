@@ -7,4 +7,5 @@ db.user = require("./user.model");
 db.group = require("./group_device.model");
 db.device = require("./device.model");
 db.deviceType = require("./device_type.model");
+db.deviceLog = require("./device_log.model");
 module.exports = db;

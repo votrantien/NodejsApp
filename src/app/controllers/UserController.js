@@ -30,9 +30,7 @@ class UserController {
         res.render('home')
     }
     signin(req, res, next) {
-        // Passport store user info in req.user
         const user = req.user
-        // Generate jwt token for user, you can also add more data to sign, such as: role, birthday...
         const token = jwt.sign(
             { id: user.id, username: user.username },
             process.env.JWT_SECRET,
@@ -61,12 +59,12 @@ class UserController {
             const user = await User.findById(userId)
             if (user) {
                 const group_device = await Group.find({ manage_user: user.username })
-                res.json({ user, group_device })
+                res.json({ status: 'success', user, group_device })
             } else {
-                res.json({ msg: 'Không tìm thấy user' })
+                res.json({ status: 'failure', msg: 'Không tìm thấy user' })
             }
         } catch (err) {
-            res.json({ err })
+            res.json({ status: 'failure', err })
         }
 
     }
@@ -95,24 +93,31 @@ class UserController {
     async put_changePassword(req, res) {
         const errors = validationResult(req)
         if (!errors.isEmpty()) {
-            res.status(422).json({ errors: errors.array() })
+            res.status(422).json({ status: 'failure', errors: errors.array() })
             return
         }
         const { old_password, new_password } = req.body
-        const username = req.params.username
+        const username = res.locals.user.username
         try {
-            const opts = { runValidators: true };
-            const salt = await bcrypt.genSalt();
-            const password_update = await bcrypt.hash(new_password, salt);
-            const user_result = await User.updateOne({ username: username }, {
-                password: password_update
-            }, opts)
-            res.status(201).json({ result: user_result, message: 'success' })
+            const opts = { runValidators: true }
+            const salt = await bcrypt.genSalt()
+            const user = await User.findOne({ username: username })
+            const current_pass = user.password
+            const chk_pass = await bcrypt.compare(old_password, current_pass);
+            if (chk_pass) {
+                const password_update = await bcrypt.hash(new_password, salt)
+                const user_result = await User.updateOne({ username: username }, {
+                    password: password_update
+                }, opts)
+                res.status(201).json({ status: 'success', msg: 'đổi mật khẩu thành công' })
+            }else{
+                res.status(422).json({ status: 'failure', msg:'password cũ không đúng' })
+            }
         }
         catch (err) {
             // console.log(err)
             const errors = handleErrors(err)
-            res.status(400).json({ errors })
+            res.status(400).json({ status: 'failure', errors })
         }
     }
 }

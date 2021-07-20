@@ -58,21 +58,51 @@ app.engine('hbs', handlebars({
 }))
 var hbs = require('handlebars');
 
-hbs.registerHelper('if_eq', function (a, b, opts) {
-    if (a.toString() == b.toString()) {
-      return opts.fn(this);
-    } else {
-      return opts.inverse(this);
-    }
-});
-
-hbs.registerHelper('if_neq', function (a, b, opts) {
-  if (a.toString() != b.toString()) {
-    return opts.fn(this);
-  } else {
+//hekper handlebar
+//if equal
+hbs.registerHelper('if_', function (a, e, b, opts) {
+  if (!a || !b || !e) {
     return opts.inverse(this);
   }
+  switch (e) {
+    case '==':
+      if (a.toString() == b.toString()) {
+        return opts.fn(this);
+      } else {
+        return opts.inverse(this);
+      }
+      break
+    case 'not_in':
+      const b_arr = b.split(',');
+      let check = true;
+      b_arr.every((val, idx) => {
+        if (a.toString() == val.toString()) {
+          check = false
+          return false
+        } else {
+          return true
+        }
+      })
+      if (check) {
+        return opts.fn(this);
+      } else {
+        return opts.inverse(this);
+      }
+      break
+    case 'is_exist':
+      if (a) {
+        return opts.fn(this);
+      } else {
+        return opts.inverse(this);
+      }
+      break
+    default:
+      return opts.inverse(this);
+  }
+
 });
+
+
 
 app.set('view engine', 'hbs')
 app.set('views', path.join(__dirname, "resources", "views"))
@@ -107,15 +137,15 @@ io.on("connection", function (Socket) {
     const { list_devices, socketName } = data;
     // console.log(list_devices, socketName)
     list_devices.forEach(e => {
-      const dataSend = JSON.stringify({serial: e, socketName})
+      const dataSend = JSON.stringify({ serial: e, socketName })
       io.emit('start_real_time_device', dataSend)
     });
   })
 
   Socket.on('device_send_value', (data) => {
     const { serial, socketName, Data } = JSON.parse(data);
+    io.emit(socketName, { serial, Data })
     // console.log(serial, socketName, Data)
-    io.emit(socketName, {serial,Data})
   })
   //disconnect
   Socket.on("disconnect", (reason) => {

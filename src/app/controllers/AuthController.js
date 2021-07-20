@@ -58,7 +58,7 @@ module.exports.login_get = (req, res) => {
 module.exports.signup_post = async (req, res) => {
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
-        res.status(422).json({ errors: errors.array() })
+        res.status(422).json({status: 'failure', errors: errors.array() })
         return
     }
     try {
@@ -71,12 +71,12 @@ module.exports.signup_post = async (req, res) => {
         }
         //const token = createToken(user._id)
         //res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000 })
-        res.status(201).json({ user: user, default_group })
+        res.status(201).json({status: 'success', user: user, default_group })
     }
     catch (err) {
         // console.log(err)
         const errors = handleErrors(err)
-        res.status(400).json({ errors })
+        res.status(400).json({status: 'failure', errors })
     }
 
 }
@@ -88,11 +88,11 @@ module.exports.login_post = async (req, res) => {
         const user = await User.login(username, password)
         const token = createToken(user._id)
         res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000 })
-        res.status(200).json({ user: user._id, token: token })
+        res.status(200).json({status: 'success', user: user._id, token: token })
     }
     catch (err) {
         const errors = handleErrors(err)
-        res.status(400).json({ errors })
+        res.status(400).json({status: 'failure', errors })
     }
 
 }

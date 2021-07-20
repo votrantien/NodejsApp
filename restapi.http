@@ -154,7 +154,8 @@ Content-Type: application/json
 {
    "serial": "NOLX123456794",
    "group": "60dfdee653d79310d4c4cb2c",
-   "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwZTk3NzQ5NTE3MzIyMTZkOGFjNTQ1OSIsImlhdCI6MTYyNjQwNjc5MywiZXhwIjoxNjI2NjY1OTkzfQ.9ywpI3zMx046y2DX7cQdj_O15T8am5OMTSuTQVLQHHQ"
+   "gate_way": "BSGW123456795",
+   "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwZTk3NzQ5NTE3MzIyMTZkOGFjNTQ1OSIsImlhdCI6MTYyNjc3NTU2OSwiZXhwIjoxNjI3MDM0NzY5fQ.p6x0N-rHT1S54-9COr7C8jlvgisE-_EkE4MdXmrrfZA"
 }
 
 ### xoá tb khỏi user
@@ -179,3 +180,21 @@ GET http://{{host}}/device/GetTimeServer HTTP/1.1
 
 GET http://{{host}}/device/list HTTP/1.1
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwZTk3NzQ5NTE3MzIyMTZkOGFjNTQ1OSIsImlhdCI6MTYyNjA4NjQ1MSwiZXhwIjoxNjI2MzQ1NjUxfQ.7QN6ZlqoTSdMUl3piB1s6GL2mPf21UmcZkOmiMwDEcM
+
+### add value device
+POST http://{{host}}/device/add-value HTTP/1.1
+Content-Type: application/json
+
+{
+   "serial": "NOLX123456794",
+   "gate_way":"BSGW123456795",
+   "data": {"battery":"99","rssi":"-78","val":{"C":"30.4"}}
+}
+
+### doi mat khau
+
+PUT http://localhost:3000/user/change-password HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwZTk3NzQ5NTE3MzIyMTZkOGFjNTQ1OSIsImlhdCI6MTYyNjc3NTU2OSwiZXhwIjoxNjI3MDM0NzY5fQ.p6x0N-rHT1S54-9COr7C8jlvgisE-_EkE4MdXmrrfZA
+
+{"old_password":"123456789","new_password":"123456789"}

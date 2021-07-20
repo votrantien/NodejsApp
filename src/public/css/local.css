@@ -6421,6 +6421,7 @@ table.tablesorter thead tr th:hover {
   /* device value */
   .sensor-btn{
     margin: 5px;
+   text-transform: uppercase;
   }
 
  .btn-on{
@@ -6439,12 +6440,15 @@ table.tablesorter thead tr th:hover {
    right: 0;
  }
 
+  .label-device-type{
+    text-transform: uppercase;
+  }
+  
  .label-device{
    font-size: 1.2rem;
    outline: 2px solid #5dc900;
    padding: 5px;
    margin: 5px;
-   border-radius: 20%;
  }
 
  .label-device p{

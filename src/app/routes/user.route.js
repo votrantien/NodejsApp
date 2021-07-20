@@ -9,6 +9,6 @@ router.get('/', requireLogin, userController.index)
 router.post('/reset-password', requireAuth, userController.post_resetPassword)
 router.get('/profile', requireLogin, userController.get_profile)
 router.get('/user-info', requireAuth, userController.get_user)
-router.put('/change-password/:username', requireAuth, validate.validateChangePassword, userController.put_changePassword)
+router.put('/change-password', requireAuth, validate.validateChangePassword, userController.put_changePassword)
 
 module.exports = router;

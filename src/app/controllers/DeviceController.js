@@ -3,6 +3,7 @@ const User = db.user
 const Device = db.device
 const DeviceType = db.deviceType
 const GroupDevice = db.group
+const DeviceLog = db.deviceLog
 var { validationResult } = require('express-validator')
 
 // handle errors
@@ -74,13 +75,28 @@ class DeviceController {
 
     async post_AddDeviceValue(req, res) {
         // console.log(device)
-        res.status(201).json({ device: device })
+        const errors = validationResult(req)
+        if (!errors.isEmpty()) {
+            res.status(422).json({status: 'failure', errors: errors.array() })
+            return
+        }
+        try {
+            const { serial, data } = req.body
+            const device_value = data.val
+            const update = await Device.updateOne({ sn_number: serial }, {data: data}, { upsert: true })
+            const insertLog = await DeviceLog.create({device_serial: serial, device_value})
+            // console.log(update.nModified)
+            res.status(201).json({ status: 'success' })
+        }
+        catch (e) {
+            res.status(422).json({status: 'failure', errors: e })
+        }
     }
 
     async post_RegisterDevice(req, res, next) {
         const errors = validationResult(req)
         if (!errors.isEmpty()) {
-            res.status(422).json({ errors: errors.array() })
+            res.status(422).json({status: 'failure', errors: errors.array() })
             return
         }
         try {
@@ -92,41 +108,41 @@ class DeviceController {
             const id_user_add_device = '60c493522ea45c38d0504462'
             // return res.status(201).json({ Serial, Fw, Hw, Date, Country, device_model, device_type,device_name})
             const device = await Device.create({ device_type: device_type._id, device_name, device_model, sn_number: Serial, token: Token, fw_number: Fw, hw_number: Hw, group_device: null, mfg_date: Date, user_add_device: id_user_add_device, country: Country, user_active_device: null })
-            res.status(201).json({ device: device })
+            res.status(201).json({status: 'success', device: device })
         }
         catch (err) {
             // console.log(err)
             const errors = handleErrors(err)
-            res.status(400).json({ errors })
+            res.status(400).json({status: 'failure', errors })
         }
     }
 
     async post_ActiveDevice(req, res, next) {
         const errors = validationResult(req)
         if (!errors.isEmpty()) {
-            res.status(422).json({ errors: errors.array() })
+            res.status(422).json({status: 'failure',errors: errors.array() })
             return
         }
         try {
-            const { token, serial, group, active_user } = req.body
-            const update = await Device.updateOne({ sn_number: serial }, { group, user_active_device: active_user })
+            const { token, serial, group, active_user, gate_way } = req.body
+            const update = await Device.updateOne({ sn_number: serial }, { group, user_active_device: active_user, gateway: gate_way })
             if (update.nModified == 1) {
-                res.status(201).json({ msg: "Active thành công" })
+                res.status(201).json({status: 'success', msg: "Active thành công" })
             } else {
-                res.status(201).json({ msg: "Đã active vào group này" })
+                res.status(201).json({status: 'success', msg: "Đã active vào group này" })
             }
         }
         catch (err) {
             // console.log(err)
             const errors = handleErrors(err)
-            res.status(400).json({ errors })
+            res.status(400).json({status: 'failure', errors })
         }
     }
 
     async post_InActiveDevice(req, res, next) {
         const errors = validationResult(req)
         if (!errors.isEmpty()) {
-            res.status(422).json({ errors: errors.array() })
+            res.status(422).json({status: 'failure', errors: errors.array() })
             return
         }
         try {
@@ -139,30 +155,30 @@ class DeviceController {
                 if (user_active_id.toString() == user_id.toString()) {
                     const update = await Device.updateOne({ sn_number: serial }, { group: null, user_active_device: null })
                     if (update.nModified == 1) {
-                        return res.status(201).json({ msg: "Xoá thành công" })
+                        return res.status(201).json({status: 'success', msg: "Xoá thành công" })
                     }
                 } else {
-                    return res.status(201).json({ msg: "Không có quyền xoá thiết bị" })
+                    return res.status(201).json({status: 'success', msg: "Không có quyền xoá thiết bị" })
                 }
             }
             const update = await Device.updateOne({ sn_number: serial }, { group: null, user_active_device: null })
             if (update.nModified == 1) {
-                return res.status(201).json({ msg: "Xoá thành công" })
+                return res.status(201).json({status: 'success', msg: "Xoá thành công" })
             } else {
-                return res.status(201).json({ msg: "Device hiện tại không thuộc user nào" })
+                return res.status(201).json({status: 'success', msg: "Device hiện tại không thuộc user nào" })
             }
         }
         catch (err) {
             // console.log(err)
             const errors = handleErrors(err)
-            res.status(400).json({ errors })
+            res.status(400).json({status: 'failure', errors })
         }
     }
 
     async post_create(req, res, next) {
         const errors = validationResult(req)
         if (!errors.isEmpty()) {
-            res.status(422).json({ errors: errors.array() })
+            res.status(422).json({status: 'failure', errors: errors.array() })
             return
         }
         try {
@@ -170,12 +186,12 @@ class DeviceController {
             const device_type = await DeviceType.findOne({ _id: device_type_id })
             const type_properties = device_type.type_properties
             const device = await Device.create({ device_code, device_type: device_type._id, device_name, device_model, sn_number, fw_number, mfg, user_add_device: id_user_add_device, location, device_property: type_properties })
-            res.status(201).json({ device: device })
+            res.status(201).json({status: 'success', device: device })
         }
         catch (err) {
             // console.log(err)
             const errors = handleErrors(err)
-            res.status(400).json({ errors })
+            res.status(400).json({status: 'failure', errors })
         }
     }
 
@@ -192,12 +208,12 @@ class DeviceController {
                 const group_id = groups.map((group) => group._id)
                 device = await Device.find({ group: group_id }).populate('device_type').populate('user_active_device', 'username').populate('user_active_device', 'username').populate('group').lean()
             }
-            res.status(201).json({ device: device })
+            res.status(201).json({status: 'success', device: device })
         }
         catch (err) {
             // console.log(err)
             // const errors = handleErrors(err)
-            res.status(400).json({ err })
+            res.status(400).json({status: 'failure', err })
         }
     }
 
@@ -221,12 +237,12 @@ class DeviceController {
             // console.log(Device.populated('device_types'))
 
             const device = await Device.find({ _id: req.params.id }).populate('device_type').populate('id_user_add_device', 'username').populate('id_user_active_device', 'username')
-            res.status(201).json({ device: device })
+            res.status(201).json({status: 'success', device: device })
         }
         catch (err) {
             // console.log(err)
             // const errors = handleErrors(err)
-            res.status(400).json({ err })
+            res.status(400).json({status: 'failure', err })
         }
     }
 
@@ -249,12 +265,12 @@ class DeviceController {
             })
             // await device.save()
             // console.log(device)
-            res.status(201).json({ device: device })
+            res.status(201).json({status: 'success', device: device })
         }
         catch (err) {
             console.log(err)
             const errors = handleErrors(err)
-            res.status(400).json({ errors })
+            res.status(400).json({status: 'failure', errors })
         }
     }
 
@@ -264,12 +280,12 @@ class DeviceController {
             const device = await Device.deleteOne({ _id: req.params.id })
             // await device.save()
             // console.log(device)
-            res.status(201).json({ device: device })
+            res.status(201).json({status: 'success', device: device })
         }
         catch (err) {
             // console.log(err)
             const errors = handleErrors(err)
-            res.status(400).json({ errors })
+            res.status(400).json({status: 'failure', errors })
         }
     }
 }
