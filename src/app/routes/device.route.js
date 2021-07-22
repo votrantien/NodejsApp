@@ -15,5 +15,6 @@ router.get('/list', requireAuth,deviceController.get_list)
 router.get('/:id', requireAuth,deviceController.get_device)
 router.put('/update/:id', requireAuth, validate.validateUpdateDevice ,deviceController.put_update)
 router.delete('/delete/:id', requireAuth,deviceController.delete_delete)
+router.post('/device-logs',deviceController.post_logDevice)
 router.get('/*', requireLogin,deviceController.index)
 module.exports = router;

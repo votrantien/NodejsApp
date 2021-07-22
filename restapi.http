@@ -188,13 +188,24 @@ Content-Type: application/json
 {
    "serial": "NOLX123456794",
    "gate_way":"BSGW123456795",
-   "data": {"battery":"99","rssi":"-78","val":{"C":"30.4"}}
+   "data": {"battery":"98","rssi":"-75","val":{"C":"32.4"}}
 }
 
 ### doi mat khau
 
-PUT http://localhost:3000/user/change-password HTTP/1.1
+PUT http://{{host}}/user/change-password HTTP/1.1
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwZTk3NzQ5NTE3MzIyMTZkOGFjNTQ1OSIsImlhdCI6MTYyNjc3NTU2OSwiZXhwIjoxNjI3MDM0NzY5fQ.p6x0N-rHT1S54-9COr7C8jlvgisE-_EkE4MdXmrrfZA
 
 {"old_password":"123456789","new_password":"123456789"}
+
+### get logs device
+POST http://{{host}}/device/device-logs HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwZTk3NzQ5NTE3MzIyMTZkOGFjNTQ1OSIsImlhdCI6MTYyNjc3NTU2OSwiZXhwIjoxNjI3MDM0NzY5fQ.p6x0N-rHT1S54-9COr7C8jlvgisE-_EkE4MdXmrrfZA
+
+{
+   "serial": "NOLX123456794",
+   "startDate": "2021-07-20",
+   "endDate": "2021-07-21"
+}
