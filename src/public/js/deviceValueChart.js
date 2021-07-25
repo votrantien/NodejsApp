@@ -15,20 +15,36 @@ $(document).ready(function () {
 
     socket.on('device_disconnect', function (data) {
         var serial = data
-        var status = $(`#device-data-${serial} .device-status`).hasClass('device-on');
-        if (status) {
-            $(`#device-data-${serial} .device-status`).toggleClass('device-on device-off');
+        if (serial.slice(0, 4) == 'BSGW') {
+            $(`.label-device[dev-gateway*=${serial}] .device-on`).toggleClass('device-on device-off');
+        } else {
+            var status = $(`#device-data-${serial} .device-status`).hasClass('device-on');
+            if (status) {
+                $(`#device-data-${serial} .device-status`).toggleClass('device-on device-off');
+            }
         }
-        $(`#device-data-${serial} .value`).html('N/a');
+        //$(`#device-data-${serial} .value`).html('N/a');
+    })
+
+    socket.on('node_device_disconnect', function (data) {
+        var serial = data;
+        $(`#device-data-${serial} .device-on`).toggleClass('device-on device-off');
+        //$(`#device-data-${serial} .value`).html('N/a');
     })
     //socket start real time device
     async function StartRealTime() {
         var list_devices = [];
+        var list_gateway = [];
         $('.device-serial').each(function () {
-            list_devices.push($(this).val())
+            if ($(this).attr('dev-gateway') == '' || $(this).attr('dev-gateway') == 'none') {
+                list_devices.push($(this).val())
+            } else {
+                if (list_gateway.indexOf($(this).attr('dev-gateway')) < 0) {
+                    list_gateway.push($(this).attr('dev-gateway'));
+                }
+            }
         })
-        //console.log(list_devices)
-        socket.emit('start_real_time_device', { list_devices, socketName });
+        socket.emit('start_real_time_device', { list_devices, list_gateway, socketName });
     }
     socket.on(socketName, function (device) {
         //console.log(device);
@@ -45,7 +61,7 @@ $(document).ready(function () {
             if (status) {
                 $(`#device-data-${serial} .device-status`).toggleClass('device-off device-on');
             }
-            var value = Object.values(arr_value).reduce((pre_val, cur_val, key) => pre_val += "-" + cur_val)
+            var value = Object.values(arr_value).reduce((pre_val, cur_val, key) => pre_val += "</br>" + cur_val)
             $(`#device-data-${serial} .value`).html(value);
             $(`#device-data-${serial} .battery .sub-value`).html(battery);
             $(`#device-data-${serial} .rssi .sub-value`).html(rssi);

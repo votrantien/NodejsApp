@@ -28,10 +28,10 @@
                 {{#each ../../devices as |device|}}
                 {{#if_ group._id '==' device.group._id}}
                 {{#if_ device.device_type.prefix '==' device_type.prefix}}
-                <input type="hidden" class="device-serial" value="{{device.sn_number}}">
+                <input type="hidden" class="device-serial" value="{{device.sn_number}}" dev-gateway = "{{device.gateway}}">
                 <div class="col-lg-2 col-xs-5 col-sm-3 col-md-4 label-device label-{{device_type.prefix}} device" dev-group="{{group._id}}"
                     dev-sn="{{device.sn_number}}" dev-type="{{device_type.prefix}}"
-                    id="device-data-{{device.sn_number}}"">
+                    id="device-data-{{device.sn_number}}">
                     {{#if_ device.status '==' '1'}}
                     <span class="device-status device-on"></span>
                     {{else}}
@@ -39,9 +39,12 @@
                     {{/if_}}
                     {{#if_ device.data 'is_exist' 'p_null'}}
                     {{#data}}
-                    {{#each val}}
-                    <p class="value">{{this}}</p>
-                    {{/each}}
+                    <div class="value">
+                        {{#each val}}
+                        {{this}}
+                        <br>
+                        {{/each}}
+                    </div>
                     <p class="battery">Battery: <span class="sub-value">{{battery}}</span></p>
                     <p class="rssi">Rssi: <span class="sub-value">{{rssi}}</span></p>
                     {{/data}}

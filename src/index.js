@@ -137,20 +137,29 @@ io.on("connection", function (Socket) {
 
   //start real time device
   Socket.on('start_real_time_device', (data) => {
-    const { list_devices, socketName } = data
+    const { list_devices, list_gateway, socketName } = data
     // console.log(list_devices, socketName)
     list_devices.forEach(e => {
       const dataSend = JSON.stringify({ serial: e, socketName })
       io.emit('start_real_time_device', dataSend)
     });
+
+    list_gateway.forEach(e => {
+      const dataSend = JSON.stringify({ serial: e, socketName })
+      io.emit('start_real_time_device', dataSend)
+    });
   })
 
-  Socket.on('device_connect',async (data) => {
+  Socket.on('device_connect', async (data) => {
     try {
       const serial = data
       devices[Socket.id] = serial
-      const update_status = await Device.findOneAndUpdate({ sn_number: serial }, { status: 1 })
-      console.log(devices)
+      if (String(serial).slice(0, 4) == 'BSGW') {
+        const update_status = await Device.updateMany({ gateway: serial }, { status: 1 })
+      } else {
+        const update_status = await Device.findOneAndUpdate({ sn_number: serial }, { status: 1 })
+      }
+      console.log(String(serial).slice(0, 4))
       io.emit('device_connected', '{ "status": "Connnect success" }')
     } catch (e) {
       console.log(e)
@@ -159,18 +168,13 @@ io.on("connection", function (Socket) {
 
   Socket.on('device_send_value_realtime', (device_value) => {
     try {
-      const { serial, socketName, data } = JSON.parse(device_value);
-      io.emit(socketName, { serial, data })
-      console.log(serial, socketName, data, Socket.id)
-    } catch (e) {
-      console.log(e)
-    }
-  })
-
-  Socket.on('device_send_value', (device_value) => {
-    try {
-      const { serial, socketName, data } = JSON.parse(device_value);
-      io.emit(socketName, { serial, data })
+      const { serial, socketName, data, snNode } = JSON.parse(device_value);
+      if (snNode != 'none') {
+        let serial = snNode
+        io.emit(socketName, { serial, data })
+      } else {
+        io.emit(socketName, { serial, data })
+      }
       console.log(serial, socketName, data, Socket.id)
     } catch (e) {
       console.log(e)
@@ -178,21 +182,42 @@ io.on("connection", function (Socket) {
   })
 
   //disconnect
-  Socket.on("disconnect",async (reason) => {
+  Socket.on("disconnect", async (reason) => {
     if (!devices[Socket.id]) {
       io.emit('end_real_time_device', socketName)
     }
     try {
       const serial = devices[Socket.id]
-      console.log('device ' + devices[Socket.id] + ' disconnected')
-      const update_status = await Device.findOneAndUpdate({ sn_number: serial }, { status: 0 })
-      io.emit('device_disconnect', devices[Socket.id])
-      delete devices[Socket.id]
+      if (String(serial).slice(0, 4) == 'BSGW') {
+        console.log('device ' + devices[Socket.id] + ' disconnected')
+        const update_status = await Device.updateMany({ gateway: serial }, { status: 0 })
+        io.emit('device_disconnect', devices[Socket.id])
+        delete devices[Socket.id]
+      } else {
+        console.log('device ' + devices[Socket.id] + ' disconnected')
+        const update_status = await Device.findOneAndUpdate({ sn_number: serial }, { status: 0 })
+        io.emit('device_disconnect', devices[Socket.id])
+        delete devices[Socket.id]
+      }
+
     } catch (e) {
       console.log(e)
-    } 
-  });
+    }
+  })
+
+  // node_disconnected
+  Socket.on("node_disconnect", async (data) => {
+    try {
+        const serial = data;
+        console.log('device ' + serial + ' disconnected')
+        const update_status = await Device.findOneAndUpdate({ sn_number: serial }, { status: 0 })
+        io.emit('node_device_disconnect', serial)
+    } catch (e) {
+      console.log(e)
+    }
+  })
 })
+
 
 route(app)
 
