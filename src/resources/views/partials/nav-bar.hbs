@@ -12,7 +12,8 @@
         <ul id="active" class="nav navbar-nav side-nav">
             <li class=""><a href="/"><i class="fa fa-bullseye"></i> Dashboard</a></li>
             <li><a href="/device"><i class="fa fa-tasks"></i> Quản lý thiết bị</a></li>
-            <li><a href="/device-value"><i class="fa fa-tasks"></i> Giá trị thiết bị gửi về</a></li>
+            <li><a href="/device-value/sensor"><i class="fa fa-tasks"></i> Giá trị thiết bị cảm biến</a></li>
+            <li><a href="/device-value/ahsd"><i class="fa fa-tasks"></i> Giá trị automatic hydroponic system</a></li>
             {{!-- <li><a href="#"><i class="fa fa-globe"></i> Blog</a></li>
             <li><a href="#"><i class="fa fa-list-ol"></i> SignUp</a></li>
             <li><a href="#"><i class="fa fa-font"></i> Register</a></li>
@@ -72,9 +73,3 @@
         </ul>
     </div>
 </nav>
-
-<script>
-    $(function() {
-        $('#active a[href="/' + location.pathname.split("/")[1] + '"]').addClass('selected');
-    });
-</script>

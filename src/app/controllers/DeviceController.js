@@ -52,7 +52,7 @@ class DeviceController {
         res.render('device', { username: res.locals.user.username, groups, idUser: res.locals.user.id, devices: device, device_types: device_type })
     }
 
-    async get_DeviceValue(req, res) {
+    async get_SensorValue(req, res) {
         // console.log(device)
         const user = res.locals.user
         let devices
@@ -73,6 +73,27 @@ class DeviceController {
         res.render('device_value', { username: res.locals.user.username, devices, groups, device_types })
     }
 
+    async get_AhsdValue(req, res) {
+        // console.log(device)
+        const user = res.locals.user
+        let devices
+        let groups
+        const device_types = await DeviceType.find({prefix: 'AHSD'}).lean()
+        if (user.role == 'admin') {
+            groups = await GroupDevice.find().lean()
+            devices = await Device.find({device_model: 'AHSD'}).populate('device_type').populate('user_active_device', 'username').populate('group').lean()
+        } else {
+            groups = await GroupDevice.find({ manage_user: user.username }).lean()
+            const group_id = groups.map((group) => group._id)
+            devices = await Device.find({ device_model: 'AHSD', group: group_id }).populate('device_type').populate('user_active_device', 'username').populate('group').lean()
+        }
+        // devices.sort(function (a, b) {
+        //     return a.device_model.localeCompare(b.device_model);
+        // });
+        // console.log(devices)
+        res.render('device_value_ahsd', { username: res.locals.user.username, devices, groups, device_types })
+    }
+
     async post_AddDeviceValue(req, res) {
         // console.log(device)
         const errors = validationResult(req)
@@ -81,10 +102,10 @@ class DeviceController {
             return
         }
         try {
-            const { serial, data } = req.body
+            const { serial, data, amount_of_values } = req.body
             const device_value = data.val
             const update = await Device.updateOne({ sn_number: serial }, { data: data }, { upsert: true })
-            const insertLog = await DeviceLog.create({ device_serial: serial, device_value })
+            const insertLog = await DeviceLog.create({ device_serial: serial, device_value, amount_of_values })
             // console.log(update.nModified)
             res.status(201).json({ status: 'success' })
         }
@@ -290,7 +311,6 @@ class DeviceController {
     }
 
     async post_logDevice(req, res) {
-        console.log(req.body)
         try {
             let { serial, startDate, endDate } = req.body
             startDate = new Date(startDate)

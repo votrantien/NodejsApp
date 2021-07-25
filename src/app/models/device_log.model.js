@@ -6,6 +6,7 @@ const deviceLogSchema = new mongoose.Schema({
     type: String,
   },
   device_value: {},
+  amount_of_values: { type: Number, default: 1 },
   status: { type: Number, default: 1 },
 },
   { timestamps: true }

@@ -210,6 +210,8 @@ let validateAddDeviceValue = [
       return true
     }
   }),
+  body('amount_of_values', 'số lượng values không được để trống').not().isEmpty(),
+  body('amount_of_values', 'số lượng values phải là số >= 1').isInt({min: 1}),
   //body('data', 'data không được để trống').not().isEmpty(),
 ]
 

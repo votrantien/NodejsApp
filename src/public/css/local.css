@@ -6,6 +6,7 @@ html {
 }
 body {
   margin: 0;
+  position: relative;
 }
 article,
 aside,
@@ -6280,13 +6281,12 @@ table.tablesorter thead tr th:hover {
 
         /* loading spin */
         #mask {
-          position: absolute;
-          z-index: 9999;
-          width: 100%;
-          height: 100%;
+          position: fixed;
+          z-index: 99999;
+          width: 100vw;
+          height: 100vh;
           background-color: rgba(0, 0, 0, 0.5);
           top: 0;
-          left: 0;
         }
 
         #loader {
@@ -6422,6 +6422,7 @@ table.tablesorter thead tr th:hover {
   .sensor-btn{
     margin: 5px;
    text-transform: uppercase;
+   border-radius: 0;
   }
 
  .btn-on{
@@ -6456,6 +6457,9 @@ table.tablesorter thead tr th:hover {
     margin: 0;
     text-align: left;
     cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
  }
 
  .label-device .value{
@@ -6495,4 +6499,45 @@ table.tablesorter thead tr th:hover {
 
 .chart-active {
   outline: solid 2px green;
+}
+
+/* datepicker dropdown uom */
+.drp-wrap, .uom-wrap{
+  padding: 3px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+
+}
+
+.uom-dropdown-lst{
+  color: white;
+  background-color: #060606;
+  border: unset;
+  border-bottom: 1px solid #fff;
+  outline: unset;
+}
+
+.uom-dropdown-lst option::hover{
+  background-color: unset;
+  color: grey;
+}
+
+
+/* // */
+
+.date-picker-wrapper{
+  z-index: 1000;
+}
+
+.date-picker-input{
+  padding: 0;
+  font-size: 1.2rem;
+  background-color: #060606;
+  color: #fff;
+  border-radius: 0;
+  text-align: left;
+}
+
+.date-picker-wrapper .month-wrapper table .day.toMonth.valid {
+  color: #fff;
 }

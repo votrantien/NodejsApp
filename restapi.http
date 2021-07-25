@@ -137,7 +137,7 @@ POST http://{{host}}/device/register-device HTTP/1.1
 Content-Type: application/json
 
 {
-   "Serial":"NOLX123456794",
+   "Serial":"NOTH123456797",
    "Action":"registor",
    "Token":"hsvhjv565jhdvzjhv",
    "Fw":"1.00",
@@ -152,10 +152,10 @@ POST http://{{host}}/device/active HTTP/1.1
 Content-Type: application/json
 
 {
-   "serial": "NOLX123456794",
+   "serial": "NOTH123456797",
    "group": "60dfdee653d79310d4c4cb2c",
    "gate_way": "BSGW123456795",
-   "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwZTk3NzQ5NTE3MzIyMTZkOGFjNTQ1OSIsImlhdCI6MTYyNjc3NTU2OSwiZXhwIjoxNjI3MDM0NzY5fQ.p6x0N-rHT1S54-9COr7C8jlvgisE-_EkE4MdXmrrfZA"
+   "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwZTk3NzQ5NTE3MzIyMTZkOGFjNTQ1OSIsImlhdCI6MTYyNzEzMzkzMCwiZXhwIjoxNjI3MzkzMTMwfQ.GlOlREz4csfrJczvhcK0BCOH3IJjvdflUnQdDdZAaKA"
 }
 
 ### xoá tb khỏi user
@@ -186,9 +186,10 @@ POST http://{{host}}/device/add-value HTTP/1.1
 Content-Type: application/json
 
 {
-   "serial": "NOLX123456794",
-   "gate_way":"BSGW123456795",
-   "data": {"battery":"98","rssi":"-75","val":{"C":"32.4"}}
+   "serial": "AHSD12345675",
+   "gate_way":"none",
+   "data": {"battery":"98","rssi":"-75","val":{"v1":"33.4-Ph","v2":"26-mS/cm","v3":"31-°C","v4":"85-%"}},
+   "amount_of_values":"4"
 }
 
 ### doi mat khau

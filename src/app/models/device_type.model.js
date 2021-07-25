@@ -15,6 +15,8 @@ const deviceTypeSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Please enter a description'],
   },
+  amount_of_values: {type: Number, default: 1},
+  uom_values: {},
   type_properties: {},
   status: {type: Number, default: 1},
 });
