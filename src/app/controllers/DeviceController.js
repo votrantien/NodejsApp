@@ -5,6 +5,7 @@ const DeviceType = db.deviceType
 const GroupDevice = db.group
 const DeviceLog = db.deviceLog
 var { validationResult } = require('express-validator')
+const { Model } = require("mongoose")
 
 // handle errors
 const handleErrors = (err) => {
@@ -55,43 +56,75 @@ class DeviceController {
     async get_SensorValue(req, res) {
         // console.log(device)
         const user = res.locals.user
+        const username = res.locals.user.username
         let devices
         let groups
+        let gateways
         const device_types = await DeviceType.find().lean()
         if (user.role == 'admin') {
             groups = await GroupDevice.find().lean()
-            devices = await Device.find().populate('device_type').populate('user_active_device', 'username').populate('group').lean()
+            gateways = await Device.find({ device_model: 'BSGW' }).lean()
+            devices = await Device.find({ device_model: { $nin: ['BSGW', 'AHSD'] } }).populate('device_type').populate('user_active_device', 'username').populate('group').lean()
         } else {
             groups = await GroupDevice.find({ manage_user: user.username }).lean()
             const group_id = groups.map((group) => group._id)
-            devices = await Device.find({ group: group_id }).populate('device_type').populate('user_active_device', 'username').populate('group').lean()
+            gateways = await Device.find({ group: group_id, device_model: 'BSGW' }).lean()
+            devices = await Device.find({ group: group_id, device_model: { $nin: ["BSGW", "AHSD"] } }).populate('device_type').populate('user_active_device', 'username').populate('group').lean()
         }
         // devices.sort(function (a, b) {
         //     return a.device_model.localeCompare(b.device_model);
         // });
         // console.log(devices)
-        res.render('device_value', { username: res.locals.user.username, devices, groups, device_types })
+        res.render('device_value_gateway', { username, devices, groups, device_types, gateways })
+    }
+
+    // test
+    async get_SensorValueTest(req, res) {
+        // console.log(device)
+        const user = res.locals.user
+        const username = res.locals.user.username
+        let devices
+        let groups
+        let gateways
+        const device_types = await DeviceType.find().lean()
+        if (user.role == 'admin') {
+            groups = await GroupDevice.find().lean()
+            gateways = await Device.find({ device_model: 'BSGW' }).lean()
+            devices = await Device.find({ device_model: { $nin: ['BSGW', 'AHSD'] } }).populate('device_type').populate('user_active_device', 'username').populate('group').lean()
+        } else {
+            groups = await GroupDevice.find({ manage_user: user.username }).lean()
+            const group_id = groups.map((group) => group._id)
+            gateways = await Device.find({ group: group_id, device_model: 'BSGW' }).lean()
+            devices = await Device.find({ group: group_id, device_model: { $nin: ['BSGW', 'AHSD'] } }).populate('device_type').populate('user_active_device', 'username').populate('group').lean()
+        }
+        // devices.sort(function (a, b) {
+        //     return a.device_model.localeCompare(b.device_model);
+        // });
+        // console.log(devices)
+        res.render('device_value_test', { username, devices, groups, device_types, gateways })
     }
 
     async get_AhsdValue(req, res) {
         // console.log(device)
         const user = res.locals.user
+        const username = res.locals.user.username
         let devices
         let groups
-        const device_types = await DeviceType.find({prefix: 'AHSD'}).lean()
+        let gateways
+        const device_types = await DeviceType.find().lean()
         if (user.role == 'admin') {
             groups = await GroupDevice.find().lean()
-            devices = await Device.find({device_model: 'AHSD'}).populate('device_type').populate('user_active_device', 'username').populate('group').lean()
+            devices = await Device.find({ device_model: 'AHSD' }).populate('device_type').populate('user_active_device', 'username').populate('group').lean()
         } else {
             groups = await GroupDevice.find({ manage_user: user.username }).lean()
             const group_id = groups.map((group) => group._id)
-            devices = await Device.find({ device_model: 'AHSD', group: group_id }).populate('device_type').populate('user_active_device', 'username').populate('group').lean()
+            devices = await Device.find({ group: group_id, device_model: 'AHSD' }).populate('device_type').populate('user_active_device', 'username').populate('group').lean()
         }
         // devices.sort(function (a, b) {
         //     return a.device_model.localeCompare(b.device_model);
         // });
         // console.log(devices)
-        res.render('device_value_ahsd', { username: res.locals.user.username, devices, groups, device_types })
+        res.render('device_value_ahsd', { username, devices, groups, device_types })
     }
 
     async post_AddDeviceValue(req, res) {

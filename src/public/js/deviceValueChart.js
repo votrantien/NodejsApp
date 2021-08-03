@@ -263,7 +263,6 @@ $(document).ready(function () {
         }
         $(id).dateRangePicker(options);
     })
-
     // call api get data device
     async function postData(url = '', data = {}) {
         // Default options are marked with *

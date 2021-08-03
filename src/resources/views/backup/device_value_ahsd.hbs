@@ -1,0 +1,81 @@
+<div id="page-wrapper">
+    <div class="row">
+        <input type="hidden" value="{{username}}" id="socketName">
+        {{#each groups as |group|}}
+        <div class="col-lg-12 group_device" id="{{group._id}}">
+            <h4 class="group_name">{{group.group_name}}</h4>
+            {{#each ../device_types as |device_type|}}
+            {{#if_ device_type.prefix '==' 'AHSD'}}
+            <button type="button" class="btn btn-default sensor-btn" type-id="{{device_type._id}}"
+                dev-type="{{device_type.prefix}}">
+                {{device_type.device_type}}
+            </button>
+            <div class="col-lg-12 devices collapse" dev-type="{{device_type.prefix}}">
+                <hr>
+                <h4 class="label-device-type">{{device_type.device_type}}</h4>
+                <div class="col-lg-12 drp-wrap">
+                    <span>Thời gian: </span><input type="text" class="btn date-picker-input" size="40"
+                        id="dtp-{{group._id}}-{{device_type.prefix}}" chart-id="chart-{{group._id}}-{{device_type.prefix}}">
+                </div>
+                <div class="col-lg-12 uom-wrap">
+                    <label for="#uom-{{group._id}}-{{device_type.prefix}}">Đơn vị đo: </label>
+                    <select class="uom-dropdown-lst" id="uom-{{group._id}}-{{device_type.prefix}}" chart-id="chart-{{group._id}}-{{device_type.prefix}}">
+                        {{#each uom_values}}
+                            <option value="{{@key}}">{{this}}</option>
+                        {{/each}}
+                    </select>
+                </div>
+                {{#each ../../devices as |device|}}
+                {{#if_ group._id '==' device.group._id}}
+                {{#if_ device.device_type.prefix '==' device_type.prefix}}
+                <input type="hidden" class="device-serial" value="{{device.sn_number}}" dev-gateway = "{{device.gateway}}">
+                <div class="col-lg-2 col-xs-5 col-sm-3 col-md-4 label-device label-{{device_type.prefix}} device" dev-group="{{group._id}}"
+                    dev-sn="{{device.sn_number}}" dev-type="{{device_type.prefix}}"
+                    id="device-data-{{device.sn_number}}">
+                    {{#if_ device.status '==' '1'}}
+                    <span class="device-status device-on"></span>
+                    {{else}}
+                    <span class="device-status device-off"></span>
+                    {{/if_}}
+                    {{#if_ device.data 'is_exist' 'p_null'}}
+                    {{#data}}
+                    <div class="value">
+                        {{#each val}}
+                        {{this}}
+                        <br>
+                        {{/each}}
+                    </div>
+                    <p class="battery">Battery: <span class="sub-value">{{battery}}</span></p>
+                    <p class="rssi">Rssi: <span class="sub-value">{{rssi}}</span></p>
+                    {{/data}}
+                    {{else}}
+                    <p class="value">N/a</p>
+                    <p class="battery">Battery: <span class="sub-value">N/a</span></p>
+                    <p class="rssi">Rssi: <span class="sub-value">N/a</span></p>
+                    {{/if_}}
+                    <p class="serial">S/n: {{device.sn_number}}</p>
+                    <p class="name">Name: {{device.device_name}}</p>
+                    {{#if_ device.gateway 'not_in' 'none'}}
+                    <p class="gateway">G/w: {{device.gateway}}</p>
+                    {{/if_}}
+                </div>
+                {{/if_}}
+                {{/if_}}
+                {{/each}}
+                <div class="chart">
+                    <canvas id="chart-{{group._id}}-{{device_type.prefix}}" width="400" height="150"></canvas>
+                </div>
+            </div>
+            {{/if_}}
+            {{/each}}
+        </div>
+        {{/each}}
+    </div>
+    <!-- /.row -->
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/chart.min.js"></script>
+<script src="/js/jquery.daterangepicker.min.js"></script>
+<script src="/js/chartjs-adapter-date-fns.bundle.min.js"></script>
+<script src="/js/deviceValueChart.js"></script>

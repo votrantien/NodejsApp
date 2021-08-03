@@ -188,7 +188,7 @@ Content-Type: application/json
 {
    "serial": "AHSD12345675",
    "gate_way":"none",
-   "data": {"battery":"98","rssi":"-75","val":{"v1":"33.4-Ph","v2":"26-mS/cm","v3":"31-°C","v4":"85-%"}},
+   "data": {"battery":"98","rssi":"-75","val":{"v1":"33.4","v2":"26","v3":"31","v4":"85"}},
    "amount_of_values":"4"
 }
 

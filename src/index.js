@@ -117,9 +117,12 @@ app.use(function (req, res, next) {
 });
 
 const devices = {};
+const userRooms = {};
+const userId = {};
+
 
 io.on("connection", function (Socket) {
-  const socketName = Socket.handshake.query.socketName;
+  const socketName = Socket.handshake.query.socketName
   // console.log(socketName);
   // console.log(Socket.id)
   Socket.on('WEB_SET_UP_DEVICE', (data) => {
@@ -131,51 +134,70 @@ io.on("connection", function (Socket) {
     io.emit('CONFIG_SUCCESS', data)
   })
   Socket.on('data_sensor', (data) => {
-    console.log(data)
+    // console.log(data)
     io.emit('server_data_sensor', data)
   })
 
   //start real time device
   Socket.on('start_real_time_device', (data) => {
-    const { list_devices, list_gateway, socketName } = data
-    // console.log(list_devices, socketName)
-    list_devices.forEach(e => {
-      const dataSend = JSON.stringify({ serial: e, socketName })
-      io.emit('start_real_time_device', dataSend)
-    });
+    try {
+      const { listDevices, user } = data
+      userId[Socket.id] = user
+      userRooms[user] = listDevices
 
-    list_gateway.forEach(e => {
-      const dataSend = JSON.stringify({ serial: e, socketName })
-      io.emit('start_real_time_device', dataSend)
-    });
+      // console.log(listGateWay)
+      listDevices.forEach(e => {
+        let room = io.of("/").adapter.rooms.get(e) || {}
+        // console.log(room.size)
+
+        if (room.size >= 1) {
+          console.log('join room')
+          Socket.join(e)
+        }
+
+        if (room.size <= 2) {
+          const dataSend = JSON.stringify({ serial: e })
+          const socketIdDevice = Object.keys(devices).find(key => devices[key] === e);
+          console.log('start real time')
+          io.to(socketIdDevice).emit('start_real_time_device', dataSend)
+        }
+      })
+      // console.log(userId, userRooms)
+    } catch (e) {
+      console.log(e)
+    }
   })
 
   Socket.on('device_connect', async (data) => {
     try {
       const serial = data
       devices[Socket.id] = serial
+      Socket.join(serial)
       if (String(serial).slice(0, 4) == 'BSGW') {
         const update_status = await Device.updateMany({ gateway: serial }, { status: 1 })
       } else {
         const update_status = await Device.findOneAndUpdate({ sn_number: serial }, { status: 1 })
       }
-      console.log(String(serial).slice(0, 4))
-      io.emit('device_connected', '{ "status": "Connnect success" }')
+      // console.log(String(serial).slice(0, 4))
+
+      const dataSend = JSON.stringify({ status: "Connnect success" })
+      io.to(Socket.id).emit('device_connected', dataSend)
     } catch (e) {
       console.log(e)
     }
   })
 
-  Socket.on('device_send_value_realtime', (device_value) => {
+  // device send realtime value
+  Socket.on('send_realtime_value', (device_value) => {
     try {
-      const { serial, socketName, data, snNode } = JSON.parse(device_value);
+      const { serial, data, snNode } = JSON.parse(device_value);
       if (snNode != 'none') {
         let serial = snNode
-        io.emit(socketName, { serial, data })
+        io.emit(serial, { data })
       } else {
-        io.emit(socketName, { serial, data })
+        io.emit(serial, { data })
       }
-      console.log(serial, socketName, data, Socket.id)
+      // console.log(serial, data, Socket.id)
     } catch (e) {
       console.log(e)
     }
@@ -183,35 +205,47 @@ io.on("connection", function (Socket) {
 
   //disconnect
   Socket.on("disconnect", async (reason) => {
-    if (!devices[Socket.id]) {
-      io.emit('end_real_time_device', socketName)
-    }
     try {
-      const serial = devices[Socket.id]
-      if (String(serial).slice(0, 4) == 'BSGW') {
-        console.log('device ' + devices[Socket.id] + ' disconnected')
-        const update_status = await Device.updateMany({ gateway: serial }, { status: 0 })
-        io.emit('device_disconnect', devices[Socket.id])
-        delete devices[Socket.id]
+      if (!devices[Socket.id]) {
+        const arrRooms = userRooms[userId[Socket.id]] || []
+        arrRooms.forEach(idroom => {
+          let room = io.of("/").adapter.rooms.get(idroom)
+          if (room) {
+            if (room.size == 1) {
+              console.log('stop real time')
+              io.emit('end_real_time_device', idroom)
+            }
+          }
+        })
+        delete userId[Socket.id]
+        // io.emit('end_real_time_device', socketName)
       } else {
-        console.log('device ' + devices[Socket.id] + ' disconnected')
-        const update_status = await Device.findOneAndUpdate({ sn_number: serial }, { status: 0 })
-        io.emit('device_disconnect', devices[Socket.id])
-        delete devices[Socket.id]
+        const serial = devices[Socket.id]
+        if (String(serial).slice(0, 4) == 'BSGW') {
+          console.log('device ' + devices[Socket.id] + ' disconnected')
+          const update_status = await Device.updateMany({ gateway: serial }, { status: 0 })
+          io.emit('device_disconnect', devices[Socket.id])
+          delete devices[Socket.id]
+        } else {
+          console.log('device ' + devices[Socket.id] + ' disconnected')
+          const update_status = await Device.findOneAndUpdate({ sn_number: serial }, { status: 0 })
+          io.emit('device_disconnect', devices[Socket.id])
+          delete devices[Socket.id]
+        }
       }
-
     } catch (e) {
       console.log(e)
     }
   })
-
   // node_disconnected
-  Socket.on("node_disconnect", async (data) => {
+  Socket.on("node_status", async (data) => {
     try {
-        const serial = data;
-        console.log('device ' + serial + ' disconnected')
-        const update_status = await Device.findOneAndUpdate({ sn_number: serial }, { status: 0 })
-        io.emit('node_device_disconnect', serial)
+      const {serial, status} = data
+      // console.log(data)
+      // status : 1 -online; 2 - sleep; 0 - ofline
+      // serial : sn number node
+      const update_status = await Device.findOneAndUpdate({ sn_number: serial }, { status: status })
+      io.emit('node_status', {serial, status})
     } catch (e) {
       console.log(e)
     }
