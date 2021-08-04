@@ -29,7 +29,7 @@
         color: white;
         background-color: #016343;
         position: relative;
-        margin: 10px 0px 0px;
+        margin: 0px 0px 5px;
     }
 
     .tab-active {
@@ -371,14 +371,13 @@
         //socket io
         var socket = io();
         var user = $('#user').val();
-
+        var listDevices = [];
+        $('.device_sn').map(function (e) {
+            var device_sn = this.value;
+            listDevices.push(device_sn);
+        })
         //start real time
-        async function StartRealTime() {
-            var listDevices = [];
-            await $('.device_sn').map(function (e) {
-                var device_sn = this.value;
-                listDevices.push(device_sn);
-            })
+        function StartRealTime() {
             //console.log(listGateWay);
             if (listDevices) {
                 socket.emit('start_real_time_device', { listDevices, user });
@@ -388,13 +387,21 @@
         }
         StartRealTime();
 
+        //Device connected
+        socket.on('device_connect', function (data) {
+            if (listDevices.indexOf(data) != -1) {
+                $(`#tab-${data}`).removeClass('status-1 status-2 status-0');
+                $(`#tab-${data}`).addClass('status-1');
+                socket.emit('start_real_time_device', { listDevices, user });
+            }
+        })
+
         //on realtime value
         $('.device_sn').map(function () {
             var deviceSn = $(this).val();
             socket.on(deviceSn, function (value) {
                 // value = {serial: ..., value: {...}}
-                console.log(value);
-
+                // console.log(value);
                 var serial = value.serial;
                 var data = value.data;
                 for (const [key, value] of Object.entries(data.val)) {

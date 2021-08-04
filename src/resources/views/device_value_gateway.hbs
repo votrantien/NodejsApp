@@ -25,7 +25,7 @@
         outline: none;
         border: none;
         padding: 15px;
-        margin: 10px 0px 0px;
+        margin: 0px 0px 5px;
         color: white;
         background-color: #016343;
     }
@@ -87,6 +87,10 @@
         text-align: right;
         font-size: 2rem;
         font-weight: bold;
+    }
+
+    .device-item .device-item-value .value-wrapper {
+        float: right;
     }
 
     .collapse-open::after {
@@ -299,7 +303,13 @@
                                     <br>
                                     <span class="device-item-value">
                                         <i class="fas fa-bullseye icon"></i>
-                                        <i class="value">N/a</i>
+                                        {{#each device.device_type.uom_values}}
+                                        <span class="value-wrapper">
+                                            <i class="value" id="{{@key}}-{{device.sn_number}}">N/a</i><i>
+                                                {{this.uom}}</i>
+                                        </span>
+                                        <br>
+                                        {{/each}}
                                     </span>
                                 </p>
                                 <p class="device-item-name">{{device.device_name}}</p>
@@ -318,7 +328,7 @@
                                     chart-id="chart-{{gateway.sn_number}}-{{dev_type.prefix}}"
                                     dev-group="dev-type-{{gateway.sn_number}}-{{dev_type.prefix}}">
                                     {{#each uom_values}}
-                                    <option value="{{@key}}">{{this}}</option>
+                                    <option value="{{@key}}" uom="{{this.uom}}">{{this.name}}</option>
                                     {{/each}}
                                 </select>
                             </div>
@@ -422,23 +432,28 @@
         //socket io
         var socket = io();
         var user = $('#user').val();
-
+        var listDevices = [];
+        $('.gateway_sn').map(function (e) {
+            var gateway_sn = this.value;
+            listDevices.push(gateway_sn);
+        })
         //start real time
-        async function StartRealTime() {
-            var listDevices = [];
-            await $('.gateway_sn').map(function (e) {
-                var gateway_sn = this.value;
-                listDevices.push(gateway_sn);
-            })
+        function StartRealTime() {
             //console.log(listGateWay);
             if (listDevices) {
                 socket.emit('start_real_time_device', { listDevices, user });
             }
-
-
         }
-        StartRealTime();
 
+        StartRealTime();
+        //Device connected
+        socket.on('device_connect', function (data) {
+            if(listDevices.indexOf(data) != -1){
+                $(`#gw-${data} .device-item`).removeClass('status-1 status-2 status-0');
+                $(`#gw-${data} .device-item`).addClass('status-1');
+                socket.emit('start_real_time_device', { listDevices, user });
+            }
+        })
         //on realtime value
         $('.device-item').map(function () {
             var deviceSn = $(this).attr('device-sn');
@@ -448,9 +463,9 @@
                 var data = value.data;
                 var rssi = data.rssi;
                 var battery = data.battery;
-                var valueHtml = '';
                 for (const [key, value] of Object.entries(data.val)) {
-                    valueHtml += value + '</br>';
+                    $(`#${key}-${deviceSn}`).html(value);
+                    console.log(`#${key}-${deviceSn}`)
                 }
 
 
@@ -459,7 +474,6 @@
 
                 $(`#dev-${deviceSn} .device-item-battery .value`).html(battery);
                 $(`#dev-${deviceSn} .device-item-rssi .value`).html(rssi);
-                $(`#dev-${deviceSn} .device-item-value .value`).html(rssi);
                 //console.log(deviceSn, value)
             });
         })
@@ -472,14 +486,14 @@
 
                 $(`#gw-${data} .device-item .device-item-battery .value`).html("N/a");
                 $(`#gw-${data} .device-item .device-item-rssi .value`).html("N/a");
-                $(`#gw-${data} .device-item .device-item-value .value`).html("N/a");
+                $(`#gw-${data} .device-item .device-item-value .value-wrapper .value`).html("N/a");
             } else {
                 $(`#dev-${data}`).removeClass('status-1 status-2 status-0');
                 $(`#dev-${data}`).addClass('status-0');
 
                 $(`#dev-${data} .device-item-battery .value`).html("N/a");
                 $(`#dev-${data} .device-item-rssi .value`).html("N/a");
-                $(`#dev-${data} .device-item-value .value`).html("N/a");
+                $(`#dev-${data} .device-item-value .value-wrapper .value`).html("N/a");
             }
         })
 
@@ -494,7 +508,7 @@
 
                 $(`#dev-${serial} .device-item-battery .value`).html("N/a");
                 $(`#dev-${serial} .device-item-rssi .value`).html("N/a");
-                $(`#dev-${serial} .device-item-value .value`).html("N/a");
+                $(`#dev-${serial} .device-item-value .value-wrapper .value`).html("N/a");
             }
         })
 
@@ -527,14 +541,15 @@
             var chartId = `chart-${gateway}-${devType}`;
             var chart = Chart.getChart(chartId);
             var onChart = $(this).data('on-chart');
-            var uomValue = $(`#uom-${gateway}-${devType}`).val();
-            var uomText = $(`#uom-${gateway}-${devType} option:selected`).text();
+            var uom = $(`#uom-${gateway}-${devType} option:selected`).attr('uom');
+            var uomKey = $(`#uom-${gateway}-${devType}`).val();
+            var uomName = $(`#uom-${gateway}-${devType} option:selected`).text();
             var typeName = $(this).attr('type-name');
             var color = Colors[$(this).attr('color-idx')];
             var dpValue = $(`#date-picker-${gateway}-${devType}`).val().split(' ~ ');
             var startDate = dpValue[0];
             var endDate = dpValue[1];
-            var chartTitle = String(`${typeName} ( ${uomText} ) - Từ ${startDate} đến ${endDate}`).toUpperCase();
+            var chartTitle = String(`${typeName} ( ${uom} ) - Từ ${startDate} đến ${endDate}`).toUpperCase();
 
             if (onChart == 'true') {
                 $(this).data('on-chart', 'false');
@@ -569,15 +584,13 @@
 
                 if (chartData) {
                     chartData.forEach((log) => {
-                        var dbValue = [];
+                        var dbValue;
                         for (var key of Object.keys(log.device_value)) {
-                            if (key == uomValue) {
-                                dbValue = log.device_value[key].split('-')
+                            if (key == uomKey) {
+                                dbValue = log.device_value[key]
                             }
                         }
-
-                        var value = dbValue[0];
-                        var uom = dbValue[1];
+                        var value = dbValue;
                         var data = { x: log.createdAt, y: value * 1 }
                         dataset.data.push(data);
                     });
@@ -680,10 +693,11 @@
             var dpValue = $(`#${devGroup} .date-picker`).val().split(' ~ ');
             var startDate = dpValue[0];
             var endDate = dpValue[1];
-            var uomValue = $(`#${devGroup} .list-uom`).val();
-            var uomText = $(`#${devGroup} .list-uom option:selected`).text();
+            var uom = $(`#${devGroup} .list-uom option:selected`).attr('uom');
+            var uomKey = $(`#${devGroup} .list-uom`).val();
+            var uomName = $(`#${devGroup} .list-uom option:selected`).text();
             var typeName = $(`#${devGroup}`).attr('group-label');
-            var chartTitle = String(`${typeName} ( ${uomText} )  - Từ ${startDate} đến ${endDate}`).toUpperCase();
+            var chartTitle = String(`${typeName} ( ${uom} )  - Từ ${startDate} đến ${endDate}`).toUpperCase();
             var datasets = [];
 
             var deviceLogs = await PrepareChartData(serials, startDate, endDate);
@@ -708,15 +722,14 @@
                     };
                     deviceLogs.forEach(function (log) {
                         if (log.device_serial == serial) {
-                            var dbValue = [];
+                            var dbValue;
                             for (var key of Object.keys(log.device_value)) {
-                                if (key == uomValue) {
-                                    dbValue = log.device_value[key].split('-')
+                                if (key == uomKey) {
+                                    dbValue = log.device_value[key]
                                 }
                             }
 
-                            var value = dbValue[0];
-                            var uom = dbValue[1];
+                            var value = dbValue;
                             var data = { x: log.createdAt, y: value * 1 }
                             dataset.data.push(data);
                         }

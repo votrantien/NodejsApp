@@ -147,19 +147,16 @@ io.on("connection", function (Socket) {
 
       // console.log(listGateWay)
       listDevices.forEach(e => {
-        let room = io.of("/").adapter.rooms.get(e) || {}
+        const socketIdDevice = Object.keys(devices).find(key => devices[key] === e);
+        let room = io.of("/").adapter.rooms.get(socketIdDevice) || {}
+
         // console.log(room.size)
-
-        if (room.size >= 1) {
+        if(room.size == 1 ){
           console.log('join room')
-          Socket.join(e)
-        }
-
-        if (room.size <= 2) {
-          const dataSend = JSON.stringify({ serial: e })
-          const socketIdDevice = Object.keys(devices).find(key => devices[key] === e);
-          console.log('start real time')
-          io.to(socketIdDevice).emit('start_real_time_device', dataSend)
+          Socket.join(socketIdDevice)
+          io.to(socketIdDevice).emit('start_real_time_device')
+        }else if (room.size > 1) {
+          Socket.join(socketIdDevice)
         }
       })
       // console.log(userId, userRooms)
@@ -169,17 +166,18 @@ io.on("connection", function (Socket) {
   })
 
   Socket.on('device_connect', async (data) => {
+    io.emit('device_connect', data);
     try {
       const serial = data
       devices[Socket.id] = serial
-      Socket.join(serial)
+      // Socket.join(serial)
       if (String(serial).slice(0, 4) == 'BSGW') {
         const update_status = await Device.updateMany({ gateway: serial }, { status: 1 })
       } else {
         const update_status = await Device.findOneAndUpdate({ sn_number: serial }, { status: 1 })
       }
       // console.log(String(serial).slice(0, 4))
-
+      console.log('device connect id socket', Socket.id, 'arr device ', devices)
       const dataSend = JSON.stringify({ status: "Connnect success" })
       io.to(Socket.id).emit('device_connected', dataSend)
     } catch (e) {
@@ -209,11 +207,12 @@ io.on("connection", function (Socket) {
       if (!devices[Socket.id]) {
         const arrRooms = userRooms[userId[Socket.id]] || []
         arrRooms.forEach(idroom => {
-          let room = io.of("/").adapter.rooms.get(idroom)
+          const socketIdDevice = Object.keys(devices).find(key => devices[key] === idroom);
+          let room = io.of("/").adapter.rooms.get(socketIdDevice)
           if (room) {
             if (room.size == 1) {
               console.log('stop real time')
-              io.emit('end_real_time_device', idroom)
+              io.to(socketIdDevice).emit('end_real_time_device', idroom)
             }
           }
         })
@@ -230,6 +229,7 @@ io.on("connection", function (Socket) {
           console.log('device ' + devices[Socket.id] + ' disconnected')
           const update_status = await Device.findOneAndUpdate({ sn_number: serial }, { status: 0 })
           io.emit('device_disconnect', devices[Socket.id])
+          Socket.leave(devices[Socket.id])
           delete devices[Socket.id]
         }
       }
@@ -240,12 +240,12 @@ io.on("connection", function (Socket) {
   // node_disconnected
   Socket.on("node_status", async (data) => {
     try {
-      const {serial, status} = data
+      const { serial, status } = data
       // console.log(data)
       // status : 1 -online; 2 - sleep; 0 - ofline
       // serial : sn number node
       const update_status = await Device.findOneAndUpdate({ sn_number: serial }, { status: status })
-      io.emit('node_status', {serial, status})
+      io.emit('node_status', { serial, status })
     } catch (e) {
       console.log(e)
     }
