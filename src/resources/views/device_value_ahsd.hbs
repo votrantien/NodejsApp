@@ -463,7 +463,9 @@
             if (onChart == 'true') {
                 $(this).attr('on-chart', 'false');
                 $(this).removeClass('on-chart');
-                chart.destroy();
+                if(chart){
+                    chart.destroy();
+                }
                 $(`#dev-${serial} .chart-title`).show();
             } else {
                 $(`#uom-key-${serial}`).val(keyValue);
@@ -500,6 +502,7 @@
                     ScrollToElement(chartId);
                 }
                 $(`#dev-${serial} .device-item`).removeClass('on-chart');
+                $(`#dev-${serial} .device-item`).attr('on-chart', 'false');
                 $(this).addClass('on-chart');
                 $(this).attr('on-chart', 'true');
             }

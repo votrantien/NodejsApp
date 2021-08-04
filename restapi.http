@@ -123,14 +123,14 @@ GET http://localhost:3000/device/GetTimeServer HTTP/1.1
 POST http://{{host}}/auth/signup/ HTTP/1.1
 Content-Type: application/json
 
-{"username":"usertest3", "email":"votrantien3@ymail.com","password":"123456789","fullname":"test user","phone":"0255848254","groupname":"group default 1"}
+{"username":"usertest5", "email":"votrantien5@ymail.com","password":"123456789","fullname":"test user","phone":"0255848254","groupname":"group default 1"}
 
 ### Login và lấy jwt
 
 POST http://{{host}}/auth/sign-in/ HTTP/1.1
 Content-Type: application/json
 
-{"username":"usertest","password":"123456789"}
+{"username":"usertest","password":"1234567859"}
 
 ### Đăng ký thiết bị
 POST http://{{host}}/device/register-device HTTP/1.1
@@ -152,7 +152,7 @@ POST http://{{host}}/device/active HTTP/1.1
 Content-Type: application/json
 
 {
-   "serial": "NOTH123456797",
+   "serial": "NOTH1234567697",
    "group": "60dfdee653d79310d4c4cb2c",
    "gate_way": "BSGW123456795",
    "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwZTk3NzQ5NTE3MzIyMTZkOGFjNTQ1OSIsImlhdCI6MTYyNzEzMzkzMCwiZXhwIjoxNjI3MzkzMTMwfQ.GlOlREz4csfrJczvhcK0BCOH3IJjvdflUnQdDdZAaKA"
@@ -186,7 +186,7 @@ POST http://{{host}}/device/add-value HTTP/1.1
 Content-Type: application/json
 
 {
-   "serial": "NOLX123456795",
+   "serial": "NOLX4123456795",
    "gate_way":"none",
    "data": {"battery":"98","rssi":"-75","val":{"lux":"33.4"}},
    "amount_of_values":"4"
@@ -198,7 +198,7 @@ PUT http://{{host}}/user/change-password HTTP/1.1
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwZTk3NzQ5NTE3MzIyMTZkOGFjNTQ1OSIsImlhdCI6MTYyNjc3NTU2OSwiZXhwIjoxNjI3MDM0NzY5fQ.p6x0N-rHT1S54-9COr7C8jlvgisE-_EkE4MdXmrrfZA
 
-{"old_password":"123456789","new_password":"123456789"}
+{"old_password":"1234567869","new_password":"123456789"}
 
 ### get logs device
 POST http://{{host}}/device/device-logs HTTP/1.1
