@@ -1,0 +1,221 @@
+.group-wrapper {
+    margin-bottom: 15px;
+}
+
+.group-label {
+    font-size: 2rem;
+    color: #039666;
+    margin-bottom: 15px;
+}
+
+.group-item {
+    border-bottom: solid 1px #016343;
+    border-left: solid 1px #016343;
+    padding-bottom: 5px;
+}
+
+.tab-controll {
+    border-bottom: solid 2px #016343;
+}
+
+.tab-link {
+    font-size: 1.5rem;
+    border-radius: 0;
+    outline: none;
+    border: none;
+    padding: 15px;
+    margin: 0;
+    color: white;
+    background-color: #016343;
+    position: relative;
+    margin: 0px 0px 5px;
+}
+
+.tab-active {
+    background-color: #039666;
+}
+
+.tab-content {
+    margin-top: 15px;
+    padding: 15px;
+}
+
+.device-type-controll {
+    position: relative;
+    font-size: 1.5rem;
+    border-radius: 0;
+    outline: none;
+    border: none;
+    padding: 10px;
+    margin: 5px;
+    color: white;
+    background-color: #016343;
+}
+
+.device-group {
+    padding-top: 2px;
+    margin: 5px;
+    position: relative;
+    border: solid 1px #016343;
+    margin-top: 15px;
+}
+
+.device-group::before {
+    content: attr(group-label)"\a";
+    white-space: pre;
+    background-color: #016343;
+    padding: 5px;
+}
+
+.device-item {
+    padding: 12px;
+    width: 150px;
+    max-width: 150px;
+    font-size: 1.3rem;
+    border-radius: 0;
+    outline: none;
+    border: none;
+    margin: 10px;
+    color: white;
+    background-color: #016343;
+    text-align: left;
+    text-overflow: ellipsis;
+    position: relative;
+}
+
+.device-item .device-item-value {
+    text-align: right;
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.collapse-open::after {
+    position: absolute;
+    content: '';
+    width: 5px;
+    height: 100%;
+    left: 0;
+    background-color: yellow;
+    top: 0;
+}
+
+
+/* device status */
+
+.status-1::after {
+    position: absolute;
+    content: 'Online';
+    color: #42ff42;
+    top: 0;
+    right: 0;
+    padding: 1px 3px 1px;
+    font-weight: bold;
+    background-color: rgba(0, 0, 0, 0.7);
+    font-size: 1.2rem;
+}
+
+.status-2::after {
+    position: absolute;
+    content: 'Sleep';
+    color: #fbff04;
+    top: 0;
+    right: 0;
+    padding: 1px 3px 1px;
+    font-weight: bold;
+    background-color: rgba(0, 0, 0, 0.7);
+    font-size: 1.2rem;
+}
+
+.status-0::after {
+    position: absolute;
+    content: 'Offline';
+    color: #ff0000;
+    top: 0;
+    right: 0;
+    padding: 1px 3px 1px;
+    font-weight: bold;
+    background-color: rgba(0, 0, 0, 0.7);
+    font-size: 1.2rem;
+}
+
+.uom-wrapper {
+    padding: 8px;
+}
+
+.list-uom {
+    background-color: black;
+    border: none;
+    min-width: 200px;
+    font-weight: bold;
+}
+
+.chart-title {
+    width: 100%;
+    color: rgba(255, 255, 255, 0.7);
+    text-align: center;
+}
+
+.chart-wrapper {
+    position: relative;
+}
+
+.chart-canvas {
+    max-height: 400px;
+}
+
+
+/* check device on chart */
+
+.on-chart::before {
+    position: absolute;
+    content: 'Biểu đồ';
+    padding: 3px;
+    font-size: 1rem;
+    background-color: green;
+    color: #fff;
+    bottom: 0;
+    right: 0;
+}
+
+.quick-time-wrapper {
+    padding: 5px;
+}
+
+.quick-time-list {
+    display: flex;
+    list-style: none;
+    padding: 0;
+}
+
+.quick-time-list .quick-time-item {
+    padding: 5px 10px 5px;
+    font-size: 1.3rem;
+    font-weight: bold;
+    margin-left: 5px;
+    width: 50px;
+    text-align: center;
+    cursor: pointer;
+    position: relative;
+    background-color: #016343;
+    color: #fff;
+}
+
+.quick-time-list .quick-time-label {
+    padding: 5px 10px 5px;
+    font-size: 1.3rem;
+    font-weight: bold;
+    margin-left: 5px;
+    text-align: center;
+    background-color: #016343;
+    color: #fff;
+}
+
+.high-light-box::after {
+    position: absolute;
+    content: '';
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: solid 3px #1ee05a;
+}

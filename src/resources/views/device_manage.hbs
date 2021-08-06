@@ -1,0 +1,100 @@
+<style>
+    .list-device-wrapper {
+        width: 100%;
+    }
+
+    .list-device {
+        width: 100%;
+    }
+
+    .list-device * {
+        border: solid 1px white;
+    }
+
+    .list-device .list-device-header th {
+        padding: 5px;
+    }
+
+    .list-device .list-device-item td {
+        padding: 5px;
+    }
+
+    .list-node {
+        width: 100%;
+    }
+
+    .list-node .list-node-header th {
+        padding: 5px;
+        text-align: center;
+    }
+
+    .list-node .list-node-item td {
+        padding: 5px;
+    }
+</style>
+
+<div id="page-wrapper">
+    {{!-- device table --}}
+    <div class="list-device-wrapper" style="overflow-x:auto;">
+        <table class="list-device">
+            <tr class="list-device-header">
+                <th>Serial<i class="fas fa- show-node" value="BSGW12345678">Node</i></th>
+                <th>Tên</th>
+                <th>Loại</th>
+                <th>Công cụ</th>
+            </tr>
+            <tr class="list-device-item">
+                <td class="device-item">BSGW12345678</td>
+                <td class="device-item">Gateway farm 1</td>
+                <td class="device-item">Gateway</td>
+                <td class="device-item">
+                    
+                </td>
+            </tr>
+            <tr class="collapse" id="node-BSGW12345678">
+                <td colspan="5">
+                    <table class="list-node">
+                        <tr>
+                            <td colspan="5">---</td>
+                        </tr>
+                        <tr class="list-node-header">
+                            <th>Gateway</th>
+                            <th>Serial node</th>
+                            <th>Tên node</th>
+                            <th>Loại</th>
+                            <th>Công cụ</th>
+                        </tr>
+                        <tr class="list-node-item">
+                            <td>BSGW12345678</td>
+                            <td class="node-item">NOTH12345678</td>
+                            <td class="node-item">Node farm 1</td>
+                            <td class="node-item">Node nhiệt độ</td>
+                            <td class="node-item">
+                                <button>edit</button>
+                            </td>
+                        </tr>
+                        <tr class="list-node-item">
+                            <td>BSGW12345678</td>
+                            <td class="node-item">NOTH12345678</td>
+                            <td class="node-item">Node farm 1</td>
+                            <td class="node-item">Node nhiệt độ</td>
+                            <td class="node-item">
+                                <button>edit</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="6">---</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<script>
+$('.show-node').on('click',function(){
+    var idNode = `#node-${$(this).val()}`;
+    $(idNode).toggleClass('collapse');
+})
+</script>
