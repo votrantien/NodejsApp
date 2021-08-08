@@ -38,19 +38,20 @@
                             chart-id="chart-{{device.sn_number}}">
                     </div>
                     {{!-- device controll --}}
-                    <div>
+                    <div class="group-device-item">
                         {{#each device.device_type.uom_values as |value_type|}}
                         <button class="device-item" style="background-color: #016343;"
                             id="val-{{device.sn_number}}-{{@key}}" device-sn="{{device.sn_number}}"
                             color-idx="{{@index}}" key-value="{{@key}}" value-name="{{value_type.name}}"
                             uom="{{value_type.uom}}" on-chart="false">
                             <p class="device-item-dynamic-value">
-                                <span>{{value_type.name}}</span>
+                                <span class="value-type">{{value_type.name}}</span>
                                 <br>
                                 <span class="device-item-value">
                                     <i class="fas fa-bullseye icon"></i>
-                                    <i class="value" style="width: 50px;">N/a</i>
+                                    <i class="value">N/a</i>
                                 </span>
+                                <br>
                                 <i class="uom">{{value_type.uom}}</i>
                             </p>
                         </button>

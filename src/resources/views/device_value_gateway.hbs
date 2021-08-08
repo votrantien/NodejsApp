@@ -54,7 +54,7 @@
                                 dev-group="dev-type-{{gateway.sn_number}}-{{dev_type.prefix}}">
                         </div>
                         {{!-- device controll --}}
-                        <div>
+                        <div class="group-device-item">
                             {{#each ../../../devices as |device|}}
                             {{#if_ device.gateway '==' gateway.sn_number}}
                             {{#if_ device.device_model '==' dev_type.prefix}}
@@ -78,10 +78,9 @@
                                         <i class="fas fa-bullseye icon"></i>
                                         {{#each device.device_type.uom_values}}
                                         <span class="value-wrapper">
-                                            <i class="value" id="{{@key}}-{{device.sn_number}}">N/a</i><i>
-                                                {{this.uom}}</i>
+                                            <i class="value" id="{{@key}}-{{device.sn_number}}">N/a</i>
+                                            <i class="uom">{{this.uom}}</i>
                                         </span>
-                                        <br>
                                         {{/each}}
                                     </span>
                                 </p>

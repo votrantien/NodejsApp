@@ -95,25 +95,25 @@ $(document).ready(function () {
 
         $(`#dev-${serial} .device-item-battery .value`).html(battery);
         $(`#dev-${serial} .device-item-rssi .value`).html(rssi);
-        //console.log(deviceSn, value)
+        //console.log(serial, data)
     });
 
     //check device disconnect
-    socket.on('device_disconnect', function (data) {
-        if (String(data).slice(0, 4) == 'BSGW') {
-            $(`#gw-${data} .device-item`).removeClass('status-1 status-2 status-0');
-            $(`#gw-${data} .device-item`).addClass('status-0');
+    socket.on('device_disconnect', function (serial) {
+        if (String(serial).slice(0, 4) == 'BSGW') {
+            $(`#gw-${serial} .device-item`).removeClass('status-1 status-2 status-0');
+            $(`#gw-${serial} .device-item`).addClass('status-0');
 
-            $(`#gw-${data} .device-item .device-item-battery .value`).html("N/a");
-            $(`#gw-${data} .device-item .device-item-rssi .value`).html("N/a");
-            $(`#gw-${data} .device-item .device-item-value .value-wrapper .value`).html("N/a");
+            $(`#gw-${serial} .device-item .device-item-battery .value`).html("N/a");
+            $(`#gw-${serial} .device-item .device-item-rssi .value`).html("N/a");
+            $(`#gw-${serial} .device-item .device-item-value .value-wrapper .value`).html("N/a");
         } else {
-            $(`#dev-${data}`).removeClass('status-1 status-2 status-0');
-            $(`#dev-${data}`).addClass('status-0');
+            $(`#dev-${serial}`).removeClass('status-1 status-2 status-0');
+            $(`#dev-${serial}`).addClass('status-0');
 
-            $(`#dev-${data} .device-item-battery .value`).html("N/a");
-            $(`#dev-${data} .device-item-rssi .value`).html("N/a");
-            $(`#dev-${data} .device-item-value .value-wrapper .value`).html("N/a");
+            $(`#dev-${serial} .device-item-battery .value`).html("N/a");
+            $(`#dev-${serial} .device-item-rssi .value`).html("N/a");
+            $(`#dev-${serial} .device-item-value .value-wrapper .value`).html("N/a");
         }
     })
 

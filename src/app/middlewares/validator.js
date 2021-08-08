@@ -75,8 +75,8 @@ let validateUpdateDevice = [
     }),
     body('device_name', 'Nhập tên thiết bị').not().isEmpty(),
     body('device_model', 'Nhập model thiết bị').not().isEmpty(),
-    body('device_type_id', 'Nhập id loại thiết bị').not().isEmpty(),
-    body('device_type_id').custom(value => {
+    body('device_type', 'Nhập id loại thiết bị').not().isEmpty(),
+    body('device_type').custom(value => {
         return DeviceType.findOne({ _id: value }).then(deviceType => {
             if (!deviceType) {
                 return Promise.reject('Id loại thiết bị không hợp lệ')
@@ -84,8 +84,22 @@ let validateUpdateDevice = [
         })
     }),
     body('fw_number', 'Nhập fw_number thiết bị').not().isEmpty(),
-    body('mfg', 'Nhập mfg thiết bị').not().isEmpty(),
-    body('location', 'Nhập vị trí thiết bị').not().isEmpty(),
+    body('hw_number', 'Nhập hw_number thiết bị').not().isEmpty(),
+    body('mfg_date', 'Nhập mfg_date thiết bị').not().isEmpty(),
+    body('country', 'Nhập nơi sản xuất thiết bị').not().isEmpty(),
+]
+
+let validateDeleteDevice = [
+    param('id', 'Nhập id thiết bị').not().isEmpty(),
+    param('id').custom(value => {
+        return Device.findOne({ _id: value }).then(device => {
+            if (!device) {
+                return Promise.reject('Id thiết bị không tồn tại')
+            } else if(device.group != null){
+                return Promise.reject('deactive thiết bị trước khi xoá')
+            }
+        })
+    })
 ]
 
 let validateSignup = [
@@ -272,6 +286,7 @@ let validate = {
     validateInActiveDevice: validateInActiveDevice,
     validateDeactivateNode: validateDeactivateNode,
     validateAddDeviceValue: validateAddDeviceValue,
+    validateDeleteDevice: validateDeleteDevice,
 }
 
 module.exports = { validate }

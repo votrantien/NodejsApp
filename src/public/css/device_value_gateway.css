@@ -64,10 +64,16 @@
     padding: 5px;
 }
 
+.group-device-item{
+    display: flex;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: center;
+}
+
 .device-item {
     padding: 12px;
-    width: 150px;
-    max-width: 150px;
     font-size: 1.3rem;
     border-radius: 0;
     outline: none;
@@ -78,16 +84,76 @@
     text-align: left;
     text-overflow: ellipsis;
     position: relative;
+    flex: 0 0 200px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: center;
 }
 
-.device-item .device-item-value {
+.device-item-dynamic-value{
+    flex: 1 0 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.device-item-dynamic-value .device-item-battery,
+.device-item-dynamic-value .device-item-rssi{
+    flex: 1 0 50%;
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.device-item-dynamic-value .device-item-battery *,
+.device-item-dynamic-value .device-item-rssi *{
+    padding-right: 5px;
+}
+
+
+.device-item-dynamic-value .device-item-value {
     text-align: right;
     font-size: 2rem;
     font-weight: bold;
+    flex: 1 0 100%;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    padding-top: 5px;
 }
 
-.device-item .device-item-value .value-wrapper {
-    float: right;
+.device-item-value .icon{
+    flex: 1 0 100%;
+    text-align: left;
+}
+
+.device-item-value .value-wrapper{
+    flex: 1 0 100%;
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.device-item-value .value-wrapper .value{
+    flex: 1 0 70%;
+    overflow: hidden;
+}
+
+.device-item-value .value-wrapper .uom{
+    flex: 1 0 30%;
+}
+
+.device-item-name {
+    flex: 1 0 100%;
 }
 
 .collapse-open::after {

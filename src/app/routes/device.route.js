@@ -19,8 +19,8 @@ router.post('/deactivate-device', validate.validateInActiveDevice, deviceControl
 router.post('/create', requireAuth, validate.validateCreateDevice, deviceController.post_create)
 router.get('/list', requireAuth, deviceController.get_list)
 router.get('/:id', requireAuth, deviceController.get_device)
-router.put('/update/:id', requireAuth, validate.validateUpdateDevice, deviceController.put_update)
-router.delete('/delete/:id', requireAuth, deviceController.delete_delete)
+router.put('/update/:id', requireAuth, validate.validateUpdateDevice, deviceController.put_updateDevice)
+router.delete('/delete/:id', requireAuth, validate.validateDeleteDevice, deviceController.delete_deleteDevice)
 router.post('/device-logs', deviceController.post_logDevice)
 router.get('/*', requireLogin, deviceController.index)
 module.exports = router;

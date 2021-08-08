@@ -74,7 +74,7 @@ $(document).ready(function () {
 
     socket.on('realtime_device_value', function (data) {
         // value = {serial: ..., value: {...}}
-        //console.log(data);
+        // console.log(data);
         var serial = data.serial;
         for (const [key, value] of Object.entries(data.data.val)) {
             var idxValue = key;

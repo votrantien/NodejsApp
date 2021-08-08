@@ -20,7 +20,7 @@
     <!-- you need to include the shieldui css and js assets in order for the charts to work -->
     <link rel="stylesheet" type="text/css" href="/vendor/light_bootstrap/all.min.css" />
     <link id="gridcss" rel="stylesheet" type="text/css" href="/vendor/dark_boostrap/all.min.css" />
- 
+
     <script type="text/javascript" src="/vendor/shieldui-all.min.js"></script>
     <script type="text/javascript" src="/vendor/gridData.js"></script>
     <script type="text/javascript" src="/js/main.js"></script>
@@ -52,7 +52,22 @@
 
     {{>footer}}
 
+    <div class="modal" tabindex="-1" role="dialog" id="noticeModal">
+        <div class="modal-dialog radius-none" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Modal title</h5>
+                </div>
+                <div class="modal-body">
 
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="noticeModalSubmit" submit-type="none">Gửi</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal" id="modalCancel">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div id="mask" style="display: none;">
         <div id="loader"></div>
