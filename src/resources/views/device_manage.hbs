@@ -18,7 +18,7 @@
         padding: 5px;
     }
 
-    .list-device .list-device-item td {
+    .list-device .list-device-item-td td {
         padding: 5px;
     }
 
@@ -76,21 +76,21 @@
             </tr>
             {{#each devices as |device|}}
             {{#if_ device.gateway "==" "none"}}
-            <tr class="list-device-item" id="dev-{{device.sn_number}}">
-                <td class="device-item device-serial" nowrap>
+            <tr class="list-device-item-td" id="dev-{{device.sn_number}}">
+                <td class="device-item-td device-serial" nowrap>
                     {{device.sn_number}}
                     {{#if_ device.device_model "==" "BSGW"}}
                     <button class="controll-button show-node fas fa-plus" value="{{device.sn_number}}"></button>
                     {{/if_}}
                 </td>
-                <td class="device-item device-name">{{device.device_name}}</td>
-                <td class="device-item device-type">{{device.device_type.device_type}}</td>
-                <td class="device-item device-group">{{device.group.group_name}}</td>
-                <td class="device-item fw-number">{{device.fw_number}}</td>
-                <td class="device-item hw-number">{{device.hw_number}}</td>
-                <td class="device-item mfg-date" nowrap>{{device.mfg_date}}</td>
-                <td class="device-item country">{{device.country}}</td>
-                <td class="device-item status" nowrap>
+                <td class="device-item-td device-name">{{device.device_name}}</td>
+                <td class="device-item-td device-type">{{device.device_type.device_type}}</td>
+                <td class="device-item-td device-group">{{device.group.group_name}}</td>
+                <td class="device-item-td fw-number">{{device.fw_number}}</td>
+                <td class="device-item-td hw-number">{{device.hw_number}}</td>
+                <td class="device-item-td mfg-date" nowrap>{{device.mfg_date}}</td>
+                <td class="device-item-td country">{{device.country}}</td>
+                <td class="device-item-td status" nowrap>
                     {{#if device.group._id}}
                     <label class="switch">
                         <input type="checkbox" class="change-status-device" id="active-{{device.sn_number}}"
@@ -107,7 +107,7 @@
                     </label>
                     {{/if}}
                 </td>
-                <td class="device-item" nowrap>
+                <td class="device-item-td" nowrap>
                     <button class="controll-button fas fa-pen edit" dev-id="{{device._id}}"
                         dev-serial="{{device.sn_number}}" dev-name="{{device.device_name}}"
                         dev-type="{{device.device_type._id}}" dev-fw="{{device.fw_number}}"
@@ -467,26 +467,26 @@
                 if (status == 'success') {
                     var html;
                     if (device.device_model == "BSGW") {
-                        html = `<tr class="list-device-item" id="dev-${device.sn_number}">
-                                    <td class="device-item device-serial" nowrap>
+                        html = `<tr class="list-device-item-td" id="dev-${device.sn_number}">
+                                    <td class="device-item-td device-serial" nowrap>
                                         ${device.sn_number}
                                         <button class="controll-button show-node fas fa-plus" value="${device.sn_number}"></button>
                                     </td>
-                                    <td class="device-item device-name">${device.device_name}</td>
-                                    <td class="device-item device-type">${deviceTypeText}</td>
-                                    <td class="device-item device-group"></td>
-                                    <td class="device-item fw-number">${device.fw_number}</td>
-                                    <td class="device-item hw-number">${device.hw_number}</td>
-                                    <td class="device-item mfg-date" nowrap>${device.mfg_date}</td>
-                                    <td class="device-item country">${device.country}</td>
-                                    <td class="device-item status" nowrap>
+                                    <td class="device-item-td device-name">${device.device_name}</td>
+                                    <td class="device-item-td device-type">${deviceTypeText}</td>
+                                    <td class="device-item-td device-group"></td>
+                                    <td class="device-item-td fw-number">${device.fw_number}</td>
+                                    <td class="device-item-td hw-number">${device.hw_number}</td>
+                                    <td class="device-item-td mfg-date" nowrap>${device.mfg_date}</td>
+                                    <td class="device-item-td country">${device.country}</td>
+                                    <td class="device-item-td status" nowrap>
                                         <label class="switch">
                                             <input type="checkbox" class="change-status-device" deviceType="${device.device_model}"
                                                 deviceSerial="${device._id}">
                                             <span class="slider round"></span>
                                         </label>
                                     </td>
-                                    <td class="device-item" nowrap>
+                                    <td class="device-item-td" nowrap>
                                         <button class="controll-button fas fa-pen edit" dev-id="${device._id}"
                                             dev-serial="${device.sn_number}" dev-name="${device.device_name}"
                                             dev-type="${device.device_type}" dev-fw="${device.fw_number}"
@@ -515,25 +515,25 @@
                                 </tr>`;
                         $('#deviceActiveGateway').append(`<option class="text-dark text-bold" value="${device.sn_number}">${device.sn_number}</option>`)
                     } else {
-                        html = `<tr class="list-device-item" id="dev-${device.sn_number}">
-                            <td class="device-item device-serial" nowrap>
+                        html = `<tr class="list-device-item-td" id="dev-${device.sn_number}">
+                            <td class="device-item-td device-serial" nowrap>
                                 ${device.sn_number}
                             </td>
-                            <td class="device-item device-name">${device.device_name}</td>
-                            <td class="device-item device-type">${deviceTypeText}</td>
-                            <td class="device-item device-group"></td>
-                            <td class="device-item fw-number">${device.fw_number}</td>
-                            <td class="device-item hw-number">${device.hw_number}</td>
-                            <td class="device-item mfg-date" nowrap>${device.mfg_date}</td>
-                            <td class="device-item country">${device.country}</td>
-                            <td class="device-item status" nowrap>
+                            <td class="device-item-td device-name">${device.device_name}</td>
+                            <td class="device-item-td device-type">${deviceTypeText}</td>
+                            <td class="device-item-td device-group"></td>
+                            <td class="device-item-td fw-number">${device.fw_number}</td>
+                            <td class="device-item-td hw-number">${device.hw_number}</td>
+                            <td class="device-item-td mfg-date" nowrap>${device.mfg_date}</td>
+                            <td class="device-item-td country">${device.country}</td>
+                            <td class="device-item-td status" nowrap>
                                 <label class="switch">
                                     <input type="checkbox" class="change-status-device" deviceType="${device.device_model}"
                                         deviceSerial="${device._id}">
                                     <span class="slider round"></span>
                                 </label>
                             </td>
-                            <td class="device-item" nowrap>
+                            <td class="device-item-td" nowrap>
                                 <button class="controll-button fas fa-pen edit" dev-id="${device._id}"
                                     dev-serial="${device.sn_number}" dev-name="${device.device_name}"
                                     dev-type="${device.device_type}" dev-fw="${device.fw_number}"
@@ -770,8 +770,8 @@
                 if (status == 'success') {
                     var nodeElement = $(nodeElementId);
                     nodeElement.find('td:first').remove()
-                    nodeElement.find('.device-type').after('<td class="device-item device-group"></td>')
-                    var html = '<tr class="list-device-item" id=dev-' + deviceSerial + '>' + nodeElement.html() + '</tr>';
+                    nodeElement.find('.device-type').after('<td class="device-item-td device-group"></td>')
+                    var html = '<tr class="list-device-item-td" id=dev-' + deviceSerial + '>' + nodeElement.html() + '</tr>';
                     nodeElement.remove()
                     console.log(html);
                     $('#tableDevice > tbody').append(html);
