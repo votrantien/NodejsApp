@@ -74,7 +74,6 @@ let validateUpdateDevice = [
         })
     }),
     body('device_name', 'Nhập tên thiết bị').not().isEmpty(),
-    body('device_model', 'Nhập model thiết bị').not().isEmpty(),
     body('device_type', 'Nhập id loại thiết bị').not().isEmpty(),
     body('device_type').custom(value => {
         return DeviceType.findOne({ _id: value }).then(deviceType => {
@@ -95,7 +94,7 @@ let validateDeleteDevice = [
         return Device.findOne({ _id: value }).then(device => {
             if (!device) {
                 return Promise.reject('Id thiết bị không tồn tại')
-            } else if(device.group != null){
+            } else if (device.group != null) {
                 return Promise.reject('deactive thiết bị trước khi xoá')
             }
         })
@@ -145,17 +144,32 @@ let validateActiveDevice = [
     }),
     body('token', 'Token không được để trống').not().isEmpty(),
     body('token').custom(async (value, { req }) => {
-        const decode = await jwt.verify(value, process.env.JWT_SECRET, async (err, decodedToken) => {
-            if (err) {
-                return Promise.reject('Token không hợp lệ')
-            } else {
-                const user = await User.findById(decodedToken.id)
-                if (!user) {
-                    return Promise.reject('user active không tồn tại')
+        const token = req.cookies.jwt
+        if (token) {
+            const decode = await jwt.verify(token, process.env.JWT_SECRET, async (err, decodedToken) => {
+                if (err) {
+                    return Promise.reject('Token không hợp lệ')
+                } else {
+                    const user = await User.findById(decodedToken.id)
+                    if (!user) {
+                        return Promise.reject('user active không tồn tại')
+                    }
                 }
-            }
-            req.body.active_user = decodedToken.id
-        })
+                req.body.active_user = decodedToken.id
+            })
+        } else {
+            const decode = await jwt.verify(value, process.env.JWT_SECRET, async (err, decodedToken) => {
+                if (err) {
+                    return Promise.reject('Token không hợp lệ')
+                } else {
+                    const user = await User.findById(decodedToken.id)
+                    if (!user) {
+                        return Promise.reject('user active không tồn tại')
+                    }
+                }
+                req.body.active_user = decodedToken.id
+            })
+        }
     }),
     body('group', 'group không được để trống').not().isEmpty(),
     body('group').custom(async (value) => {
@@ -183,12 +197,12 @@ let validateActiveNode = [
         }
     }),
     body('token', 'Token không được để trống').not().isEmpty(),
-    body('token').custom( (value, { req }) => {
+    body('token').custom((value, { req }) => {
         const token = value
         const checkMd5 = CryptoJS.MD5(req.body.serial + mdfSecretKey).toString()
-        if(token === checkMd5){
+        if (token === checkMd5) {
             return true
-        }else{
+        } else {
             return Promise.reject('Token không hợp lệ')
         }
     }),
@@ -198,7 +212,7 @@ let validateActiveNode = [
             const gateway = await Device.findOne({ sn_number: value })
             if (!gateway) {
                 return Promise.reject('serial gateway active không tồn tại')
-            } else if(gateway.group == null){
+            } else if (gateway.group == null) {
                 return Promise.reject('gateway chưa active, hãy active gateway trước')
             } else {
                 req.body.group = gateway.group
@@ -221,12 +235,12 @@ let validateDeactivateNode = [
         }
     }),
     body('token', 'Token không được để trống').not().isEmpty(),
-    body('token').custom( (value, { req }) => {
+    body('token').custom((value, { req }) => {
         const token = value
         const checkMd5 = CryptoJS.MD5(req.body.serial + mdfSecretKey).toString()
-        if(token === checkMd5){
+        if (token === checkMd5) {
             return true
-        }else{
+        } else {
             return Promise.reject('Token không hợp lệ')
         }
     })
@@ -245,17 +259,32 @@ let validateInActiveDevice = [
     body('token', 'Token không được để trống').not().isEmpty(),
     body('token').custom(async (value, { req }) => {
         let user
-        const decode = await jwt.verify(value, process.env.JWT_SECRET, async (err, decodedToken) => {
-            if (err) {
-                return Promise.reject('Token không hợp lệ')
-            } else {
-                user = await User.findById(decodedToken.id)
-                if (!user) {
-                    return Promise.reject('user inactive không tồn tại')
+        const token = req.cookies.jwt
+        if (token) {
+            const decode = await jwt.verify(token, process.env.JWT_SECRET, async (err, decodedToken) => {
+                if (err) {
+                    return Promise.reject('Token không hợp lệ')
+                } else {
+                    user = await User.findById(decodedToken.id)
+                    if (!user) {
+                        return Promise.reject('user inactive không tồn tại')
+                    }
                 }
-            }
-            req.body.inactive_user = user
-        })
+                req.body.inactive_user = user
+            })
+        } else {
+            const decode = await jwt.verify(value, process.env.JWT_SECRET, async (err, decodedToken) => {
+                if (err) {
+                    return Promise.reject('Token không hợp lệ')
+                } else {
+                    user = await User.findById(decodedToken.id)
+                    if (!user) {
+                        return Promise.reject('user inactive không tồn tại')
+                    }
+                }
+                req.body.inactive_user = user
+            })
+        }
     }),
 ]
 

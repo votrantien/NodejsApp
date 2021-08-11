@@ -64,7 +64,7 @@ $(document).ready(function () {
     //Device connected
     socket.on('device_connect', function (data) {
         if (listDevices.indexOf(data) != -1) {
-            $(`#tab-${data}`).removeClass('status-1 status-2 status-0');
+            $(`#tab-${data}`).removeClass('status-1 status-2 status-0 status-na');
             $(`#tab-${data}`).addClass('status-1');
             socket.emit('start_real_time_device', { listDevices, user });
         }
@@ -79,8 +79,8 @@ $(document).ready(function () {
         for (const [key, value] of Object.entries(data.data.val)) {
             var idxValue = key;
             var idValueType = 'val-' + serial + '-' + idxValue;
-            if(!$(`#tab-${serial}`).hasClass('status-1')){
-                $(`#tab-${serial}`).removeClass('status-1 status-2 status-0');
+            if (!$(`#tab-${serial}`).hasClass('status-1')) {
+                $(`#tab-${serial}`).removeClass('status-1 status-2 status-0 status-na');
                 $(`#tab-${serial}`).addClass('status-1');
             }
             $(`#${idValueType} .device-item-value .value`).html(value);
@@ -91,7 +91,7 @@ $(document).ready(function () {
     //check device disconnect
     socket.on('device_disconnect', function (data) {
         if (String(data).slice(0, 4) == 'AHSD') {
-            $(`#tab-${data}`).removeClass('status-1 status-2 status-0');
+            $(`#tab-${data}`).removeClass('status-1 status-2 status-0 status-na');
             $(`#tab-${data}`).addClass('status-0');
 
             $(`#dev-${data} .device-item .device-item-value .value`).html("N/a");
@@ -124,60 +124,61 @@ $(document).ready(function () {
         var serial = $(this).attr('device-sn');
         var valueName = $(this).attr('value-name');
         var keyValue = $(this).attr('key-value');
+        var idDataSet = keyValue;
         var chartId = `chart-${serial}`;
         var chart = Chart.getChart(chartId);
         var uomValue = $(this).attr('uom');
-        var color = Colors[$(this).attr('color-idx')];
+        var color = $(this).attr('color');
         var dpValue = $(`#date-picker-${serial}`).val().split(' ~ ');
         var startDate = dpValue[0];
         var endDate = dpValue[1];
-        var chartTitle = String(`${valueName} ( ${uomValue} ) - Từ ${startDate} đến ${endDate}`).toUpperCase();
+        var startTime = startDate.slice(11);
+        var endTime = endDate.slice(11);
+        var chartTitle = String(`Thông số dinh dưỡng - Từ ${startTime} đến ${endTime}`).toUpperCase();
 
         var onChart = $(this).attr('on-chart');
 
         if (onChart == 'true') {
             $(this).attr('on-chart', 'false');
             $(this).removeClass('on-chart');
-            if (chart) {
-                chart.destroy();
+            var checkOnChart = $(`#dev-${serial} .device-item`).hasClass('on-chart');
+            if (!checkOnChart) {
+                if (chart) {
+                    chart.destroy();
+                    $(`#dev-${serial} .chart-area`).hide();
+                }
+            } else {
+                RemoveDataChart(chart, idDataSet);
             }
-            $(`#dev-${serial} .chart-title`).show();
         } else {
             $(`#uom-key-${serial}`).val(keyValue);
             var chartData = await PrepareChartData(serial, startDate, endDate);
-            console.log(chartData);
             var dataset = {
-                id: serial,
+                id: idDataSet,
                 label: valueName,
                 data: [],
-                backgroundColor: [
-                    color
-                ],
-                borderColor: [
-                    color
-                ],
-                borderWidth: 1
+                backgroundColor: color,
+                borderColor: color,
+                borderWidth: 1,
+                yAxisID: '',
             };
 
             if (chartData) {
-                chartData.forEach((log) => {
-                    console.log(keyValue)
+                chartData.forEach((log, index) => {
                     var value = log.device_value[keyValue];
                     var data = { x: log.createdAt, y: value * 1 }
                     dataset.data.push(data);
                 });
+                dataset.yAxisID = 'y' + keyValue;
             }
             if (!chart) {
-                $(`#dev-${serial} .chart-title`).hide();
+                $(`#dev-${serial} .chart-area`).show();
                 RenderChart(chartId, dataset, chartTitle);
             } else {
-                chart.data.datasets = [dataset];
-                chart.options.plugins.title.text = chartTitle;
+                chart.data.datasets.push(dataset);
                 chart.update();
                 ScrollToElement(chartId);
             }
-            $(`#dev-${serial} .device-item`).removeClass('on-chart');
-            $(`#dev-${serial} .device-item`).attr('on-chart', 'false');
             $(this).addClass('on-chart');
             $(this).attr('on-chart', 'true');
         }
@@ -198,18 +199,65 @@ $(document).ready(function () {
                         x: {
                             type: 'time',
                             time: {
-                                displayFormats: {
-                                    quarter: 'dd/MM HH:mm'
-                                }
+                                unit: 'hour'
                             },
                             ticks: {
                                 color: "#fff"
+                            },
+                            grid: {
+                                drawOnChartArea: true,
+                                color: "rgb(121 121 121 / 70%)", // only want the grid lines for one axis to show up
                             },
                         },
-                        y: {
-                            beginAtZero: true,
+                        yph: {
+                            //PH
                             ticks: {
                                 color: "#fff"
+                            },
+                            display: true,
+                            grid: {
+                                drawOnChartArea: true,
+                                color: "rgb(121 121 121 / 70%)", // only want the grid lines for one axis to show up
+                                borderColor: '#179c52',
+                                borderWidth: 4,
+                            },
+                        },
+                        yec: {
+                            //EC
+                            ticks: {
+                                color: "#fff"
+                            },
+                            display: true,
+                            grid: {
+                                drawOnChartArea: false, // only want the grid lines for one axis to show up
+                                borderColor: '#f7b529',
+                                borderWidth: 4,
+                            },
+                        },
+                        ytemp: {
+                            //TEMP
+                            position: 'right',
+                            ticks: {
+                                color: "#fff"
+                            },
+                            display: true,
+                            grid: {
+                                drawOnChartArea: false, // only want the grid lines for one axis to show up
+                                borderColor: '#ff3e30',
+                                borderWidth: 4,
+                            },
+                        },
+                        yoxy: {
+                            //OXY
+                            position: 'right',
+                            ticks: {
+                                color: "#fff"
+                            },
+                            display: true,
+                            grid: {
+                                drawOnChartArea: false, // only want the grid lines for one axis to show up
+                                borderColor: '#176bef',
+                                borderWidth: 4,
                             },
                         }
                     },
@@ -250,54 +298,46 @@ $(document).ready(function () {
             return;
         }
         $('#mask').show();
-
-        var onChartItem = $(`#${devGroup} .device-item[on-chart*="true"]`);
-        var serial = $(onChartItem).attr('device-sn');
-        var valueName = $(onChartItem).attr('value-name');
-        var keyValue = $(onChartItem).attr('key-value');
-        var uomValue = $(onChartItem).attr('uom');
-        var color = Colors[$(onChartItem).attr('color-idx')];
+        var currDatasets = chart.data.datasets;
+        var idDatasets = currDatasets.map((value) => {
+            return value.id;
+        })
+        var serial = $(`#${devGroup} .device_sn`).val();
         var dpValue = $(`#date-picker-${serial}`).val().split(' ~ ');
         var startDate = dpValue[0];
         var endDate = dpValue[1];
-        var chartTitle = String(`${valueName} ( ${uomValue} ) - Từ ${startDate} đến ${endDate}`).toUpperCase();
-
-        var onChart = $(this).data('on-chart');
-
-
-        $(`#uom-key-${serial}`).val(keyValue);
+        var startTime = startDate.slice(11);
+        var endTime = endDate.slice(11);
+        var chartTitle = String(`Thông số dinh dưỡng - Từ ${startTime} đến ${endTime}`).toUpperCase();
         var chartData = await PrepareChartData(serial, startDate, endDate);
-
-        var dataset = {
-            id: serial,
-            label: valueName,
-            data: [],
-            backgroundColor: [
-                color
-            ],
-            borderColor: [
-                color
-            ],
-            borderWidth: 1
-        };
-
-        if (chartData) {
-            chartData.forEach((log) => {
-                var value = log.device_value[keyValue];
-                var data = { x: log.createdAt, y: value * 1 }
-                dataset.data.push(data);
-            });
-        }
-        if (!chart) {
-            $(`#dev-${serial} .chart-title`).hide();
-            RenderChart(chartId, dataset, chartTitle);
-        } else {
-            chart.data.datasets = [dataset];
-            chart.options.plugins.title.text = chartTitle;
-            chart.update();
-            ScrollToElement(chartId);
-        }
-        //console.log(datasets);
+        var newDatasets = [];
+        idDatasets.forEach((idDataset) => {
+            var idTypeDevice = `#val-${serial}-${idDataset}`
+            var valueName = $(idTypeDevice).attr('value-name');
+            var color = $(idTypeDevice).attr('color');
+            var dataset = {
+                id: idDataset,
+                label: valueName,
+                data: [],
+                backgroundColor: color,
+                borderColor: color,
+                borderWidth: 1,
+                yAxisID: '',
+            };
+            if (chartData) {
+                chartData.forEach((log, index) => {
+                    var value = log.device_value[idDataset];
+                    var data = { x: log.createdAt, y: value * 1 }
+                    dataset.data.push(data);
+                });
+                dataset.yAxisID = 'y' + idDataset;
+                newDatasets.push(dataset);
+            }
+        });
+        chart.data.datasets = newDatasets;
+        chart.options.plugins.title.text = chartTitle;
+        chart.update();
+        ScrollToElement(chartId);
         $('#mask').hide();
     }
 
@@ -319,5 +359,12 @@ $(document).ready(function () {
 
 
         RefreshChart(chartId, devGroup);
+    })
+
+    //show and hide group device
+    $('#selectGroupDevice').on('change', function () {
+        var idGroupWrapper = '#group-wrapper-' + $(this).val();
+        $('.group-wrapper').hide();
+        $(idGroupWrapper).show();
     })
 })

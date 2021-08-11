@@ -58,11 +58,12 @@ class DeviceController {
 
     async get_DeviceManage(req, res) {
         const user = res.locals.user
-        let devices
-        const groups = await GroupDevice.find({ manage_user: user.username }).lean()
+        let devices, groups
         if (user.role == 'admin') {
+            groups = await GroupDevice.find().lean()
             devices = await Device.find().populate('device_type').populate('user_active_device', 'username').populate('user_active_device', 'username').populate('group').lean()
         } else {
+            groups = await GroupDevice.find({ manage_user: user.username }).lean()
             const group_id = groups.map((group) => group._id)
             devices = await Device.find({ group: group_id }).populate('device_type').populate('user_active_device', 'username').populate('user_active_device', 'username').populate('group').lean()
         }
@@ -367,8 +368,8 @@ class DeviceController {
         }
         try {
             const deviceId = req.params.id
-            const { device_name, device_modal, device_type, fw_number, hw_number, mfg_date, country } = req.body
-            const device = await Device.findByIdAndUpdate(deviceId, { device_name, device_modal, device_type, fw_number, hw_number, mfg_date, country }, { new: true }).populate('device_type').populate('group')
+            const { device_name, device_type, fw_number, hw_number, mfg_date, country } = req.body
+            const device = await Device.findByIdAndUpdate(deviceId, { device_name, device_type, fw_number, hw_number, mfg_date, country }, { new: true }).populate('device_type').populate('group')
             // await device.save()
             // console.log(device)
             res.status(200).json({ status: 'success', device: device })

@@ -73,6 +73,13 @@ hbs.registerHelper('if_', function (a, e, b, opts) {
                 return opts.inverse(this);
             }
             break
+        case '>':
+            if (a > b) {
+                return opts.fn(this);
+            } else {
+                return opts.inverse(this);
+            }
+            break
         case 'not_in':
             const notInArr = b.split(',');
             let checkNotIn = true;
@@ -94,6 +101,14 @@ hbs.registerHelper('if_', function (a, e, b, opts) {
             const inArr = b.split(',');
             let checkInArr = inArr.indexOf(a.toString());
             if (checkInArr != -1) {
+                return opts.fn(this);
+            } else {
+                return opts.inverse(this);
+            }
+            break
+        case 'isIn':
+            console.log(b);
+            if ( b.indexOf(a.toString()) != -1) {
                 return opts.fn(this);
             } else {
                 return opts.inverse(this);

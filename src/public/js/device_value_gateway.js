@@ -71,8 +71,9 @@ $(document).ready(function () {
     //Device connected
     socket.on('device_connect', function (data) {
         if (listDevices.indexOf(data) != -1) {
-            $(`#gw-${data} .device-item`).removeClass('status-1 status-2 status-0');
-            $(`#gw-${data} .device-item`).addClass('status-2');
+            $(`#tab-control-${data}`).removeClass('status-1 status-2 status-0 status-na');
+            $(`#tab-control-${data}`).addClass('status-1');
+
             socket.emit('start_real_time_device', { listDevices, user });
         }
     })
@@ -88,9 +89,11 @@ $(document).ready(function () {
             $(`#${key}-${serial}`).html(value);
         }
 
-        if(!$(`#dev-${serial}`).hasClass('status-1')){
-            $(`#dev-${serial}`).removeClass('status-1 status-2 status-0');
+        if (!$(`#dev-${serial}`).hasClass('status-1') || !$(`#tab-control-${serial}`).hasClass('status-1')) {
+            $(`#dev-${serial}`).removeClass('status-1 status-2 status-0 status-na');
             $(`#dev-${serial}`).addClass('status-1');
+            $(`#tab-control-${serial}`).removeClass('status-1 status-2 status-0 status-na');
+            $(`#tab-control-${serial}`).addClass('status-1');
         }
 
         $(`#dev-${serial} .device-item-battery .value`).html(battery);
@@ -101,14 +104,16 @@ $(document).ready(function () {
     //check device disconnect
     socket.on('device_disconnect', function (serial) {
         if (String(serial).slice(0, 4) == 'BSGW') {
-            $(`#gw-${serial} .device-item`).removeClass('status-1 status-2 status-0');
+            $(`#gw-${serial} .device-item`).removeClass('status-1 status-2 status-0 status-na');
+            $(`#tab-control-${serial}`).removeClass('status-1 status-2 status-0 status-na');
             $(`#gw-${serial} .device-item`).addClass('status-0');
+            $(`#tab-control-${serial}`).addClass('status-0');
 
             $(`#gw-${serial} .device-item .device-item-battery .value`).html("N/a");
             $(`#gw-${serial} .device-item .device-item-rssi .value`).html("N/a");
             $(`#gw-${serial} .device-item .device-item-value .value-wrapper .value`).html("N/a");
         } else {
-            $(`#dev-${serial}`).removeClass('status-1 status-2 status-0');
+            $(`#dev-${serial}`).removeClass('status-1 status-2 status-0 status-na');
             $(`#dev-${serial}`).addClass('status-0');
 
             $(`#dev-${serial} .device-item-battery .value`).html("N/a");
@@ -123,7 +128,7 @@ $(document).ready(function () {
         var status = data.status;
 
         if (status == '0' || status == '2') {
-            $(`#dev-${serial}`).removeClass('status-1 status-2 status-0');
+            $(`#dev-${serial}`).removeClass('status-1 status-2 status-0 status-na');
             $(`#dev-${serial}`).addClass(`status-${status}`);
 
             $(`#dev-${serial} .device-item-battery .value`).html("N/a");
@@ -178,7 +183,7 @@ $(document).ready(function () {
             var checkDeviceSelected = $(`#dev-type-${gateway}-${devType} .device-item`).hasClass('on-chart');
             if (!checkDeviceSelected) {
                 chart.destroy();
-                $(`#dev-type-${gateway}-${devType} .chart-title`).show();
+                $(`#dev-type-${gateway}-${devType} .chart-area`).hide();
                 ScrollToElement($(this).attr('id'));
             } else {
                 RemoveDataChart(chart, serial);
@@ -216,7 +221,7 @@ $(document).ready(function () {
                 });
             }
             if (!chart) {
-                $(`#dev-type-${gateway}-${devType} .chart-title`).hide();
+                $(`#dev-type-${gateway}-${devType} .chart-area`).show();
                 RenderChart(chartId, dataset, chartTitle);
             } else {
                 chart.data.datasets.push(dataset);
@@ -241,18 +246,24 @@ $(document).ready(function () {
                         x: {
                             type: 'time',
                             time: {
-                                displayFormats: {
-                                    quarter: 'dd/MM HH:mm'
-                                }
+                                unit: 'hour'
                             },
                             ticks: {
                                 color: "#fff"
+                            },
+                            grid: {
+                                drawOnChartArea: true,
+                                color:"rgb(121 121 121 / 70%)" // only want the grid lines for one axis to show up
                             },
                         },
                         y: {
                             beginAtZero: true,
                             ticks: {
                                 color: "#fff"
+                            },
+                            grid: {
+                                drawOnChartArea: true,
+                                color:"rgb(121 121 121 / 70%)" // only want the grid lines for one axis to show up
                             },
                         }
                     },
@@ -385,5 +396,42 @@ $(document).ready(function () {
 
 
         RefreshChart(chartId, devGroup);
+    })
+
+    //change color icon
+    //battery
+    $(document).on('DOMSubtreeModified', '.device-item-battery .value', function () {
+        var value = $(this).text();
+        if (value < 10) {
+            if (!$(this).parent().hasClass('status-low')) {
+                $(this).parent().toggleClass('status-low')
+            }
+        } else {
+            if ($(this).parent().hasClass('status-low')) {
+                $(this).parent().toggleClass('status-low')
+            }
+        }
+    })
+
+    //rssi
+    $(document).on('DOMSubtreeModified', '.device-item-rssi .value', function () {
+        var value = $(this).text();
+        if (value < (120 * -1)) {
+            if (!$(this).parent().hasClass('status-low')) {
+                $(this).parent().toggleClass('status-low')
+            }
+        } else {
+            if ($(this).parent().hasClass('status-low')) {
+                $(this).parent().toggleClass('status-low')
+            }
+        }
+    })
+
+
+    //show and hide group device
+    $('#selectGroupDevice').on('change', function () {
+        var idGroupWrapper = '#group-wrapper-' + $(this).val();
+        $('.group-wrapper').hide();
+        $(idGroupWrapper).show();
     })
 })

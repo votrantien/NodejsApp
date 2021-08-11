@@ -4597,8 +4597,7 @@ a.thumbnail:hover, a.thumbnail:focus, a.thumbnail.active {
 }
 
 .alert-success {
-    background-color: #77b300;
-    border-color: #809a00;
+    background-color: rgb(9 255 0 / 70%);
     color: #ffffff;
 }
 
@@ -4639,8 +4638,7 @@ a.thumbnail:hover, a.thumbnail:focus, a.thumbnail.active {
 }
 
 .alert-danger {
-    background-color: #cc0000;
-    border-color: #bd001f;
+    background-color: rgb(255 67 41 / 70%);
     color: #ffffff;
 }
 
@@ -6638,7 +6636,9 @@ table.table td .add {
 
 .popup-container {
     width: 100%;
-    position: relative;
+    position: fixed;
+    z-index: 1040;
+    top: 15px;
 }
 
 .alert {
@@ -6650,6 +6650,8 @@ table.table td .add {
     left: 0;
     right: 0;
     margin: auto;
+    padding: 10px;
+    font-weight: bold;
 }
 
 /* device value */
@@ -6674,14 +6676,14 @@ table.table td .add {
 }
 
 .date-picker-div {
-    margin: 10px;
+    padding: 10px 0 10px;
 }
 
 .date-picker-div .date-picker {
     background: none;
     color: #fff;
     text-align: left;
-    width: fit-content;
+    width: 300px;
 }
 
 .date-picker-wrapper table {
@@ -6690,34 +6692,35 @@ table.table td .add {
 
 /* custom */
 
-.radius-none{
+.radius-none {
     border-radius: 0;
 }
 
-.text-dark{
+.text-dark {
     color: #000;
 }
 
-.text-bold{
+.text-bold {
     font-weight: bold;
 }
 
 /* switch */
+
 .switch {
     position: relative;
     display: inline-block;
     width: 50px;
     height: 20px;
     margin: 0;
-  }
-  
-  .switch input { 
+}
+
+.switch input {
     opacity: 0;
     width: 0;
     height: 0;
-  }
-  
-  .slider {
+}
+
+.slider {
     position: absolute;
     cursor: pointer;
     top: 0;
@@ -6727,9 +6730,9 @@ table.table td .add {
     background-color: #bb1414;
     -webkit-transition: .4s;
     transition: .4s;
-  }
-  
-  .slider:before {
+}
+
+.slider:before {
     position: absolute;
     content: "";
     height: 13px;
@@ -6739,27 +6742,327 @@ table.table td .add {
     background-color: white;
     -webkit-transition: .4s;
     transition: .4s;
-  }
-  
-  input:checked + .slider {
+}
+
+input:checked+.slider {
     background-color: #24880f;
-  }
-  
-  input:focus + .slider {
+}
+
+input:focus+.slider {
     box-shadow: 0 0 1px #24880f;
-  }
-  
-  input:checked + .slider:before {
+}
+
+input:checked+.slider:before {
     -webkit-transform: translateX(26px);
     -ms-transform: translateX(26px);
     transform: translateX(26px);
-  }
-  
-  /* Rounded sliders */
-  .slider.round {
+}
+
+/* Rounded sliders */
+
+.slider.round {
     border-radius: 34px;
-  }
-  
-  .slider.round:before {
+}
+
+.slider.round:before {
     border-radius: 50%;
-  }
+}
+
+/* device status */
+
+.status-na::after {
+    position: absolute;
+    content: 'N/a';
+    color: #fff;
+    top: 0;
+    right: 0;
+    padding: 1px 3px 1px;
+    font-weight: bold;
+    /* background-color: rgba(0, 0, 0, 0.7); */
+    font-size: 1.2rem;
+}
+
+.status-1::after {
+    position: absolute;
+    content: 'Online';
+    color: #42ff42;
+    top: 0;
+    right: 0;
+    padding: 1px 3px 1px;
+    font-weight: bold;
+    /* background-color: rgba(0, 0, 0, 0.7); */
+    font-size: 1.2rem;
+    border-top-right-radius: 5px;
+}
+
+.status-2::after {
+    position: absolute;
+    content: 'Sleep';
+    color: #fbff04;
+    top: 0;
+    right: 0;
+    padding: 1px 3px 1px;
+    font-weight: bold;
+    /* background-color: rgba(0, 0, 0, 0.7); */
+    font-size: 1.2rem;
+    border-top-right-radius: 5px;
+}
+
+.status-0::after {
+    position: absolute;
+    content: 'Offline';
+    color: #ff0000;
+    top: 0;
+    right: 0;
+    padding: 1px 3px 1px;
+    font-weight: bold;
+    /* background-color: rgba(0, 0, 0, 0.7); */
+    font-size: 1.2rem;
+    border-top-right-radius: 5px;
+}
+
+/* status icon color */
+
+.status-low {
+    color: rgb(221, 26, 26);
+}
+
+/* custom dropdown list */
+
+.dropdown-list {
+    background-color: black;
+    border: none;
+    padding: 5px;
+}
+
+.dropdown-list option {
+    font-size: 1.4rem;
+}
+
+.dropdown-list:focus {
+    outline: none;
+}
+
+/* device value page  */
+
+.uom-wrapper {
+    padding: 10px 0 10px;
+}
+
+.list-uom {
+    background-color: #151515;
+    border: none;
+    font-weight: bold;
+}
+
+.chart-title {
+    width: 100%;
+    color: rgba(255, 255, 255, 0.7);
+    text-align: center;
+}
+
+.chart-wrapper {
+    position: relative;
+    padding: 10px 0 10px;
+}
+
+.chart-canvas {
+    max-height: 400px;
+}
+
+.quick-time-wrapper {
+    padding: 10px 0 10px;
+}
+
+.quick-time-list {
+    display: flex;
+    list-style: none;
+    justify-content: flex-end;
+}
+
+.quick-time-list .quick-time-item {
+    padding: 5px 10px 5px;
+    font-size: 1.3rem;
+    font-weight: bold;
+    width: 50px;
+    text-align: center;
+    cursor: pointer;
+    position: relative;
+    color: #fff;
+    margin-left: -1px;
+}
+
+.quick-time-list .quick-time-label {
+    padding: 5px 10px 5px;
+    font-size: 1.3rem;
+    font-weight: bold;
+    margin-left: 5px;
+    text-align: center;
+    color: #fff;
+}
+
+.high-light-box {
+    background-color: currentColor;
+}
+
+.group-wrapper {
+    margin-bottom: 15px;
+}
+
+.group-label {
+    font-size: 2rem;
+    color: #039666;
+    margin-bottom: 15px;
+}
+
+.group-item {
+    padding: 15px;
+    background-color: #151515;
+    border-radius: 5px;
+    border: solid 1px #016343;
+}
+
+.tab-controll {
+    border-bottom: solid 2px #016343;
+}
+
+.tab-link {
+    font-size: 1.5rem;
+    border-radius: 0;
+    outline: none;
+    border: none;
+    padding: 15px;
+    margin: 0;
+    color: white;
+    background-color: #016343;
+    position: relative;
+    margin: 0px 0px 5px;
+}
+
+.tab-active {
+    background-color: #039666;
+}
+
+.tab-content {
+    padding-top: 15px;
+}
+
+.device-type-controll {
+    position: relative;
+    font-size: 1.5rem;
+    border-radius: 0;
+    outline: none;
+    border: none;
+    padding: 10px;
+    color: white;
+    background-color: #016343;
+}
+
+.device-group {
+    position: relative;
+    padding-top: 15px;
+    margin-top: 15px;
+    border-top: solid 1px #016343;
+}
+
+.fix-height:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+/* device item */
+
+
+.device-item {
+    padding: 5px;
+    font-size: 1.4rem;
+    border-radius: 0;
+    outline: none;
+    border: none;
+    margin: 10px 10px 0px 0px;
+    color: white;
+    background-color: #016343;
+    text-align: left;
+    text-overflow: ellipsis;
+    position: relative;
+    flex: 0 0 200px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: center;
+    border-radius: 5px;
+}
+
+.device-item-dynamic-value {
+    width: 100%;
+    margin: 0;
+}
+
+.device-item-dynamic-value .device-item-battery, .device-item-dynamic-value .device-item-rssi {
+    width: 50px;
+    padding-right: 5px;
+}
+
+.device-item-dynamic-value .device-item-battery .value, .device-item-dynamic-value .device-item-rssi .value {
+    padding-left: 5px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.device-item-dynamic-value .device-item-value {
+    font-size: 2.5rem;
+    display: block;
+    padding-top: 5px;
+}
+
+.device-item-value .value-wrapper {
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.device-item-value .value-wrapper .value-number {
+    display: flex;
+    width: 150px;
+}
+
+.device-item-value .value-wrapper .value {
+    padding-left: 5px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    text-align: right;
+    display: inline-block;
+    overflow: hidden;
+    flex: 1 0 60%;
+}
+
+.device-item-value .value-wrapper .uom {
+    flex: 1 0 20%;
+    display: block;
+    padding: 0 5px 0;
+    margin-bottom: -10px;
+    text-align: left;
+    font-style: italic;
+    text-transform: lowercase;
+    font-size: 2rem;
+}
+
+.device-item-name {
+    margin: 0;
+    padding-top: 5px;
+    text-transform: uppercase;
+    width: 100%;
+    height: 50px;
+    overflow: auto;
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+.device-item-name::-webkit-scrollbar {
+    display: none;
+}

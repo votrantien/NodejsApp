@@ -2,150 +2,168 @@
 <div id="page-wrapper">
     <input type="hidden" id="user" value="{{username}}">
     <div class="row">
+        <div class="dropdown-list-wrap" style="padding: 20px;">
+            <label for="selectGroupDevice">Chọn nhóm thiết bị: </label>
+            <select id="selectGroupDevice" class="dropdown-list">
+                {{#groups as |group|}}
+                <option value="{{group._id}}">{{group.group_name}}</option>
+                {{/groups}}
+            </select>
+        </div>
+
         {{!-- group --}}
         {{#groups as |group|}}
-        <div class="col-lg-12 group-wrapper">
-            {{!-- group label --}}
-            <div class="group-label">
-                <i class="fas fa-leaf fa-lg"></i>
-                <span class="group-name">{{this.group_name}}</span>
-            </div>
-            {{!-- group item --}}
-            <div class="group-item" id="g-{{group._id}}">
-
-                {{!-- tab gateway controll --}}
-                <div class="tab-controll">
-                    {{#each ../gateways as |gateway|}}
-                    {{#if_ gateway.group '==' group._id}}
-                    <button class="tab-link"
-                        onclick="openGroupContent('gw-{{gateway.sn_number}}',this,'g-{{group._id}}')">G/w:
-                        {{gateway.sn_number}}</button>
-                    {{/if_}}
-                    {{/each}}
+        {{#if_ @index '>' '0'}}
+        <div class="col-lg-12 group-wrapper" id="group-wrapper-{{group._id}}" style="display: none;">
+            {{else}}
+            <div class="col-lg-12 group-wrapper" id="group-wrapper-{{group._id}}">
+                {{/if_}}
+                {{!-- group label --}}
+                <div class="group-label">
+                    <i class="fas fa-leaf fa-lg"></i>
+                    <span class="group-name">{{this.group_name}}</span>
                 </div>
-                {{!-- tab content gateway --}}
-                {{#each ../gateways as |gateway|}}
-                {{#if_ gateway.group '==' group._id}}
-                <input type="hidden" class="gateway_sn" value="{{gateway.sn_number}}">
-                <div class="tab-content" id="gw-{{gateway.sn_number}}" style="display: none;">
-                    {{!-- device type controll --}}
-                    <div class="device-type-group-controll">
-                        {{#each ../../device_types as |dev_type|}}
-                        {{#if_ dev_type.prefix 'not_in' 'AHSD,BSGW'}}
-                        <button class="device-type-controll" data-toggle="collapse"
-                            data-target="#dev-type-{{gateway.sn_number}}-{{dev_type.prefix}}">{{dev_type.device_type}}</button>
+                {{!-- group item --}}
+                <div class="row group-item" id="g-{{group._id}}">
+
+                    {{!-- tab gateway controll --}}
+                    <div class="tab-controll">
+                        {{#each ../gateways as |gateway|}}
+                        {{#if_ gateway.group '==' group._id}}
+                        <button class="tab-link status-na" id="tab-control-{{gateway.sn_number}}"
+                            onclick="openGroupContent('gw-{{gateway.sn_number}}',this,'g-{{group._id}}')">G/w:
+                            {{gateway.sn_number}}</button>
                         {{/if_}}
                         {{/each}}
                     </div>
-                    {{!-- device type controll --}}
-
-                    {{!-- device item --}}
-                    {{#each ../../device_types as |dev_type|}}
-                    <div class="row collapse device-group" id="dev-type-{{gateway.sn_number}}-{{dev_type.prefix}}"
-                        group-label="{{dev_type.device_type}}"
-                        chart-id="chart-{{gateway.sn_number}}-{{dev_type.prefix}}">
-                        <div class="date-picker-div">
-                            <label for="#date-picker-{{gateway.sn_number}}-{{dev_type.prefix}}">
-                                Thời gian
-                            </label>
-                            <input type="button" class="date-picker"
-                                id="date-picker-{{gateway.sn_number}}-{{dev_type.prefix}}"
-                                chart-id="chart-{{gateway.sn_number}}-{{dev_type.prefix}}"
-                                dev-group="dev-type-{{gateway.sn_number}}-{{dev_type.prefix}}">
-                        </div>
-                        {{!-- device controll --}}
-                        <div class="group-device-item">
-                            {{#each ../../../devices as |device|}}
-                            {{#if_ device.gateway '==' gateway.sn_number}}
-                            {{#if_ device.device_model '==' dev_type.prefix}}
-                            <button class="device-item status-0"
-                                style="background-color: {{dev_type.type_properties.color}};"
-                                id="dev-{{device.sn_number}}" device-sn="{{device.sn_number}}"
-                                gateway="{{gateway.sn_number}}" dev-type="{{dev_type.prefix}}" on-chart="false"
-                                dev-name="{{device.device_name}}" type-name="{{dev_type.device_type}}"
-                                color-idx="{{@index}}">
-                                <p class="device-item-dynamic-value">
-                                    <span class="device-item-battery">
-                                        <i class="fas fa-battery-three-quarters icon"></i>
-                                        <i class="value">N/a</i>
-                                    </span>
-                                    <span class="device-item-rssi">
-                                        <i class="fas fa-wifi icon"></i>
-                                        <i class="value">N/a</i>
-                                    </span>
-                                    <br>
-                                    <span class="device-item-value">
-                                        <i class="fas fa-bullseye icon"></i>
-                                        {{#each device.device_type.uom_values}}
-                                        <span class="value-wrapper">
-                                            <i class="value" id="{{@key}}-{{device.sn_number}}">N/a</i>
-                                            <i class="uom">{{this.uom}}</i>
-                                        </span>
-                                        {{/each}}
-                                    </span>
-                                </p>
-                                <p class="device-item-name">{{device.device_name}}</p>
+                    {{!-- tab content gateway --}}
+                    {{#each ../gateways as |gateway|}}
+                    {{#if_ gateway.group '==' group._id}}
+                    <input type="hidden" class="gateway_sn" value="{{gateway.sn_number}}">
+                    <div class="tab-content" id="gw-{{gateway.sn_number}}" style="display: none;">
+                        {{!-- device type controll --}}
+                        <div class="device-type-group-controll">
+                            {{#each ../../device_types as |dev_type|}}
+                            {{#if_ dev_type.prefix 'not_in' 'AHSD,BSGW'}}
+                            <button class="device-type-controll" data-toggle="collapse"
+                                data-target="#dev-type-{{gateway.sn_number}}-{{dev_type.prefix}}">
+                                <i class="fas {{dev_type.type_properties.icon}}"></i>
+                                <p>{{dev_type.device_type}}</p>
                             </button>
-                            {{/if_}}
                             {{/if_}}
                             {{/each}}
                         </div>
-                        {{!-- chart area --}}
-                        <div class="chart-area">
-                            <div class="uom-wrapper col-lg-6">
-                                <label for="#uom-{{gateway.sn_number}}-{{dev_type.prefix}}">
-                                    Chọn đơn vị đo:
+                        {{!-- device type controll --}}
+
+                        {{!-- device item --}}
+
+                        {{#each ../../device_types as |dev_type|}}
+                        <div class="collapse device-group" id="dev-type-{{gateway.sn_number}}-{{dev_type.prefix}}"
+                            group-label="{{dev_type.device_type}}"
+                            chart-id="chart-{{gateway.sn_number}}-{{dev_type.prefix}}">
+                            <i class="label-group-content fas {{dev_type.type_properties.icon}}"></i>
+                            <div class="date-picker-div">
+                                <label for="#date-picker-{{gateway.sn_number}}-{{dev_type.prefix}}">
+                                    Thời gian
                                 </label>
-                                <select class="list-uom" id="uom-{{gateway.sn_number}}-{{dev_type.prefix}}"
+                                <input type="button" class="date-picker"
+                                    id="date-picker-{{gateway.sn_number}}-{{dev_type.prefix}}"
                                     chart-id="chart-{{gateway.sn_number}}-{{dev_type.prefix}}"
                                     dev-group="dev-type-{{gateway.sn_number}}-{{dev_type.prefix}}">
-                                    {{#each uom_values}}
-                                    <option value="{{@key}}" uom="{{this.uom}}">{{this.name}}</option>
-                                    {{/each}}
-                                </select>
                             </div>
-                            <div class="quick-time-wrapper col-lg-6">
-                                <ul class="quick-time-list">
-                                    <li class="quick-time-label"
-                                        style="background-color: {{dev_type.type_properties.color}};">Mốc thời gian</li>
-                                    <li class="quick-time-item"
-                                        style="background-color: {{dev_type.type_properties.color}};" start-time="00:00"
-                                        end-time="03:00">3h</li>
-                                    <li class="quick-time-item"
-                                        style="background-color: {{dev_type.type_properties.color}};" start-time="03:00"
-                                        end-time="09:00">6h</li>
-                                    <li class="quick-time-item"
-                                        style="background-color: {{dev_type.type_properties.color}};" start-time="06:00"
-                                        end-time="12:00">9h</li>
-                                    <li class="quick-time-item"
-                                        style="background-color: {{dev_type.type_properties.color}};" start-time="09:00"
-                                        end-time="23:59">12h</li>
-                                    <li class="quick-time-item"
-                                        style="background-color: {{dev_type.type_properties.color}};" start-time="00:00"
-                                        end-time="23:59">24h</li>
-                                </ul>
+                            {{!-- device controll --}}
+                            <div class="group-device-item">
+                                {{#each ../../../devices as |device|}}
+                                {{#if_ device.gateway '==' gateway.sn_number}}
+                                {{#if_ device.device_model '==' dev_type.prefix}}
+                                <button class="device-item status-na"
+                                    style="background-color: {{dev_type.type_properties.color}};"
+                                    id="dev-{{device.sn_number}}" device-sn="{{device.sn_number}}"
+                                    gateway="{{gateway.sn_number}}" dev-type="{{dev_type.prefix}}" on-chart="false"
+                                    dev-name="{{device.device_name}}" type-name="{{dev_type.device_type}}"
+                                    color-idx="{{@index}}">
+                                    <p class="device-item-dynamic-value">
+                                        <span class="device-item-battery">
+                                            <i class="fas fa-battery-three-quarters"><span class="value">N/a</span></i>
+                                        </span>
+                                        <span class="device-item-rssi">
+                                            <i class="fas fa-wifi"><span class="value">N/a</span></i>
+                                        </span>
+                                        <br>
+                                        <span class="device-item-value">
+                                            {{#each device.device_type.uom_values}}
+                                            <span class="value-wrapper">
+                                                <i class="value" id="{{@key}}-{{device.sn_number}}">N/a</i>
+                                                <i class="uom">{{this.uom}}</i>
+                                            </span>
+                                            {{/each}}
+                                        </span>
+                                    </p>
+                                    <p class="device-item-name">{{device.device_name}}</p>
+                                </button>
+                                {{/if_}}
+                                {{/if_}}
+                                {{/each}}
                             </div>
-                            <div class="col-lg-12 chart-wrapper">
-                                <h3 class="chart-title">Chưa có dữ liệu</h3>
-                                <canvas id="chart-{{gateway.sn_number}}-{{dev_type.prefix}}" width="100%"
-                                    class="chart-canvas"></canvas>
+                            {{!-- chart area --}}
+                            <div class="chart-area" style="display: none;">
+                                <div class="uom-wrapper col-lg-6">
+                                    <label for="#uom-{{gateway.sn_number}}-{{dev_type.prefix}}">
+                                        Chọn đơn vị đo:
+                                    </label>
+                                    <select class="list-uom" id="uom-{{gateway.sn_number}}-{{dev_type.prefix}}"
+                                        chart-id="chart-{{gateway.sn_number}}-{{dev_type.prefix}}"
+                                        dev-group="dev-type-{{gateway.sn_number}}-{{dev_type.prefix}}">
+                                        {{#each uom_values}}
+                                        <option value="{{@key}}" uom="{{this.uom}}">{{this.uom}}</option>
+                                        {{/each}}
+                                    </select>
+                                </div>
+                                <div class="quick-time-wrapper col-lg-6">
+                                    <ul class="quick-time-list">
+                                        <li class="quick-time-item"
+                                            style="border:solid 1px {{dev_type.type_properties.color}}; color:{{dev_type.type_properties.color}};"
+                                            start-time="00:00" end-time="03:00"><span style="color: #fff;">3h</span>
+                                        </li>
+                                        <li class="quick-time-item"
+                                            style="border:solid 1px {{dev_type.type_properties.color}}; color:{{dev_type.type_properties.color}};"
+                                            start-time="03:00" end-time="09:00"><span style="color: #fff;">6h</span>
+                                        </li>
+                                        <li class="quick-time-item"
+                                            style="border:solid 1px {{dev_type.type_properties.color}}; color:{{dev_type.type_properties.color}};"
+                                            start-time="06:00" end-time="12:00"><span style="color: #fff;">9h</span>
+                                        </li>
+                                        <li class="quick-time-item"
+                                            style="border:solid 1px {{dev_type.type_properties.color}}; color:{{dev_type.type_properties.color}};"
+                                            start-time="09:00" end-time="23:59"><span style="color: #fff;">12h</span>
+                                        </li>
+                                        <li class="quick-time-item high-light-box"
+                                            style="border:solid 1px {{dev_type.type_properties.color}}; color:{{dev_type.type_properties.color}};"
+                                            start-time="00:00" end-time="23:59"><span style="color: #fff;">24h</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="col-lg-12 chart-wrapper">
+                                    <canvas id="chart-{{gateway.sn_number}}-{{dev_type.prefix}}" width="100%"
+                                        class="chart-canvas"></canvas>
+                                </div>
                             </div>
                         </div>
+                        <div class="fix-height"></div>
+                        {{/each}}
+                        {{!-- device item --}}
                     </div>
+                    {{/if_}}
                     {{/each}}
-                    {{!-- device item --}}
+                    {{!-- tab content gateway --}}
                 </div>
-                {{/if_}}
-                {{/each}}
-                {{!-- tab content gateway --}}
             </div>
+            {{/groups}}
+            {{!-- end group --}}
         </div>
-        {{/groups}}
-        {{!-- end group --}}
+        <!-- /.row -->
     </div>
-    <!-- /.row -->
 </div>
-
 <script src="/socket.io/socket.io.js"></script>
 <script src="/vendor/chart.min.js"></script>
 <script src="/vendor/chartjs-adapter-date-fns.bundle.min.js"></script>

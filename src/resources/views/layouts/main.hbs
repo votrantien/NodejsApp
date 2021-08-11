@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" type="text/css" href="/font-awesome/css/all.css" />
     <link rel="stylesheet" type="text/css" href="/css/daterangepicker.min.css" />
+    <link rel="stylesheet" type="text/css" href="/css/teficod_font.css" />
     <link rel="stylesheet" type="text/css" href="/css/local.css" />
 
     <script type="text/javascript" src="/vendor/jquery-3.6.0.min.js"></script>
@@ -30,13 +31,13 @@
     <div class="popup-container">
         {{!-- notification success popup --}}
         <div class="alert alert-success" id="success-alert" style="display: none;">
-            <button type="button" class="close" data-dismiss="alert">x</button>
+            <button type="button" class="close fas fa-times" data-dismiss="alert"></button>
             <p id="success-content">thành công</p>
         </div>
 
         {{!-- notification failure popup --}}
         <div class="alert alert-danger" id="failure-alert" style="display: none;">
-            <button type="button" class="close" data-dismiss="alert">x</button>
+            <button type="button" class="close fas fa-times" data-dismiss="alert"></button>
             <p id="failure-content">ko Thành công</p>
         </div>
     </div>
@@ -63,7 +64,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary" id="noticeModalSubmit" submit-type="none">Gửi</button>
-                    <button type="button" class="btn btn-danger" data-dismiss="modal" id="modalCancel">Đóng</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal" id="noticeModalCancel">Đóng</button>
                 </div>
             </div>
         </div>

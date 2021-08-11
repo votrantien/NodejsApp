@@ -94,13 +94,15 @@
                     {{#if device.group._id}}
                     <label class="switch">
                         <input type="checkbox" class="change-status-device" id="active-{{device.sn_number}}"
-                            deviceType="{{device.device_model}}" deviceSerial="{{device._id}}" checked>
+                            deviceType="{{device.device_model}}" deviceId="{{device._id}}"
+                            deviceSerial="{{device.sn_number}}" checked>
                         <span class="slider round"></span>
                     </label>
                     {{else}}
                     <label class="switch">
                         <input type="checkbox" class="change-status-device" id="active-{{device.sn_number}}"
-                            deviceType="{{device.device_model}}" deviceSerial="{{device._id}}">
+                            deviceType="{{device.device_model}}" deviceId="{{device._id}}"
+                            deviceSerial="{{device.sn_number}}">
                         <span class="slider round"></span>
                     </label>
                     {{/if}}
@@ -145,7 +147,8 @@
                             <td>
                                 <label class="switch">
                                     <input type="checkbox" class="change-status-device" id="active-{{node.sn_number}}"
-                                        deviceType="{{node.device_model}}" deviceSerial="{{node._id}}" checked>
+                                        deviceType="{{node.device_model}}" deviceId="{{node._id}}"
+                                        deviceSerial="{{node.sn_number}}" checked>
                                     <span class="slider round"></span>
                                 </label>
                             </td>
@@ -241,9 +244,50 @@
     </div>
 </div>
 
+<div class="modal" tabindex="-1" role="dialog" id="activeDeviceModal">
+    <div class="modal-dialog radius-none" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Kích hoạt thiết bị</h5>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="deviceId">
+                <p class="modal-msg"></p>
+                <div class="input-group  device-active-gateway">
+                    <label class="input-group-addon radius-none" for="deviceActiveGateway">Gateway serial</label>
+                    <select id="deviceActiveGateway" class="form-control radius-none text-dark text-bold">
+                        {{#each devices as |device|}}
+                        {{#if_ device.device_model "==" "BSGW"}}
+                        <option class="text-dark text-bold" value="{{device.sn_number}}">
+                            {{device.sn_number}}
+                        </option>
+                        {{/if_}}
+                        {{/each}}
+                    </select>
+                </div>
+                <div class="input-group device-active-group">
+                    <label class="input-group-addon radius-none" for="deviceActiveGroup">Nhóm thiết bị</label>
+                    <select id="deviceActiveGroup" class="form-control radius-none text-dark text-bold">
+                        {{#each groups as |group|}}
+                        <option class="text-dark text-bold" value="{{group._id}}">
+                            {{group.group_name}}
+                        </option>
+                        {{/each}}
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="activeModalSubmit" submit-type="none">Xác
+                    nhận</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal" id="activeModalCancel">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     // collapse list node of basic gateway
-    $('.show-node').on('click', function () {
+    $(document).on('click', '.show-node', function () {
         var idNode = `#node-${$(this).val()}`;
         $(idNode).toggleClass('collapse');
         $(this).toggleClass('fa-plus fa-minus');
@@ -421,9 +465,12 @@
                 var status = response.status;
                 var device = response.device;
                 if (status == 'success') {
-                    var html = `<tr class="list-device-item" id="dev-${device.sn_number}">
+                    var html;
+                    if (device.device_model == "BSGW") {
+                        html = `<tr class="list-device-item" id="dev-${device.sn_number}">
                                     <td class="device-item device-serial" nowrap>
                                         ${device.sn_number}
+                                        <button class="controll-button show-node fas fa-plus" value="${device.sn_number}"></button>
                                     </td>
                                     <td class="device-item device-name">${device.device_name}</td>
                                     <td class="device-item device-type">${deviceTypeText}</td>
@@ -447,7 +494,55 @@
                                             dev-country="${device.country}"></button>
                                         <button class="controll-button fas fa-trash delete" value="${device._id}" dev-serial="${device.sn_number}"></button>
                                     </td>
-                                </tr>'`;
+                                </tr>
+                                <tr class="collapse" id="node-${device.sn_number}">
+                                    <td colspan="10">
+                                        <table class="list-node">
+                                            <tr class="list-node-header">
+                                                <th></th>
+                                                <th>Serial node</th>
+                                                <th>Tên node</th>
+                                                <th>Loại</th>
+                                                <th>Số FW</th>
+                                                <th>Số HW</th>
+                                                <th>Ngày SX</th>
+                                                <th>Quốc gia</th>
+                                                <th>Active</th>
+                                                <th></th>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>`;
+                        $('#deviceActiveGateway').append(`<option class="text-dark text-bold" value="${device.sn_number}">${device.sn_number}</option>`)
+                    } else {
+                        html = `<tr class="list-device-item" id="dev-${device.sn_number}">
+                            <td class="device-item device-serial" nowrap>
+                                ${device.sn_number}
+                            </td>
+                            <td class="device-item device-name">${device.device_name}</td>
+                            <td class="device-item device-type">${deviceTypeText}</td>
+                            <td class="device-item device-group"></td>
+                            <td class="device-item fw-number">${device.fw_number}</td>
+                            <td class="device-item hw-number">${device.hw_number}</td>
+                            <td class="device-item mfg-date" nowrap>${device.mfg_date}</td>
+                            <td class="device-item country">${device.country}</td>
+                            <td class="device-item status" nowrap>
+                                <label class="switch">
+                                    <input type="checkbox" class="change-status-device" deviceType="${device.device_model}"
+                                        deviceSerial="${device._id}">
+                                    <span class="slider round"></span>
+                                </label>
+                            </td>
+                            <td class="device-item" nowrap>
+                                <button class="controll-button fas fa-pen edit" dev-id="${device._id}"
+                                    dev-serial="${device.sn_number}" dev-name="${device.device_name}"
+                                    dev-type="${device.device_type}" dev-fw="${device.fw_number}"
+                                    dev-hw="${device.hw_number}" dev-mfg-date="${device.mfg_date}"
+                                    dev-country="${device.country}"></button>
+                                <button class="controll-button fas fa-trash delete" value="${device._id}" dev-serial="${device.sn_number}"></button>
+                            </td>
+                        </tr>`;
+                    }
                     $('#tableDevice tr:first').after(html);
                     $('#mask').hide();
                     $('#mainModal').modal('hide');
@@ -498,7 +593,8 @@
                 var regDevice = CallApi(url, data, method).then((response) => {
                     var status = response.status;
                     if (status == 'success') {
-                        $('#dev-'+deviceSerial).remove();
+                        $('#dev-' + deviceSerial).remove();
+                        $('#deviceActiveGateway option[value="' + deviceSerial + '"]').remove();
                         $('#mask').hide();
                         $('#noticeModal').modal('hide');
                         alertAction(status, 'Xoá thiết bị thành công! ');
@@ -517,8 +613,184 @@
     })
 
     //active event
-    $(document).on("click", '.change-status-device',function(e){
+    $(document).on("click", '.change-status-device', function (e) {
         e.preventDefault();
-        alert('Tính năng active chưa có sẵn !!');
+        var typeDeviceActive = $(this).attr('deviceType').slice(0, 2);
+        var deviceId = $(this).attr('deviceId');
+        var deviceSerial = $(this).attr('deviceSerial');
+        var checkedStatus = $(this).is(':checked');
+        if ($(this).attr('deviceType') == 'BSGW') {
+            var countNode = $('#node-' + deviceSerial + ' tr').length;
+            if (countNode > 1) {
+                alertAction('failure', 'deactive tất cả node trước khi deactive thiết bị! ');
+                return;
+            }
+        }
+
+        $('#activeModalSubmit').attr('type-submit', '');
+        $('#activeModalSubmit').attr('device-serial', deviceSerial);
+        $('#activeModalSubmit').attr('device-id', deviceId);
+
+        $('#activeDeviceModal .device-active-group').hide();
+        $('#activeDeviceModal .device-active-gateway').hide();
+        console.log(checkedStatus)
+        if (checkedStatus == false) {
+            if (typeDeviceActive == 'NO') {
+                $('#activeDeviceModal .modal-title').html('Huỷ kích hoạt Node gateway');
+                $('#activeDeviceModal .modal-msg').html('Xác nhận huỷ kích hoạt node khỏi gateway ?');
+                $('#activeModalSubmit').attr('type-submit', 'deactiveNode');
+
+                $('#activeDeviceModal').modal('show');
+            } else {
+                $('#activeDeviceModal .modal-title').html('Huỷ kích hoạt thiết bị');
+                $('#activeDeviceModal .modal-msg').html('Xác nhận huỷ kích hoạt thiết bị khỏi nhóm ?');
+                $('#activeModalSubmit').attr('type-submit', 'deactiveDevice');
+
+                $('#activeDeviceModal').modal('show');
+            }
+        } else {
+            if (typeDeviceActive == 'NO') {
+                $('#activeDeviceModal .modal-title').html('kích hoạt Node gateway');
+                $('#activeDeviceModal .modal-msg').html('Chọn gateway: ');
+                $('#activeDeviceModal .device-active-gateway').show();
+                $('#activeModalSubmit').attr('type-submit', 'activeNode');
+
+                $('#activeDeviceModal').modal('show');
+            } else if (checkedStatus == true) {
+                $('#activeDeviceModal .modal-title').html('kích hoạt thiết bị');
+                $('#activeDeviceModal .modal-msg').html('Chọn nhóm thiết bị: ');
+                $('#activeDeviceModal .device-active-group').show();
+                $('#activeModalSubmit').attr('type-submit', 'activeDevice');
+                $('#activeDeviceModal').modal('show');
+            }
+        }
     });
+
+    $('#activeModalSubmit').on('click', function () {
+        var deviceSerial = $(this).attr('device-serial');
+        var deviceId = $(this).attr('device-id');
+        var activeGroup = $('#deviceActiveGroup').val();
+        var groupName = $('#deviceActiveGroup option:selected').text();
+        var activeGateway = $('#deviceActiveGateway').val();
+        var typeSubmit = $(this).attr('type-submit');
+
+        if (typeSubmit == 'deactiveDevice') {
+            var url = '/device/deactivate-device';
+            var data = { serial: deviceSerial, token: 'not_using' };
+            var method = 'POST';
+            $('#mask').show();
+
+            var regDevice = CallApi(url, data, method).then((response) => {
+                var status = response.status;
+                console.log(response);
+                if (status == 'success') {
+                    $('#active-' + deviceSerial).prop('checked', false);
+                    $('#dev-' + deviceSerial + ' .device-group').html('');
+                    $('#mask').hide();
+                    $('#activeDeviceModal').modal('hide');
+                    alertAction(status, 'deactive thiết bị thành công! ');
+                } else {
+                    $('#mask').hide();
+                    alertAction(status, response.errors[0].msg);
+                    $('#activeDeviceModal').modal('hide');
+                }
+            }).catch((err) => {
+                $('#mask').hide();
+                alertAction(status, err);
+            }).finally(() => {
+                $('#mask').hide();
+            })
+        } else if (typeSubmit == 'activeDevice') {
+            var url = '/device/active-device';
+            var data = { serial: deviceSerial, group: activeGroup, token: 'not_using' };
+            var method = 'POST';
+            $('#mask').show();
+
+            var regDevice = CallApi(url, data, method).then((response) => {
+                var status = response.status;
+                console.log(response);
+                if (status == 'success') {
+                    $('#active-' + deviceSerial).prop('checked', true);
+                    $('#dev-' + deviceSerial + ' .device-group').html(groupName);
+                    $('#mask').hide();
+                    $('#activeDeviceModal').modal('hide');
+                    alertAction(status, 'Active thiết bị thành công! ');
+                } else {
+                    $('#mask').hide();
+                    alertAction(status, response.errors[0].msg);
+                    $('#activeDeviceModal').modal('hide');
+                }
+            }).catch((err) => {
+                $('#mask').hide();
+                alertAction(status, err);
+            }).finally(() => {
+                $('#mask').hide();
+            })
+        } else if (typeSubmit == 'activeNode') {
+            var url = '/device/active-node';
+            var data = { serial: deviceSerial, gate_way: activeGateway, token: GetTocken(deviceSerial) };
+            var method = 'POST';
+            var nodeElementId = '#dev-' + deviceSerial;
+
+            $('#mask').show();
+            var regDevice = CallApi(url, data, method).then((response) => {
+                var status = response.status;
+                if (status == 'success') {
+                    var nodeElement = $(nodeElementId);
+                    nodeElement.prepend('<td class="node-item">--</td>');
+                    nodeElement.find('.device-group').remove()
+                    var html = '<tr class="list-node-item" id=dev-' + deviceSerial + '>' + nodeElement.html() + '</tr>';
+                    nodeElement.remove()
+                    console.log(html);
+                    $('#node-' + activeGateway + ' tbody').append(html);
+                    $('#active-' + deviceSerial).prop('checked', true);
+                    $('#mask').hide();
+                    $('#activeDeviceModal').modal('hide');
+                    alertAction(status, 'Active thiết bị thành công! ');
+                } else {
+                    $('#mask').hide();
+                    alertAction(status, response.errors[0].msg);
+                    $('#activeDeviceModal').modal('hide');
+                }
+            }).catch((err) => {
+                $('#mask').hide();
+                alertAction(status, err);
+            }).finally(() => {
+                $('#mask').hide();
+            })
+        } else if (typeSubmit == 'deactiveNode') {
+            var url = '/device/deactivate-node';
+            var data = { serial: deviceSerial, token: GetTocken(deviceSerial) };
+            var method = 'POST';
+            var nodeElementId = '#dev-' + deviceSerial;
+
+            $('#mask').show();
+            var regDevice = CallApi(url, data, method).then((response) => {
+                var status = response.status;
+                if (status == 'success') {
+                    var nodeElement = $(nodeElementId);
+                    nodeElement.find('td:first').remove()
+                    nodeElement.find('.device-type').after('<td class="device-item device-group"></td>')
+                    var html = '<tr class="list-device-item" id=dev-' + deviceSerial + '>' + nodeElement.html() + '</tr>';
+                    nodeElement.remove()
+                    console.log(html);
+                    $('#tableDevice > tbody').append(html);
+                    $('#active-' + deviceSerial).prop('checked', false);
+                    $('#mask').hide();
+                    $('#activeDeviceModal').modal('hide');
+                    alertAction(status, 'Active thiết bị thành công! ');
+                } else {
+                    $('#mask').hide();
+                    alertAction(status, response.errors[0].msg);
+                    $('#activeDeviceModal').modal('hide');
+                }
+            }).catch((err) => {
+                $('#mask').hide();
+                alertAction(status, err);
+            }).finally(() => {
+                $('#mask').hide();
+            })
+        }
+
+    })
 </script>
