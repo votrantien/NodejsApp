@@ -1,5 +1,6 @@
 // active navbar
 
+
 $(function () {
     var href = location.pathname.split("/").reduce((pre_val, curr_val, idx) => {
         return pre_val += '/' + curr_val;

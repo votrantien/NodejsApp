@@ -159,6 +159,7 @@ class DeviceController {
             const update = await Device.updateOne({ sn_number: serial }, { data: data }, { upsert: true })
             const insertLog = await DeviceLog.create({ device_serial: serial, device_value, amount_of_values })
             // console.log(update.nModified)
+            res.io.emit('update_device_values', { serial: serial, data: data })
             res.status(201).json({ status: 'success' })
         } catch (e) {
             res.status(422).json({ status: 'failure', errors: e })
@@ -199,6 +200,7 @@ class DeviceController {
             const { token, serial, group, active_user } = req.body
             const update = await Device.updateOne({ sn_number: serial }, { group, user_active_device: active_user, gateway: "none" })
             if (update.nModified == 1) {
+                res.io.emit('active_device_success', serial)
                 res.status(201).json({ status: 'success', msg: "Active thành công" })
             } else {
                 res.status(201).json({ status: 'success', msg: "Đã active vào group này" })
@@ -220,6 +222,7 @@ class DeviceController {
             const { gate_way, serial, group } = req.body
             const update = await Device.updateOne({ sn_number: serial }, { group, user_active_device: null, gateway: gate_way })
             if (update.nModified == 1) {
+                res.io.emit('active_device_success', serial)
                 res.status(201).json({ status: 'success', msg: "Active thành công" })
             } else {
                 res.status(201).json({ status: 'success', msg: "Đã active vào group này" })
@@ -391,12 +394,12 @@ class DeviceController {
             const idDevice = req.params.id
             const device = await Device.findById(idDevice);
             const deleteDevice = await Device.deleteOne({ _id: idDevice })
-            if(device.device_model == 'BSGW'){
-                const updateNode = await Device.updateMany({gateway: device.sn_number},{gateway: 'none'})
+            if (device.device_model == 'BSGW') {
+                const updateNode = await Device.updateMany({ gateway: device.sn_number }, { gateway: 'none' })
             }
             // await device.save()
             // console.log(device)
-            res.status(201).json({ status: 'success'})
+            res.status(201).json({ status: 'success' })
         } catch (err) {
             // console.log(err)
             const errors = handleErrors(err)
@@ -407,8 +410,10 @@ class DeviceController {
     async post_logDevice(req, res) {
         try {
             let { serial, startDate, endDate } = req.body
-            startDate = new Date(startDate)
-            endDate = new Date(endDate)
+            const from = startDate.split(/[\s-:]+/)
+            const to = endDate.split(/[\s-:]+/)
+            startDate = new Date(from[2], from[1] - 1, from[0], from[3], from[4])
+            endDate = new Date(to[2], to[1] - 1, to[0], to[3], to[4])
             const logs = await DeviceLog.find({
                 createdAt: {
                     $gte: startDate,

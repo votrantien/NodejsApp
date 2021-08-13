@@ -205,8 +205,8 @@ POST http://{{host}}/device/add-value HTTP/1.1
 Content-Type: application/json
 
 {
-   "serial": "NOLX4123456795",
-   "gate_way":"none",
+   "serial": "NOLX123456794",
+   "gate_way":"BSGW123456795",
    "data": {"battery":"98","rssi":"-75","val":{"lux":"33.4"}},
    "amount_of_values":"4"
 }
@@ -226,6 +226,6 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwZTk3NzQ5N
 
 {
    "serial": "NOLX123456794",
-   "startDate": "2021-07-20",
-   "endDate": "2021-07-21"
+   "startDate": "20-07-2021 00:00",
+   "endDate": "20-07-2021 23:59"
 }

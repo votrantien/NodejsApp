@@ -23,18 +23,21 @@ $(document).ready(function () {
     $('.date-picker').each(function () {
         var dpId = '#' + $(this).attr('id');
         var today = new Date()
-        var startDate = String(today.getFullYear()).padStart(2, '0') + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0') + ' ' + '00:00';
-        var endDate = String(today.getFullYear()).padStart(2, '0') + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0') + ' ' + '23:59';
+        var startDate = String(today.getDate()).padStart(2, '0') + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getFullYear()).padStart(2, '0') + ' ' + '00:00';
+        var endDate = String(today.getDate()).padStart(2, '0') + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getFullYear()).padStart(2, '0') + ' ' + '23:59';
         this.value = startDate + ' ~ ' + endDate;
         var chartId = $(this).attr('chart-id');
         var devGroup = $(this).attr('dev-group');
 
         var options = {
+            language: "vn",
+            monthSelect: true,
+            yearSelect: true,
             startOfWeek: 'monday',
             separator: ' ~ ',
             maxDays: 2,
             minDays: 1,
-            format: 'YYYY-MM-DD HH:mm',
+            format: 'DD-MM-YYYY HH:mm',
             autoClose: true,
             time: {
                 enabled: true
@@ -253,7 +256,7 @@ $(document).ready(function () {
                             },
                             grid: {
                                 drawOnChartArea: true,
-                                color:"rgb(121 121 121 / 70%)" // only want the grid lines for one axis to show up
+                                color: "rgb(121 121 121 / 70%)" // only want the grid lines for one axis to show up
                             },
                         },
                         y: {
@@ -263,7 +266,7 @@ $(document).ready(function () {
                             },
                             grid: {
                                 drawOnChartArea: true,
-                                color:"rgb(121 121 121 / 70%)" // only want the grid lines for one axis to show up
+                                color: "rgb(121 121 121 / 70%)" // only want the grid lines for one axis to show up
                             },
                         }
                     },

@@ -6662,6 +6662,12 @@ table.table td .add {
     z-index: 1000;
 }
 
+.date-picker-wrapper .select-wrapper .month,
+.date-picker-wrapper .select-wrapper .year{
+    background-color: #016343;
+    padding: 5px;
+}
+
 .date-picker-input {
     padding: 0;
     font-size: 1.2rem;
@@ -6956,6 +6962,7 @@ input:checked+.slider:before {
     padding: 10px;
     color: white;
     background-color: #016343;
+    margin: 2px 0;
 }
 
 .device-group {

@@ -14,18 +14,21 @@ $(document).ready(function () {
     $('.date-picker').each(function () {
         var dpId = '#' + $(this).attr('id');
         var today = new Date()
-        var startDate = String(today.getFullYear()).padStart(2, '0') + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0') + ' ' + '00:00';
-        var endDate = String(today.getFullYear()).padStart(2, '0') + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0') + ' ' + '23:59';
+        var startDate = String(today.getDate()).padStart(2, '0') + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getFullYear()).padStart(2, '0') + ' ' + '00:00';
+        var endDate = String(today.getDate()).padStart(2, '0') + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getFullYear()).padStart(2, '0') + ' ' + '23:59';
         this.value = startDate + ' ~ ' + endDate;
         var chartId = $(this).attr('chart-id');
         var devGroup = $(this).parents('.tab-content').attr('id');
 
         var options = {
+            language: "vn",
+            monthSelect: true,
+            yearSelect: true,
             startOfWeek: 'monday',
             separator: ' ~ ',
             maxDays: 2,
             minDays: 1,
-            format: 'YYYY-MM-DD HH:mm',
+            format: 'DD-MM-YYYY HH:mm',
             autoClose: true,
             time: {
                 enabled: true
@@ -135,6 +138,7 @@ $(document).ready(function () {
         var startTime = startDate.slice(11);
         var endTime = endDate.slice(11);
         var chartTitle = String(`Thông số dinh dưỡng - Từ ${startTime} đến ${endTime}`).toUpperCase();
+        var idYaxis = 'y' + keyValue;
 
         var onChart = $(this).attr('on-chart');
 
@@ -148,7 +152,7 @@ $(document).ready(function () {
                     $(`#dev-${serial} .chart-area`).hide();
                 }
             } else {
-                RemoveDataChart(chart, idDataSet);
+                RemoveDataChart(chart, idDataSet, idYaxis);
             }
         } else {
             $(`#uom-key-${serial}`).val(keyValue);
@@ -169,13 +173,14 @@ $(document).ready(function () {
                     var data = { x: log.createdAt, y: value * 1 }
                     dataset.data.push(data);
                 });
-                dataset.yAxisID = 'y' + keyValue;
+                dataset.yAxisID = idYaxis;
             }
             if (!chart) {
                 $(`#dev-${serial} .chart-area`).show();
-                RenderChart(chartId, dataset, chartTitle);
+                RenderChart(chartId, dataset, chartTitle, idYaxis);
             } else {
                 chart.data.datasets.push(dataset);
+                chart.options.scales[idYaxis].display = true;
                 chart.update();
                 ScrollToElement(chartId);
             }
@@ -186,97 +191,111 @@ $(document).ready(function () {
     })
 
     //render chart
-    function RenderChart(chartId, dataset, chartTitle) {
+    function RenderChart(chartId, dataset, chartTitle, idYaxis) {
         var ctx = document.getElementById(chartId);
+        var options = {
+            scales: {
+                x: {
+                    type: 'time',
+                    time: {
+                        unit: 'hour'
+                    },
+                    ticks: {
+                        color: "#fff"
+                    },
+                    grid: {
+                        drawOnChartArea: true,
+                        color: "rgb(80 80 80 / 20%)", // only want the grid lines for one axis to show up
+                    },
+                },
+                yph: {
+                    //PH
+                    ticks: {
+                        color: "#fff"
+                    },
+                    display: false,
+                    grid: {
+                        drawOnChartArea: true,
+                        color: "rgb(80 80 80 / 20%)", // only want the grid lines for one axis to show up
+                        borderColor: '#179c52',
+                        borderWidth: 4,
+                    },
+                },
+                yec: {
+                    //EC
+                    ticks: {
+                        color: "#fff"
+                    },
+                    display: false,
+                    grid: {
+                        drawOnChartArea: false, // only want the grid lines for one axis to show up
+                        borderColor: '#f7b529',
+                        borderWidth: 4,
+                    },
+                },
+                ytemps: {
+                    //TEMP
+                    position: 'right',
+                    ticks: {
+                        color: "#fff"
+                    },
+                    display: false,
+                    grid: {
+                        drawOnChartArea: false, // only want the grid lines for one axis to show up
+                        borderColor: '#ff3e30',
+                        borderWidth: 4,
+                    },
+                },
+                ydo: {
+                    //OXY
+                    position: 'right',
+                    ticks: {
+                        color: "#fff"
+                    },
+                    display: false,
+                    grid: {
+                        drawOnChartArea: false, // only want the grid lines for one axis to show up
+                        borderColor: '#176bef',
+                        borderWidth: 4,
+                    },
+                },
+                yorp: {
+                    //OXY
+                    position: 'right',
+                    ticks: {
+                        color: "#fff"
+                    },
+                    display: false,
+                    grid: {
+                        drawOnChartArea: false, // only want the grid lines for one axis to show up
+                        borderColor: '#553186',
+                        borderWidth: 4,
+                    },
+                }
+            },
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        color: '#fff'
+                    }
+                },
+                title: {
+                    display: true,
+                    text: chartTitle,
+                    color: '#fff',
+                    font: { size: 15, weight: 'bold' }
+                }
+            },
+        };
+        options.scales[idYaxis].display = true;
         if (ctx) {
             var myChart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     datasets: [dataset]
-                },
-                options: {
-                    scales: {
-                        x: {
-                            type: 'time',
-                            time: {
-                                unit: 'hour'
-                            },
-                            ticks: {
-                                color: "#fff"
-                            },
-                            grid: {
-                                drawOnChartArea: true,
-                                color: "rgb(121 121 121 / 70%)", // only want the grid lines for one axis to show up
-                            },
-                        },
-                        yph: {
-                            //PH
-                            ticks: {
-                                color: "#fff"
-                            },
-                            display: true,
-                            grid: {
-                                drawOnChartArea: true,
-                                color: "rgb(121 121 121 / 70%)", // only want the grid lines for one axis to show up
-                                borderColor: '#179c52',
-                                borderWidth: 4,
-                            },
-                        },
-                        yec: {
-                            //EC
-                            ticks: {
-                                color: "#fff"
-                            },
-                            display: true,
-                            grid: {
-                                drawOnChartArea: false, // only want the grid lines for one axis to show up
-                                borderColor: '#f7b529',
-                                borderWidth: 4,
-                            },
-                        },
-                        ytemp: {
-                            //TEMP
-                            position: 'right',
-                            ticks: {
-                                color: "#fff"
-                            },
-                            display: true,
-                            grid: {
-                                drawOnChartArea: false, // only want the grid lines for one axis to show up
-                                borderColor: '#ff3e30',
-                                borderWidth: 4,
-                            },
-                        },
-                        yoxy: {
-                            //OXY
-                            position: 'right',
-                            ticks: {
-                                color: "#fff"
-                            },
-                            display: true,
-                            grid: {
-                                drawOnChartArea: false, // only want the grid lines for one axis to show up
-                                borderColor: '#176bef',
-                                borderWidth: 4,
-                            },
-                        }
-                    },
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                            labels: {
-                                color: '#fff'
-                            }
-                        },
-                        title: {
-                            display: true,
-                            text: chartTitle,
-                            color: '#fff',
-                            font: { size: 15, weight: 'bold' }
-                        }
-                    },
-                }
+                }, options
             });
             ScrollToElement(chartId);
         }
@@ -284,10 +303,11 @@ $(document).ready(function () {
     }
 
     //remove data in datasets
-    function RemoveDataChart(chart, id) {
+    function RemoveDataChart(chart, id, idYaxis) {
         chart.data.datasets = chart.data.datasets.filter(function (obj) {
             return (obj.id != id);
         });
+        chart.options.scales[idYaxis].display = false;
         chart.update();
     }
 
