@@ -31,8 +31,8 @@
                         {{#each ../gateways as |gateway|}}
                         {{#if_ gateway.group '==' group._id}}
                         <button class="tab-link status-na" id="tab-control-{{gateway.sn_number}}"
-                            onclick="openGroupContent('gw-{{gateway.sn_number}}',this,'g-{{group._id}}')">G/w:
-                            {{gateway.sn_number}}</button>
+                            onclick="openGroupContent('gw-{{gateway.sn_number}}',this,'g-{{group._id}}')">
+                            {{gateway.device_name}}</button>
                         {{/if_}}
                         {{/each}}
                     </div>
@@ -42,14 +42,29 @@
                     <input type="hidden" class="gateway_sn" value="{{gateway.sn_number}}">
                     <div class="tab-content" id="gw-{{gateway.sn_number}}" style="display: none;">
                         {{!-- device type controll --}}
-                        <div class="device-type-group-controll">
+                        <div class="device-type-group-controll-solution col-lg-6">
                             {{#each ../../device_types as |dev_type|}}
                             {{#if_ dev_type.prefix 'not_in' 'AHSD,BSGW'}}
-                            <button class="device-type-controll" data-toggle="collapse"
+                            {{#if_ dev_type.type_properties.environment '==' 'solution'}}
+                            <button class="device-type-controll {{dev_type.type_properties.environment}}" data-toggle="collapse"
                                 data-target="#dev-type-{{gateway.sn_number}}-{{dev_type.prefix}}">
-                                <i class="fas {{dev_type.type_properties.icon}}"></i>
+                                <i class="{{dev_type.type_properties.icon}} icon-lg"></i>
                                 <p>{{dev_type.device_type}}</p>
                             </button>
+                            {{/if_}}
+                            {{/if_}}
+                            {{/each}}
+                        </div>
+                        <div class="device-type-group-controll-air col-lg-6">
+                            {{#each ../../device_types as |dev_type|}}
+                            {{#if_ dev_type.prefix 'not_in' 'AHSD,BSGW'}}
+                            {{#if_ dev_type.type_properties.environment '==' 'air'}}
+                            <button class="device-type-controll {{dev_type.type_properties.environment}}" data-toggle="collapse"
+                                data-target="#dev-type-{{gateway.sn_number}}-{{dev_type.prefix}}">
+                                <i class="{{dev_type.type_properties.icon}} icon-lg"></i>
+                                <p>{{dev_type.device_type}}</p>
+                            </button>
+                            {{/if_}}
                             {{/if_}}
                             {{/each}}
                         </div>
@@ -61,7 +76,7 @@
                         <div class="collapse device-group" id="dev-type-{{gateway.sn_number}}-{{dev_type.prefix}}"
                             group-label="{{dev_type.device_type}}"
                             chart-id="chart-{{gateway.sn_number}}-{{dev_type.prefix}}">
-                            <i class="label-group-content fas {{dev_type.type_properties.icon}}"></i>
+                            <i class="label-group-content fas {{dev_type.type_properties.icon}} icon-lg"></i>
                             <div class="date-picker-div">
                                 <label for="#date-picker-{{gateway.sn_number}}-{{dev_type.prefix}}">
                                     Thời gian
@@ -76,8 +91,8 @@
                                 {{#each ../../../devices as |device|}}
                                 {{#if_ device.gateway '==' gateway.sn_number}}
                                 {{#if_ device.device_model '==' dev_type.prefix}}
-                                <button class="device-item status-na"
-                                    style="background-color: {{dev_type.type_properties.color}};"
+                                <button class="device-item d-{{dev_type.type_properties.environment}} status-na"
+                                    style="color: {{dev_type.type_properties.color}};"
                                     id="dev-{{device.sn_number}}" device-sn="{{device.sn_number}}"
                                     gateway="{{gateway.sn_number}}" dev-type="{{dev_type.prefix}}" on-chart="false"
                                     dev-name="{{device.device_name}}" type-name="{{dev_type.device_type}}"
@@ -94,7 +109,7 @@
                                             {{#each device.device_type.uom_values}}
                                             <span class="value-wrapper">
                                                 <i class="value" id="{{@key}}-{{device.sn_number}}">N/a</i>
-                                                <i class="uom">{{this.uom}}</i>
+                                                <sub class="uom">{{this.uom}}</sub>
                                             </span>
                                             {{/each}}
                                         </span>

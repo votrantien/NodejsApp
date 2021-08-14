@@ -1,11 +1,11 @@
 @font-face {
   font-family: 'teficod_font';
-  src: url('../font/teficod_font.eot?15897843');
-  src: url('../font/teficod_font.eot?15897843#iefix') format('embedded-opentype'),
-       url('../font/teficod_font.woff2?15897843') format('woff2'),
-       url('../font/teficod_font.woff?15897843') format('woff'),
-       url('../font/teficod_font.ttf?15897843') format('truetype'),
-       url('../font/teficod_font.svg?15897843#teficod_font') format('svg');
+  src: url('../font/teficod_font.eot?98107793');
+  src: url('../font/teficod_font.eot?98107793#iefix') format('embedded-opentype'),
+       url('../font/teficod_font.woff2?98107793') format('woff2'),
+       url('../font/teficod_font.woff?98107793') format('woff'),
+       url('../font/teficod_font.ttf?98107793') format('truetype'),
+       url('../font/teficod_font.svg?98107793#teficod_font') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -15,7 +15,7 @@
 @media screen and (-webkit-min-device-pixel-ratio:0) {
   @font-face {
     font-family: 'teficod_font';
-    src: url('../font/teficod_font.svg?15897843#teficod_font') format('svg');
+    src: url('../font/teficod_font.svg?98107793#teficod_font') format('svg');
   }
 }
 */
@@ -53,6 +53,18 @@
   /* Uncomment for 3D effect */
   /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
 }
-
-.icon-oxy:before { content: '\e800'; } /* '' */
-.icon-co2:before { content: '\e801'; } /* '' */
+.icon-lg{
+  font-size: 2.5rem;
+}
+.icon-co2:before { content: '\e800'; } /* '' */
+.icon-light:before { content: '\e801'; } /* '' */
+.icon-oxygen:before { content: '\e802'; } /* '' */
+.icon-pressure-level:before { content: '\e805'; } /* '' */
+.icon-warter-flow:before { content: '\e808'; } /* '' */
+.icon-do:before { content: '\e809'; } /* '' */
+.icon-th:before { content: '\e80a'; } /* '' */
+.icon-water-temp:before { content: '\e80b'; } /* '' */
+.icon-orp:before { content: '\e80c'; } /* '' */
+.icon-ph:before { content: '\e80d'; } /* '' */
+.icon-ec:before { content: '\e80e'; } /* '' */
+.icon-water-level:before { content: '\e80f'; } /* '' */

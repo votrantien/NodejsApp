@@ -88,15 +88,17 @@ $(document).ready(function () {
         var data = data.data;
         var rssi = data.rssi;
         var battery = data.battery;
+        var idGateway = $(`#dev-${serial}`).attr('gateway');
+        console.log(idGateway);
         for (const [key, value] of Object.entries(data.val)) {
             $(`#${key}-${serial}`).html(value);
         }
 
-        if (!$(`#dev-${serial}`).hasClass('status-1') || !$(`#tab-control-${serial}`).hasClass('status-1')) {
+        if (!$(`#dev-${serial}`).hasClass('status-1') || !$(`#tab-control-${idGateway}`).hasClass('status-1')) {
             $(`#dev-${serial}`).removeClass('status-1 status-2 status-0 status-na');
             $(`#dev-${serial}`).addClass('status-1');
-            $(`#tab-control-${serial}`).removeClass('status-1 status-2 status-0 status-na');
-            $(`#tab-control-${serial}`).addClass('status-1');
+            $(`#tab-control-${idGateway}`).removeClass('status-1 status-2 status-0 status-na');
+            $(`#tab-control-${idGateway}`).addClass('status-1');
         }
 
         $(`#dev-${serial} .device-item-battery .value`).html(battery);

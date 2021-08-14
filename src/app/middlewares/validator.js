@@ -74,6 +74,7 @@ let validateUpdateDevice = [
         })
     }),
     body('device_name', 'Nhập tên thiết bị').not().isEmpty(),
+    body('device_name', 'Tên thiết bị phải từ 5 đến 20 ký tự').not().isLength({ min: 6, max: 20 }),
     body('device_type', 'Nhập id loại thiết bị').not().isEmpty(),
     body('device_type').custom(value => {
         return DeviceType.findOne({ _id: value }).then(deviceType => {

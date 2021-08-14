@@ -3,6 +3,10 @@
         width: 100%;
     }
 
+    .list-device-wrapper tr{
+        cursor: pointer;
+    }
+
     .list-device {
         width: 100%;
         background-color: #222222;
@@ -11,7 +15,14 @@
     .list-device tr,
     .list-device td,
     .list-device th {
-        border: solid 1px #2b2626;
+        border: solid 1px #ddd4d4;
+    }
+
+    .list-device .device-item-td .long-text{
+        overflow: auto;
+        max-height: 39px;
+        position: relative;
+        padding-right: 10px;
     }
 
     .list-device .list-device-header th {
@@ -27,12 +38,15 @@
     }
 
     .list-node .list-node-header th {
+        border: solid 1px #444040;
         padding: 5px;
         text-align: center;
     }
 
     .list-node .list-node-item td {
+        border: solid 1px #444040;
         padding: 5px;
+        text-align: center;
     }
 
 
@@ -65,32 +79,48 @@
                 <th nowrap>Tên</th>
                 <th nowrap>Loại</th>
                 <th nowrap>Nhóm</th>
-                <th nowrap>Số FW</th>
-                <th nowrap>Số HW</th>
-                <th nowrap>Ngày SX</th>
+                <th class="text-right" nowrap>Số FW</th>
+                <th class="text-right" nowrap>Số HW</th>
+                <th class="text-right" nowrap>Ngày SX</th>
                 <th nowrap>Quốc gia</th>
-                <th nowrap>Active</th>
+                <th class="text-center" nowrap>Active</th>
                 <th style="text-align: right; font-size: 1.5rem;">
                     <button class="controll-button fas fa-plus-square add-new"></button>
                 </th>
             </tr>
             {{#each devices as |device|}}
             {{#if_ device.gateway "==" "none"}}
-            <tr class="list-device-item-td" id="dev-{{device.sn_number}}">
+            <tr class="list-device-item-td" id="dev-{{device.sn_number}}" height="40px">
                 <td class="device-item-td device-serial" nowrap>
-                    {{device.sn_number}}
-                    {{#if_ device.device_model "==" "BSGW"}}
-                    <button class="controll-button show-node fas fa-plus" value="{{device.sn_number}}"></button>
-                    {{/if_}}
+                    <div class="space-beetween">
+                        <span>
+                            {{device.sn_number}}
+                        </span>
+                        {{#if_ device.device_model "==" "BSGW"}}
+                        <button class="controll-button show-node fas fa-plus" value="{{device.sn_number}}"></button>
+                        {{/if_}}
+                    </div>
                 </td>
-                <td class="device-item-td device-name">{{device.device_name}}</td>
-                <td class="device-item-td device-type">{{device.device_type.device_type}}</td>
-                <td class="device-item-td device-group">{{device.group.group_name}}</td>
-                <td class="device-item-td fw-number">{{device.fw_number}}</td>
-                <td class="device-item-td hw-number">{{device.hw_number}}</td>
-                <td class="device-item-td mfg-date" nowrap>{{device.mfg_date}}</td>
+                <td class="device-item-td device-name">
+                    <div class="space-beetween">
+                        <span>
+                            {{device.device_name}}
+                        </span>
+                        <button class="controll-button show-description fas fa-question-circle" title="Mô tả"
+                            data-description="{{device.description}}"></button>
+                    </div>
+                </td>
+                <td class="device-item-td device-type">
+                    <div class="long-text hide-scroll">{{device.device_type.device_type}}</div>
+                </td>
+                <td class="device-item-td device-group">
+                    <div class="long-text hide-scroll">{{device.group.group_name}}</div>
+                </td>
+                <td class="text-right device-item-td fw-number">{{device.fw_number}}</td>
+                <td class="text-right device-item-td hw-number">{{device.hw_number}}</td>
+                <td class="text-right device-item-td mfg-date" nowrap>{{device.mfg_date}}</td>
                 <td class="device-item-td country">{{device.country}}</td>
-                <td class="device-item-td status" nowrap>
+                <td class="text-center device-item-td status" nowrap>
                     {{#if device.group._id}}
                     <label class="switch">
                         <input type="checkbox" class="change-status-device" id="active-{{device.sn_number}}"
@@ -122,7 +152,6 @@
                 <td colspan="10">
                     <table class="list-node">
                         <tr class="list-node-header">
-                            <th></th>
                             <th>Serial node</th>
                             <th>Tên node</th>
                             <th>Loại</th>
@@ -136,7 +165,6 @@
                         {{#each ../devices as |node|}}
                         {{#if_ node.gateway "==" device.sn_number}}
                         <tr class="list-node-item" id="dev-{{node.sn_number}}">
-                            <td class="node-item">--</td>
                             <td class="node-item device-serial">{{node.sn_number}}</td>
                             <td class="node-item device-name">{{node.device_name}}</td>
                             <td class="node-item device-type">{{node.device_type.device_type}}</td>
@@ -293,11 +321,18 @@
         $(this).toggleClass('fa-plus fa-minus');
     })
 
+    //event click row table
+    $(document).on('click','.list-device-item-td, .list-node-item',function(){
+        $('.list-device-item-td').removeClass('row-active');
+        $('.list-node-item').removeClass('row-active');
+        $(this).toggleClass('row-active');
+    })
+
     //Contrain validate js
     var constraints = {
         deviceName: {
             presence: { allowEmpty: false, message: ': Tên thiết bị không được để trống' },
-            length: { minimum: 5, message: ': Tên thiết bị phải từ 5 ký tự' },
+            length: { minimum: 5, maximum: 20, message: ': Tên thiết bị phải từ 5 đến 25 ký tự' },
         },
         deviceType: {
             presence: { allowEmpty: false, message: ': Phải chọn loại thiết bị' },
@@ -791,6 +826,6 @@
                 $('#mask').hide();
             })
         }
-
     })
+    
 </script>

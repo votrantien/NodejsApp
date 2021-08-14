@@ -42,6 +42,7 @@ const deviceSchema = new mongoose.Schema({
   group: {type: Schema.Types.ObjectId, ref: 'GroupDevice', default: null},
   gateway: {type: String, default: 'none'},
   data: {},
+  description: {type: String, default: 'Mô tả thiết bị'},
   status: {type: Number, default: 0},
 },
 { timestamps: true }

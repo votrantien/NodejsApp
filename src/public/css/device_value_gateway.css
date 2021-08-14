@@ -13,15 +13,6 @@
 }
 
 
-.collapse-open::after {
-    position: absolute;
-    content: '';
-    width: 5px;
-    height: 100%;
-    left: 0;
-    background-color: yellow;
-    top: 0;
-}
 
 /* check device on chart */
 

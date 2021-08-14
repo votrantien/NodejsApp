@@ -79,7 +79,7 @@ class DeviceController {
         let devices
         let groups
         let gateways
-        const device_types = await DeviceType.find().lean()
+        const device_types = await DeviceType.find().sort({'type_properties.environment': -1}).lean()
         if (user.role == 'admin') {
             groups = await GroupDevice.find().lean()
             gateways = await Device.find({ device_model: 'BSGW' }).lean()
