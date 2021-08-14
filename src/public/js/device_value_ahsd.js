@@ -365,9 +365,20 @@ $(document).ready(function () {
     $(document).on('click', '.quick-time-item', function () {
         var devGroup = $(this).parents('.tab-content').attr('id');
         var chartId = $(`#${devGroup} .chart-canvas`).attr('id');
-        var startTime = $(this).attr('start-time');
-        var endTime = $(this).attr('end-time');
+        var limitTime = $(this).data('time-limit');
         var currentDate = $(`#${devGroup} .date-picker`).val().split(" ~ ");
+        var currHour = moment().hour();
+        var currMinute = moment().minute();
+        var startTime;
+        var endTime;
+        if (limitTime != '24') {
+            var startHour = currHour - limitTime > 0 ? currHour - limitTime : 0;
+            startTime = String(startHour).padStart(2, '0') + ":" + String(currMinute).padStart(2, '0');
+            endTime = String(currHour).padStart(2, '0') + ":" + String(currMinute).padStart(2, '0');
+        } else {
+            startTime = "00:00";
+            endTime = "23:59";
+        }
         var startDate = currentDate[0].slice(0, 11) + startTime;
         var endDate = currentDate[1].slice(0, 11) + endTime;
         var newDate = startDate + ' ~ ' + endDate;
