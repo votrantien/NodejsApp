@@ -5396,11 +5396,13 @@ button.close {
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */
+
 .hide-scroll::-webkit-scrollbar {
     display: none;
 }
 
 /* Hide scrollbar for IE, Edge and Firefox */
+
 .hide-scroll {
     -ms-overflow-style: none;
     /* IE and Edge */
@@ -5408,7 +5410,7 @@ button.close {
     /* Firefox */
 }
 
-.row-active{
+.row-active {
     background: rgba(134, 134, 134, 0.555);
 }
 
@@ -6654,7 +6656,7 @@ table.table td .add {
 .popup-container {
     width: 100%;
     position: fixed;
-    z-index: 1040;
+    z-index: 1060;
     top: 15px;
 }
 
@@ -6676,11 +6678,10 @@ table.table td .add {
 /* datepicker css */
 
 .date-picker-wrapper {
-    z-index: 1000;
+    z-index: 2000;
 }
 
-.date-picker-wrapper .select-wrapper .month,
-.date-picker-wrapper .select-wrapper .year{
+.date-picker-wrapper .select-wrapper .month, .date-picker-wrapper .select-wrapper .year {
     background-color: #016343;
     padding: 5px;
 }
@@ -6702,11 +6703,13 @@ table.table td .add {
     padding: 10px 0 10px;
 }
 
-.date-picker-div .date-picker {
+.date-picker-div .date-picker,
+.date-picker-export {
     background: none;
     color: #fff;
     text-align: left;
     width: 300px;
+    border: none;
 }
 
 .date-picker-wrapper table {
@@ -6725,6 +6728,10 @@ table.table td .add {
 
 .text-bold {
     font-weight: bold;
+}
+
+.text-cap {
+    text-transform: capitalize;
 }
 
 /* switch */
@@ -6795,7 +6802,7 @@ input:checked+.slider:before {
 
 .status-na::after {
     position: absolute;
-    content: 'N/a';
+    content: 'N/A';
     color: #fff;
     top: 0;
     right: 0;
@@ -6846,8 +6853,8 @@ input:checked+.slider:before {
 
 /* status icon color */
 
-.status-low {
-    color: rgb(221, 26, 26);
+.status-low *, .status-low::before{
+    color: rgb(221, 26, 26) !important;
 }
 
 /* custom dropdown list */
@@ -6938,7 +6945,7 @@ input:checked+.slider:before {
     margin-bottom: 15px;
 }
 
-.label-group-content{
+.label-group-content {
     color: #fff;
 }
 
@@ -6977,15 +6984,29 @@ input:checked+.slider:before {
     padding-top: 15px;
 }
 
-.device-type-group-controll-solution{
+.device-type-group-controll-solution {
     text-align: left;
     padding: 0;
+    margin-top: 10px;
+    text-align: left;
+    padding: 0;
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: row;
 }
 
-
-.device-type-group-controll-air{
+.device-type-group-controll-air {
     text-align: left;
     padding: 0;
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: row;
 }
 
 .device-type-controll {
@@ -6997,17 +7018,17 @@ input:checked+.slider:before {
     padding: 10px;
     color: white;
     margin: 2px 0;
+    width: 150px;
 }
 
-.solution{
+.solution {
     background-color: #016343;
 }
 
-.air{
+.air {
     border: solid 2px #016343;
     background: none;
 }
-
 
 .collapse-open::after {
     position: absolute;
@@ -7020,7 +7041,7 @@ input:checked+.slider:before {
     border-radius: 10px 0 0 10px;
 }
 
-.device-type-controll *{
+.device-type-controll * {
     margin: 0;
 }
 
@@ -7038,7 +7059,6 @@ input:checked+.slider:before {
 }
 
 /* device item */
-
 
 .device-item {
     padding: 5px;
@@ -7060,16 +7080,15 @@ input:checked+.slider:before {
     border-radius: 5px;
 }
 
-.device-item *{
+.device-item * {
     color: white;
 }
 
-
-.d-solution{
+.d-solution {
     background-color: currentColor;
 }
 
-.d-air{
+.d-air {
     border: solid 2px currentColor;
     background: none;
 }
@@ -7124,7 +7143,6 @@ input:checked+.slider:before {
     padding: 0 5px 0;
     text-align: left;
     font-style: italic;
-    text-transform: lowercase;
     font-size: 2rem;
 }
 
@@ -7146,9 +7164,24 @@ input:checked+.slider:before {
 }
 
 /* quick align item */
-.space-beetween{
+
+.space-beetween {
     display: flex;
     flex-wrap: nowrap;
     justify-content: space-between;
     align-items: center;
+}
+
+
+.export-data-btn{
+    background: #24880f;
+    color: white;
+    outline: none;
+    border: none;
+    border-radius: 25px;
+    padding: 5px 10px 5px;
+    position: absolute;
+    top: 0;
+    right: 5px;
+    font-weight: bold;
 }

@@ -172,14 +172,15 @@ $(document).ready(function () {
         var chart = Chart.getChart(chartId);
         var onChart = $(this).data('on-chart');
         var uom = $(`#uom-${gateway}-${devType} option:selected`).attr('uom');
+        var uomName = $(`#uom-${gateway}-${devType} option:selected`).attr('uom-name');
         var uomKey = $(`#uom-${gateway}-${devType}`).val();
-        var uomName = $(`#uom-${gateway}-${devType} option:selected`).text();
         var typeName = $(this).attr('type-name');
         var color = Colors[$(this).attr('color-idx')];
         var dpValue = $(`#date-picker-${gateway}-${devType}`).val().split(' ~ ');
         var startDate = dpValue[0];
         var endDate = dpValue[1];
-        var chartTitle = String(`${typeName} ( ${uom} ) - Từ ${startDate} đến ${endDate}`).toUpperCase();
+
+        var chartTitle = String(`Thông số ${uomName} ( ${uom} ) -  Ngày ${startDate.slice(0, 11)} Từ ${startDate.slice(11)} đến ${endDate.slice(11)}`).toUpperCase();
 
         if (onChart == 'true') {
             $(this).data('on-chart', 'false');
@@ -331,9 +332,9 @@ $(document).ready(function () {
         var endDate = dpValue[1];
         var uom = $(`#${devGroup} .list-uom option:selected`).attr('uom');
         var uomKey = $(`#${devGroup} .list-uom`).val();
-        var uomName = $(`#${devGroup} .list-uom option:selected`).text();
+        var uomName = $(`#${devGroup} .list-uom option:selected`).attr('uom-name');
         var typeName = $(`#${devGroup}`).attr('group-label');
-        var chartTitle = String(`${typeName} ( ${uom} )  - Từ ${startDate} đến ${endDate}`).toUpperCase();
+        var chartTitle = String(`Thông số ${uomName} ( ${uom} )  - Ngày ${startDate.slice(0, 11)} Từ ${startDate.slice(11)} đến ${endDate.slice(11)}`).toUpperCase();
         var datasets = [];
 
         var deviceLogs = await PrepareChartData(serials, startDate, endDate);
@@ -399,7 +400,7 @@ $(document).ready(function () {
             endTime = String(currHour).padStart(2, '0') + ":" + String(currMinute).padStart(2, '0');
         } else {
             startTime = "00:00";
-            endTime = "23:59";
+            endTime = String(currHour).padStart(2, '0') + ":" + String(currMinute).padStart(2, '0');
         }
         var startDate = currentDate[0].slice(0, 11) + startTime;
         var endDate = currentDate[1].slice(0, 11) + endTime;
@@ -450,4 +451,86 @@ $(document).ready(function () {
         $('.group-wrapper').hide();
         $(idGroupWrapper).show();
     })
+
+
+    //export data to excel
+
+    //date picker export
+    var today = new Date()
+    var startDate = String(today.getDate()).padStart(2, '0') + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getFullYear()).padStart(2, '0') + ' ' + '00:00';
+    var endDate = String(today.getDate()).padStart(2, '0') + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getFullYear()).padStart(2, '0') + ' ' + '23:59';
+    $('#dateExport').val(startDate + ' ~ ' + endDate);
+
+    var options = {
+        language: "vn",
+        monthSelect: true,
+        yearSelect: true,
+        startOfWeek: 'monday',
+        separator: ' ~ ',
+        maxDays: 31,
+        minDays: 1,
+        format: 'DD-MM-YYYY HH:mm',
+        autoClose: true,
+        time: {
+            enabled: true
+        }
+    }
+    $('#dateExport').dateRangePicker(options);
+
+    //event show model export
+    $(document).on('click', '.export-data-btn', async function () {
+
+        $('#exportModal').modal('show');
+    })
+    $('#exportModalSubmit').on('click', async function () {
+        var idGroup = $('#deviceGroupExport').val();
+        var dateExport = $('#dateExport').val().split(' ~ ');
+        var startDate = dateExport[0];
+        var endDate = dateExport[1];
+        var deviceModel = $('#deviceTypeExport').val();
+
+        ExportData(idGroup, startDate, endDate, deviceModel)
+    })
+    //func export data
+
+    async function ExportData(idGroup, dateStart, dateEnd, deviceModel) {
+        $('#mask').show();
+
+        var title = `Thống kê môi trường \n từ ${dateStart} đến ${dateEnd}`;
+        var fileName = `Thống kê môi trường từ ${dateStart} đến ${dateEnd}`;
+        var fileExtension = 'xlsx';
+
+        var getData = await PrepareExportData(idGroup, dateStart, dateEnd, deviceModel);
+        if (getData.deviceLogs.length > 0) {
+
+            var deviceLogs = getData.deviceLogs;
+            var deviceTypes = getData.deviceType;
+
+            var exportData = deviceLogs.map((d) => {
+                var logValue = d?.device_value;
+                var LogDate = moment(d?.createdAt).format("DD/MM/YYYY HH:mm");
+                var data = {
+                    serial: d?.device_serial,
+                    deviceName: d?.devices?.device_name,
+                    date: LogDate,
+                };
+
+                if (logValue) {
+                    for (const [key, value] of Object.entries(logValue)) {
+                        data[key] = value * 1;
+                    }
+                }
+                return data;
+            });
+            // console.log(exportData);
+            await ExportDataToFile(exportData, fileName, fileExtension, title, deviceTypes).finally(function(){
+                $('#mask').hide();
+            });
+        } else {
+            alertAction('failure', 'Không có dữ liệu để xuất');
+            $('#mask').hide();
+        }
+
+    }
+
 })

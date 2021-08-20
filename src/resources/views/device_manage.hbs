@@ -772,7 +772,6 @@
                 var status = response.status;
                 if (status == 'success') {
                     var nodeElement = $(nodeElementId);
-                    nodeElement.prepend('<td class="node-item">--</td>');
                     nodeElement.find('.device-group').remove()
                     var html = '<tr class="list-node-item" id=dev-' + deviceSerial + '>' + nodeElement.html() + '</tr>';
                     nodeElement.remove()
@@ -804,7 +803,6 @@
                 var status = response.status;
                 if (status == 'success') {
                     var nodeElement = $(nodeElementId);
-                    nodeElement.find('td:first').remove()
                     nodeElement.find('.device-type').after('<td class="device-item-td device-group"></td>')
                     var html = '<tr class="list-device-item-td" id=dev-' + deviceSerial + '>' + nodeElement.html() + '</tr>';
                     nodeElement.remove()

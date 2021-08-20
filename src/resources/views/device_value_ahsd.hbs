@@ -18,6 +18,8 @@
             <div class="col-lg-12 group-wrapper" id="group-wrapper-{{group._id}}">
                 {{/if_}}
                 {{!-- group label --}}
+                <button class="export-data-btn" data-group-id="{{group._id}}">Xuất dữ liệu</button>
+
                 <div class="group-label">
                     <i class="fas fa-leaf fa-lg"></i>
                     <span class="group-name">{{this.group_name}}</span>
@@ -84,7 +86,8 @@
                                     <li class="quick-time-item" style="border:solid 1px #016343; color:#016343;"
                                         data-time-limit="12"><span style="color: #fff;">12h</span></li>
                                     <li class="quick-time-item high-light-box"
-                                        style="border:solid 1px #016343; color:#016343;" data-time-limit="24"><span style="color: #fff;">24h</span></li>
+                                        style="border:solid 1px #016343; color:#016343;" data-time-limit="24"><span
+                                            style="color: #fff;">24h</span></li>
                                 </ul>
                             </div>
                             <div class="col-lg-12 chart-wrapper">
@@ -106,6 +109,35 @@
 
 </div>
 
+<div class="modal" tabindex="-1" role="dialog" id="exportModal">
+    <div class="modal-dialog radius-none" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Xuất dữ liệu</h5>
+            </div>
+            <div class="modal-body">
+                <div class="date-picker-div">
+                    <label for="dateExport">Thời gian</label>
+                    <input type="button" class="date-picker-export" id="dateExport">
+                </div>
+                <div class="input-group">
+                    <label class="input-group-addon radius-none" for="deviceGroupExport">Chọn group</label>
+                    <select id="deviceGroupExport" class="form-control radius-none text-dark text-bold text-cap">
+                        {{#each groups as |group|}}
+                        <option class="text-dark text-bold text-cap" value="{{group._id}}">
+                            {{group.group_name}}
+                        </option>
+                        {{/each}}
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="exportModalSubmit" submit-type="none">Xuất</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal" id="exportModalCancel">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
 <script src="/socket.io/socket.io.js"></script>
 <script src="/vendor/chart.min.js"></script>
 <script src="/vendor/chartjs-adapter-date-fns.bundle.min.js"></script>

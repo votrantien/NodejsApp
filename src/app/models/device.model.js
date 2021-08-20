@@ -7,7 +7,7 @@ const deviceSchema = new mongoose.Schema({
     required: [true, 'Xin nhập sn_number'],
     unique: true,
   },
-  device_type:{ type: Schema.Types.ObjectId, ref: 'Device_Type' },
+  device_type: { type: Schema.Types.ObjectId, ref: 'Device_Type' },
   device_name: {
     type: String,
     required: [true, 'Xin nhập device_name'],
@@ -36,16 +36,23 @@ const deviceSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Xin nhập token'],
   },
-  user_add_device:{ type: Schema.Types.ObjectId, ref: 'User' },
-  user_active_device:{ type: Schema.Types.ObjectId, ref: 'User' },
-  active_date: {type: Date},
-  group: {type: Schema.Types.ObjectId, ref: 'GroupDevice', default: null},
-  gateway: {type: String, default: 'none'},
+  user_add_device: { type: Schema.Types.ObjectId, ref: 'User' },
+  user_active_device: { type: Schema.Types.ObjectId, ref: 'User' },
+  active_date: { type: Date },
+  group: { type: Schema.Types.ObjectId, ref: 'GroupDevice', default: null },
+  gateway: { type: String, default: 'none' },
   data: {},
-  description: {type: String, default: 'Mô tả thiết bị'},
-  status: {type: Number, default: 0},
+  type_properties: {
+    color: { type: String},
+    icon: { type: String},
+    environment: { type: String},
+    display_name: { type: String},
+    order_number: { type: Number}
+  },
+  description: { type: String, default: 'Mô tả thiết bị' },
+  status: { type: Number, default: 0 },
 },
-{ timestamps: true }
+  { timestamps: true }
 );
 
 const Device = mongoose.model('Device', deviceSchema);

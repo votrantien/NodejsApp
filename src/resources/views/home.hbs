@@ -1,5 +1,216 @@
 <div id="page-wrapper">
-    {{!-- <div class="row">
+  <button onclick="getData()">
+    Refresh data
+  </button>
+  <button
+    id="testExport"
+    onclick="exportToExcel('Users', 'Users', 'Báo cáo hàng tháng')"
+  >
+    testExport
+  </button>
+  <button id="testExportEx">
+    testExportEx
+  </button>
+  <table id="data">
+    <tbody>
+      <tr>
+        <td>
+          Tên
+        </td>
+        <td>
+          Họ
+        </td>
+        <td>
+          Email
+        </td>
+        <td>
+          Phone
+        </td>
+        <td>
+          Income
+        </td>
+      </tr>
+      <tr>
+        <td>
+          Esat
+        </td>
+        <td>
+          Egeli
+        </td>
+        <td>
+          esat.egeli@example.com
+        </td>
+        <td>
+          (739)-054-4378
+        </td>
+        <td align="right">
+          335.37
+        </td>
+      </tr>
+      <tr>
+        <td>
+          Megan
+        </td>
+        <td>
+          Campbell
+        </td>
+        <td>
+          megan.campbell@example.com
+        </td>
+        <td>
+          667-918-8179
+        </td>
+        <td align="right">
+          880.73
+        </td>
+      </tr>
+      <tr>
+        <td>
+          Sergio
+        </td>
+        <td>
+          Castillo
+        </td>
+        <td>
+          sergio.castillo@example.com
+        </td>
+        <td>
+          946-904-126
+        </td>
+        <td align="right">
+          428.87
+        </td>
+      </tr>
+      <tr>
+        <td>
+          Sohan
+        </td>
+        <td>
+          Menard
+        </td>
+        <td>
+          sohan.menard@example.com
+        </td>
+        <td>
+          04-04-22-27-61
+        </td>
+        <td align="right">
+          792.71
+        </td>
+      </tr>
+      <tr>
+        <td>
+          Ida
+        </td>
+        <td>
+          Hansen
+        </td>
+        <td>
+          ida.hansen@example.com
+        </td>
+        <td>
+          05466978
+        </td>
+        <td align="right">
+          -419.43
+        </td>
+      </tr>
+      <tr>
+        <td>
+          Mildred
+        </td>
+        <td>
+          Hoffman
+        </td>
+        <td>
+          mildred.hoffman@example.com
+        </td>
+        <td>
+          04-1703-0215
+        </td>
+        <td align="right">
+          978.9
+        </td>
+      </tr>
+      <tr>
+        <td>
+          Elizabeth
+        </td>
+        <td>
+          Mckinney
+        </td>
+        <td>
+          elizabeth.mckinney@example.com
+        </td>
+        <td>
+          015394 84041
+        </td>
+        <td align="right">
+          -425.72
+        </td>
+      </tr>
+      <tr>
+        <td>
+          Pasquale
+        </td>
+        <td>
+          Stöckl
+        </td>
+        <td>
+          pasquale.stockl@example.com
+        </td>
+        <td>
+          0669-5537690
+        </td>
+        <td align="right">
+          -647.82
+        </td>
+      </tr>
+      <tr>
+        <td>
+          Niklas
+        </td>
+        <td>
+          Saarinen
+        </td>
+        <td>
+          niklas.saarinen@example.com
+        </td>
+        <td>
+          04-983-058
+        </td>
+        <td align="right">
+          968.42
+        </td>
+      </tr>
+      <tr>
+        <td>
+          Jordan
+        </td>
+        <td>
+          Martin
+        </td>
+        <td>
+          jordan.martin@example.com
+        </td>
+        <td>
+          (659)-089-5569
+        </td>
+        <td align="right">
+          12.54
+        </td>
+      </tr>
+      <tr>
+        <td colspan="4">
+          Total
+        </td>
+        <td align="right">
+          2904.57
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  {{! <div class="row">
         <div class="col-lg-12">
             <h1>Dashboard <small>Statistics and more</small></h1>
             <div class="alert alert-dismissable alert-warning">
@@ -385,92 +596,93 @@
                 </div>
             </div>
         </div>
-    </div> --}}
-    {{!-- <h1>Test socket device</h1>
+    </div> }}
+  {{! <h1>Test socket device</h1>
     <form class="form-controll" action="" id="config_device">
-        EC: <input class="form-controll"  type="text" id="max_ec" placeholder="ec max" value="1">
+        EC: <input class="form-controll" type="text" id="max_ec" placeholder="ec max" value="1">
         PH: <input class="form-controll" type="text" id="max_ph" placeholder="ph max" value="2">
         <button class="btn btn-success" type="submit">Gửi</button>
-    </form> --}}
+    </form> }}
 </div>
 <script src="/socket.io/socket.io.js"></script>
-{{!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script> --}}
-
+{{!
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script> }}
 <script type="text/javascript">
-/*
-    jQuery(function ($) {
-        var performance = [12, 43, 34, 22, 12, 33, 4, 17, 22, 34, 54, 67],
-            visits = [123, 323, 443, 32],
-            traffic = [
-                {
-                    Source: "Direct", Amount: 323, Change: 53, Percent: 23, Target: 600
+    
+    /*
+        jQuery(function ($) {
+            var performance = [12, 43, 34, 22, 12, 33, 4, 17, 22, 34, 54, 67],
+                visits = [123, 323, 443, 32],
+                traffic = [
+                    {
+                        Source: "Direct", Amount: 323, Change: 53, Percent: 23, Target: 600
+                    },
+                    {
+                        Source: "Refer", Amount: 345, Change: 34, Percent: 45, Target: 567
+                    },
+                    {
+                        Source: "Social", Amount: 567, Change: 67, Percent: 23, Target: 456
+                    },
+                    {
+                        Source: "Search", Amount: 234, Change: 23, Percent: 56, Target: 890
+                    },
+                    {
+                        Source: "Internal", Amount: 111, Change: 78, Percent: 12, Target: 345
+                    }];
+    
+    
+            $("#shieldui-chart1").shieldChart({
+                theme: "dark",
+    
+                primaryHeader: {
+                    text: "Visitors"
                 },
-                {
-                    Source: "Refer", Amount: 345, Change: 34, Percent: 45, Target: 567
+                exportOptions: {
+                    image: false,
+                    print: false
                 },
-                {
-                    Source: "Social", Amount: 567, Change: 67, Percent: 23, Target: 456
+                dataSeries: [{
+                    seriesType: "area",
+                    collectionAlias: "Q Data",
+                    data: performance
+                }]
+            });
+    
+            $("#shieldui-chart2").shieldChart({
+                theme: "dark",
+                primaryHeader: {
+                    text: "Traffic Per week"
                 },
-                {
-                    Source: "Search", Amount: 234, Change: 23, Percent: 56, Target: 890
+                exportOptions: {
+                    image: false,
+                    print: false
                 },
-                {
-                    Source: "Internal", Amount: 111, Change: 78, Percent: 12, Target: 345
-                }];
-
-
-        $("#shieldui-chart1").shieldChart({
-            theme: "dark",
-
-            primaryHeader: {
-                text: "Visitors"
-            },
-            exportOptions: {
-                image: false,
-                print: false
-            },
-            dataSeries: [{
-                seriesType: "area",
-                collectionAlias: "Q Data",
-                data: performance
-            }]
+                dataSeries: [{
+                    seriesType: "pie",
+                    collectionAlias: "traffic",
+                    data: visits
+                }]
+            });
+    
+            $("#shieldui-grid1").shieldGrid({
+                dataSource: {
+                    data: traffic
+                },
+                sorting: {
+                    multiple: true
+                },
+                rowHover: false,
+                paging: false,
+                columns: [
+                    { field: "Source", width: "170px", title: "Source" },
+                    { field: "Amount", title: "Amount" },
+                    { field: "Percent", title: "Percent", format: "{0} %" },
+                    { field: "Target", title: "Target" },
+                ]
+            });
         });
-
-        $("#shieldui-chart2").shieldChart({
-            theme: "dark",
-            primaryHeader: {
-                text: "Traffic Per week"
-            },
-            exportOptions: {
-                image: false,
-                print: false
-            },
-            dataSeries: [{
-                seriesType: "pie",
-                collectionAlias: "traffic",
-                data: visits
-            }]
-        });
-
-        $("#shieldui-grid1").shieldGrid({
-            dataSource: {
-                data: traffic
-            },
-            sorting: {
-                multiple: true
-            },
-            rowHover: false,
-            paging: false,
-            columns: [
-                { field: "Source", width: "170px", title: "Source" },
-                { field: "Amount", title: "Amount" },
-                { field: "Percent", title: "Percent", format: "{0} %" },
-                { field: "Target", title: "Target" },
-            ]
-        });
-    });
-*/
-    var socket = io();
+    */
+    /*var socket = io();
 
     var form = document.getElementById('config_device');
     var input_ph = document.getElementById('max_ph');
@@ -485,5 +697,5 @@
 
     socket.on('CONFIG_SUCCESS', function(msg){
         alert(msg)
-    })
+    })*/
 </script>

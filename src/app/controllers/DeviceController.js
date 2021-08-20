@@ -5,7 +5,7 @@ const DeviceType = db.deviceType
 const GroupDevice = db.group
 const DeviceLog = db.deviceLog
 var { validationResult } = require('express-validator')
-const { Model } = require("mongoose")
+const mongoose = require("mongoose")
 const CryptoJS = require("crypto-js")
 const mdfSecretKey = process.env.MD5_SECRET_KEY || 'thuycanh'
 
@@ -13,29 +13,8 @@ const mdfSecretKey = process.env.MD5_SECRET_KEY || 'thuycanh'
 // handle errors
 const handleErrors = (err) => {
     console.log(err.message, err.code)
-    let errors = {
-        device_code: '',
-        sn_number: '',
-    }
 
-    // duplicate 
-    if (err.code === 11000) {
-        console.log(Object.keys(err.keyValue))
-        errors.device_code = `${Object.keys(err.keyValue)} đã tồn tại`
-        return errors
-    }
-
-    // validation errors
-    if (err.message.includes('devices validation failed')) {
-        // console.log(err)
-        Object.values(err.errors).forEach(({ properties }) => {
-            // console.log(val)
-            // console.log(properties)
-            errors[properties.path] = properties.message
-        })
-    }
-
-    return errors
+    return err.message
 }
 
 class DeviceController {
@@ -79,7 +58,7 @@ class DeviceController {
         let devices
         let groups
         let gateways
-        const device_types = await DeviceType.find().sort({'type_properties.environment': -1}).lean()
+        const device_types = await DeviceType.find().sort({ 'type_properties.order_number': 1 }).lean()
         if (user.role == 'admin') {
             groups = await GroupDevice.find().lean()
             gateways = await Device.find({ device_model: 'BSGW' }).lean()
@@ -200,15 +179,14 @@ class DeviceController {
             const { token, serial, group, active_user } = req.body
             const update = await Device.updateOne({ sn_number: serial }, { group, user_active_device: active_user, gateway: "none" })
             if (update.nModified == 1) {
-                res.io.emit('active_device_success', serial)
+                res.io.emit('active_device_success', { serial, active_user })
                 res.status(201).json({ status: 'success', msg: "Active thành công" })
             } else {
                 res.status(201).json({ status: 'success', msg: "Đã active vào group này" })
             }
         } catch (err) {
             // console.log(err)
-            const errors = handleErrors(err)
-            res.status(400).json({ status: 'failure', errors })
+            res.status(400).json({ status: 'failure', errors: err })
         }
     }
 
@@ -229,8 +207,7 @@ class DeviceController {
             }
         } catch (err) {
             // console.log(err)
-            const errors = handleErrors(err)
-            res.status(400).json({ status: 'failure', errors })
+            res.status(400).json({ status: 'failure', errors: err })
         }
     }
 
@@ -421,13 +398,60 @@ class DeviceController {
                 },
                 device_serial: serial
             }).sort('createdAt')
+
             // await device.save()
-            // console.log(device)
+            //console.log(logs)
             res.status(200).json({ status: 'success', deviceLogs: logs })
         } catch (err) {
             // console.log(err)
             const errors = handleErrors(err)
-            res.status(400).json({ status: 'failure', errors })
+            res.status(400).json({ status: 'failure', err: err.message })
+        }
+    }
+
+    async post_exportLogDevice(req, res) {
+        try {
+            let { startDate, endDate, groupId, deviceModel } = req.body
+            const from = startDate.split(/[\s-:]+/)
+            const to = endDate.split(/[\s-:]+/)
+            startDate = new Date(from[2], from[1] - 1, from[0], from[3], from[4])
+            endDate = new Date(to[2], to[1] - 1, to[0], to[3], to[4])
+            let arrSerials = []
+            let deviceSerials
+            let deviceType
+            if (deviceModel == 'all') {
+                deviceType = await DeviceType.find({prefix: {$nin: ['AHSD','BSGW']}}).lean()
+                deviceSerials = await Device.find({
+                    group: groupId,
+                    device_model: {$nin: ['AHSD','BSGW']}
+                }, { '_id': 0, 'sn_number': 1 })
+            } else {
+                deviceType = await DeviceType.find({ prefix: deviceModel }).lean()
+                deviceSerials = await Device.find({
+                    group: groupId,
+                    device_model: deviceModel
+                }, { '_id': 0, 'sn_number': 1 })
+            }
+
+
+            for (const [key, value] of Object.entries(deviceSerials)) {
+                arrSerials.push(value.sn_number)
+            }
+
+            const logs = await DeviceLog.find({
+                createdAt: {
+                    $gte: startDate,
+                    $lte: endDate
+                },
+                device_serial: { $in: arrSerials }
+            }).populate('devices').sort({ device_serial: 1, createdAt: 1 }).lean();
+            // await device.save()
+            // console.log(logs, groupId, deviceModel, deviceSerials)
+            res.status(200).json({ status: 'success', deviceLogs: logs, deviceType: deviceType })
+        } catch (err) {
+            // console.log(err)
+            const errors = handleErrors(err)
+            res.status(400).json({ status: 'failure', err: err.message })
         }
     }
 }

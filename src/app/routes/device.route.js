@@ -22,5 +22,6 @@ router.get('/:id', requireAuth, deviceController.get_device)
 router.put('/update/:id', requireAuth, validate.validateUpdateDevice, deviceController.put_updateDevice)
 router.delete('/delete/:id', requireAuth, validate.validateDeleteDevice, deviceController.delete_deleteDevice)
 router.post('/device-logs', deviceController.post_logDevice)
+router.post('/export-device-logs', deviceController.post_exportLogDevice)
 router.get('/*', requireLogin, deviceController.index)
 module.exports = router;
