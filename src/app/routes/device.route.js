@@ -17,6 +17,7 @@ router.post('/active-node', validate.validateActiveNode, deviceController.post_A
 router.post('/deactivate-node', validate.validateDeactivateNode, deviceController.post_InActiveNode)
 router.post('/deactivate-device', validate.validateInActiveDevice, deviceController.post_InActiveDevice)
 router.post('/create', requireAuth, validate.validateCreateDevice, deviceController.post_create)
+router.post('/change-device-group', requireAuth, validate.validateChangeDeviceGroup, deviceController.post_ChangeDeviceGroup)
 router.get('/list', requireAuth, deviceController.get_list)
 router.get('/:id', requireAuth, deviceController.get_device)
 router.put('/update/:id', requireAuth, validate.validateUpdateDevice, deviceController.put_updateDevice)

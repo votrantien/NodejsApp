@@ -1,17 +1,76 @@
-<div class="container-fluid" >
-    <div class="row" style="padding: 10PX;">
-        <h1 class="col-lg-12 text-center">THÔNG TIN NGƯỜI DÙNG</h1>
-        <div class="col-lg-12">
-            <b>ID: </b>{{user_info._id}}
+<style>
+    .info-wrapper {
+        background-color: #171717;
+    }
+
+    .avatar {
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-right: solid 1px grey;
+        flex-wrap: wrap;
+    }
+
+    .avatar>i {
+        font-size: 20rem;
+        flex: 1 0 100%;
+        text-align: center;
+    }
+
+    #updateAvartaBtn {
+        flex: 1 0 100%;
+    }
+
+    .info {
+        padding: 20px;
+    }
+
+    .control-bar {
+        margin-top: 10px;
+        text-align: center;
+    }
+</style>
+<div id="page-wrapper">
+    <h1 class="text-center">THÔNG TIN TÀI KHOẢN</h1>
+    <br>
+    <div class="row info-wrapper">
+        <div class="col-sm-4 avatar">
+            <i class="fas fa-user-tie"></i>
+            <div class="control-bar">
+                <button class="btn btn-success" id="updateAvartaBtn">Đổi avarta</button>
+            </div>
         </div>
-        <div class="col-lg-12">
-            <b>Username: </b>{{user_info.username}}
-        </div>
-        <div class="col-lg-12">
-            <b>Farm: </b>{{user_info.farm}}
-        </div>
-        <div class="col-lg-12">
-            <b>Loại tài khoản: </b>{{user_info.role}}
+        <div class="col-sm-8 info">
+            <div class="input-group">
+                <label class="input-group-addon radius-none text-cap" for="userName">Tên đăng nhập</label>
+                <input type="text" class="form-control text-dark radius-none text-bold" id="userName"
+                    placeholder="Tên đăng nhập" autocomplete="off" readonly value="{{user_info.username}}">
+            </div>
+            <div class="input-group">
+                <label class="input-group-addon radius-none text-cap" for="fullName">Họ tên</label>
+                <input type="text" class="form-control text-dark radius-none text-bold" id="fullName"
+                    placeholder="Họ và tên" autocomplete="off" readonly value="{{user_info.fullname}}">
+            </div>
+            <div class="input-group">
+                <label class="input-group-addon radius-none text-cap" for="email">email</label>
+                <input type="text" class="form-control text-dark radius-none text-bold" id="email" placeholder="email"
+                    autocomplete="off" readonly value="{{user_info.email}}">
+            </div>
+            <div class="input-group">
+                <label class="input-group-addon radius-none text-cap" for="phone">điện thoại</label>
+                <input type="text" class="form-control text-dark radius-none text-bold" id="phone"
+                    placeholder="Số điện thoại" autocomplete="off" readonly value="{{user_info.phone}}">
+            </div>
+            <div class="input-group">
+                <label class="input-group-addon radius-none text-cap" for="role">loại tài khoản</label>
+                <input type="text" class="form-control text-dark radius-none text-bold" id="role"
+                    placeholder="Loại tài khoản" autocomplete="off" readonly value="{{user_info.role}}">
+            </div>
+            <div class="control-bar">
+                <button class="btn btn-success" id="updateInfoBtn">Cập nhật thông tin</button>
+                <button class="btn btn-success" id="changePasswordBtn">Đổi mật khẩu</button>
+            </div>
         </div>
     </div>
 </div>

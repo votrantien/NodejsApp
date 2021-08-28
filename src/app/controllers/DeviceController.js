@@ -55,25 +55,27 @@ class DeviceController {
         // console.log(device)
         const user = res.locals.user
         const username = res.locals.user.username
-        let devices
-        let groups
-        let gateways
+        let devices, listGroups, gateways, listGroupShare, userGroups
         const device_types = await DeviceType.find().sort({ 'type_properties.order_number': 1 }).lean()
         if (user.role == 'admin') {
-            groups = await GroupDevice.find().lean()
+            listGroups = await GroupDevice.find().lean()
+            userGroups = listGroups
             gateways = await Device.find({ device_model: 'BSGW' }).lean()
             devices = await Device.find({ device_model: { $nin: ['BSGW', 'AHSD'] } }).populate('device_type').populate('user_active_device', 'username').populate('group').lean()
         } else {
-            groups = await GroupDevice.find({ manage_user: user.username }).lean()
-            const group_id = groups.map((group) => group._id)
-            gateways = await Device.find({ group: group_id, device_model: 'BSGW' }).lean()
-            devices = await Device.find({ group: group_id, device_model: { $nin: ["BSGW", "AHSD"] } }).populate('device_type').populate('user_active_device', 'username').populate('group').lean()
+            userGroups = await GroupDevice.find({ manage_user: user.username }).lean()
+            listGroupShare = await GroupDevice.find({ access_user: user._id }).lean()
+            listGroups = userGroups.concat(listGroupShare)
+            const groupId = listGroups.map((group) => group._id)
+
+            gateways = await Device.find({ group: groupId, device_model: 'BSGW' }).lean()
+            devices = await Device.find({ group: groupId, device_model: { $nin: ["BSGW", "AHSD"] } }).populate('device_type').populate('user_active_device', 'username').populate('group').lean()
         }
         // devices.sort(function (a, b) {
         //     return a.device_model.localeCompare(b.device_model);
         // });
         // console.log(devices)
-        res.render('device_value_gateway', { username, devices, groups, device_types, gateways, title: "Giá trị cảm biến" })
+        res.render('device_value_gateway', { username, devices, listGroups, userGroups, listGroupShare, device_types, gateways, title: "Giá trị cảm biến" })
     }
 
     // test
@@ -106,23 +108,24 @@ class DeviceController {
         // console.log(device)
         const user = res.locals.user
         const username = res.locals.user.username
-        let devices
-        let groups
-        let gateways
+        let devices, listGroups, listGroupShare, userGroups
         const device_types = await DeviceType.find().lean()
         if (user.role == 'admin') {
-            groups = await GroupDevice.find().lean()
+            listGroups = await GroupDevice.find().lean()
+            userGroups = listGroups
             devices = await Device.find({ device_model: 'AHSD' }).populate('device_type').populate('user_active_device', 'username').populate('group').lean()
         } else {
-            groups = await GroupDevice.find({ manage_user: user.username }).lean()
-            const group_id = groups.map((group) => group._id)
-            devices = await Device.find({ group: group_id, device_model: 'AHSD' }).populate('device_type').populate('user_active_device', 'username').populate('group').lean()
+            userGroups = await GroupDevice.find({ manage_user: user.username }).lean()
+            listGroupShare = await GroupDevice.find({ access_user: user._id }).lean()
+            listGroups = userGroups.concat(listGroupShare)
+            const groupId = listGroups.map((group) => group._id)
+            devices = await Device.find({ group: groupId, device_model: 'AHSD' }).populate('device_type').populate('user_active_device', 'username').populate('group').lean()
         }
         // devices.sort(function (a, b) {
         //     return a.device_model.localeCompare(b.device_model);
         // });
         // console.log(devices)
-        res.render('device_value_ahsd', { username, devices, groups, device_types, title: "Automatic Hydrobonic System" })
+        res.render('device_value_ahsd', { username, devices, listGroups, userGroups, listGroupShare, device_types, title: "Automatic Hydrobonic System" })
     }
 
     async post_AddDeviceValue(req, res) {
@@ -184,6 +187,23 @@ class DeviceController {
             } else {
                 res.status(201).json({ status: 'success', msg: "Đã active vào group này" })
             }
+        } catch (err) {
+            // console.log(err)
+            res.status(400).json({ status: 'failure', errors: err })
+        }
+    }
+
+    async post_ChangeDeviceGroup(req, res, next) {
+        const errors = validationResult(req)
+        if (!errors.isEmpty()) {
+            res.status(422).json({ status: 'failure', errors: errors.array() })
+            return
+        }
+        try {
+            const { serial, groupId } = req.body
+            const update = await Device.updateOne({ sn_number: serial }, { group: groupId })
+            const updateNode = await Device.updateMany({ gateway: serial }, { group: groupId })
+            res.status(201).json({ status: 'success', msg: "Change device group thành công" })
         } catch (err) {
             // console.log(err)
             res.status(400).json({ status: 'failure', errors: err })
@@ -420,10 +440,10 @@ class DeviceController {
             let deviceSerials
             let deviceType
             if (deviceModel == 'all') {
-                deviceType = await DeviceType.find({prefix: {$nin: ['AHSD','BSGW']}}).lean()
+                deviceType = await DeviceType.find({ prefix: { $nin: ['AHSD', 'BSGW'] } }).lean()
                 deviceSerials = await Device.find({
                     group: groupId,
-                    device_model: {$nin: ['AHSD','BSGW']}
+                    device_model: { $nin: ['AHSD', 'BSGW'] }
                 }, { '_id': 0, 'sn_number': 1 })
             } else {
                 deviceType = await DeviceType.find({ prefix: deviceModel }).lean()

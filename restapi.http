@@ -229,3 +229,61 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwZTk3NzQ5N
    "startDate": "20-07-2021 00:00",
    "endDate": "20-07-2021 23:59"
 }
+
+# api 25-08-2021
+### update device group
+PUT http://{{host}}/device-group/update/60dfce07ceeb700f240a2c9b HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwZTk3NzQ5NTE3MzIyMTZkOGFjNTQ1OSIsImlhdCI6MTYyOTg2MzQ1NSwiZXhwIjoxNjMwMTIyNjU1fQ.eztNj0KTWhiZ4dTXo3w1l2XCwwtWFgLIwuddUGa7IUU
+
+{
+   "groupName": "Group 1",
+   "groupDesc": "Mô tả group 1"
+}
+
+### create device group
+
+POST http://{{host}}/device-group/create HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwZTk3NzQ5NTE3MzIyMTZkOGFjNTQ1OSIsImlhdCI6MTYyOTg2MzQ1NSwiZXhwIjoxNjMwMTIyNjU1fQ.eztNj0KTWhiZ4dTXo3w1l2XCwwtWFgLIwuddUGa7IUU
+
+{
+   "groupName": "Group 3",
+   "groupDesc": "Mô tả group 3"
+}
+
+### create device group
+
+DELETE http://{{host}}/device-group/delete/6125c8d472b2c72300374dd8 HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwZTk3NzQ5NTE3MzIyMTZkOGFjNTQ1OSIsImlhdCI6MTYyOTg2MzQ1NSwiZXhwIjoxNjMwMTIyNjU1fQ.eztNj0KTWhiZ4dTXo3w1l2XCwwtWFgLIwuddUGa7IUU
+
+### change device group
+POST http://{{host}}/device/change-device-group HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwZTk3NzQ5NTE3MzIyMTZkOGFjNTQ1OSIsImlhdCI6MTYyOTg2MzQ1NSwiZXhwIjoxNjMwMTIyNjU1fQ.eztNj0KTWhiZ4dTXo3w1l2XCwwtWFgLIwuddUGa7IUU
+
+{
+   "serial": "BSGW5258485BWTEST",
+   "groupId": "60dfce07ceeb700f240a2c9b"
+}
+
+### share group device
+POST http://{{host}}/device-group/share-group HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwZTk3NzQ5NTE3MzIyMTZkOGFjNTQ1OSIsImlhdCI6MTYyOTg2MzQ1NSwiZXhwIjoxNjMwMTIyNjU1fQ.eztNj0KTWhiZ4dTXo3w1l2XCwwtWFgLIwuddUGa7IUU
+
+{
+   "shareUserName": "usertest2",
+   "groupId": "6125f540d27dc507308648cf"
+}
+
+### remove access user group device
+POST http://{{host}}/device-group/remove-access-user HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwZTk3NzQ5NTE3MzIyMTZkOGFjNTQ1OSIsImlhdCI6MTYyOTg2MzQ1NSwiZXhwIjoxNjMwMTIyNjU1fQ.eztNj0KTWhiZ4dTXo3w1l2XCwwtWFgLIwuddUGa7IUU
+
+{
+   "accessUserId": "id",
+   "groupId": "6125f540d27dc507308648cf"
+}

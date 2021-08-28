@@ -5,20 +5,25 @@
         <div class="dropdown-list-wrap" style="padding: 20px;">
             <label for="selectGroupDevice">Chọn nhóm thiết bị: </label>
             <select id="selectGroupDevice" class="dropdown-list text-cap">
-                {{#groups as |group|}}
+                {{#userGroups as |group|}}
                 <option class="text-cap" value="{{group._id}}">{{group.group_name}}</option>
-                {{/groups}}
+                {{/userGroups}}
+                <option class="text-cap" disabled>-- Nhóm được chia sẻ --</option>
+                {{#listGroupShare as |group|}}
+                <option class="text-cap" value="{{group._id}}">{{group.group_name}}</option>
+                {{/listGroupShare}}
             </select>
         </div>
 
         {{!-- group --}}
-        {{#groups as |group|}}
+        {{#listGroups as |group|}}
         {{#if_ @index '>' '0'}}
         <div class="col-lg-12 group-wrapper" id="group-wrapper-{{group._id}}" style="display: none;">
             {{else}}
             <div class="col-lg-12 group-wrapper" id="group-wrapper-{{group._id}}">
                 {{/if_}}
-                <button class="export-data-btn" data-group-id="{{group._id}}">Xuất dữ liệu</button>
+                <button class="export-data-btn fas fa-file-export" data-group-id="{{group._id}}"
+                    data-default-model="all"></button>
                 {{!-- group label --}}
                 <div class="group-label">
                     <i class="fas fa-leaf fa-lg"></i>
@@ -81,7 +86,12 @@
                         <div class="collapse device-group" id="dev-type-{{gateway.sn_number}}-{{dev_type.prefix}}"
                             group-label="{{dev_type.device_type}}"
                             chart-id="chart-{{gateway.sn_number}}-{{dev_type.prefix}}">
-                            <i class="label-group-content fas {{dev_type.type_properties.icon}} icon-lg"></i>
+                            <div class="group-content-header">
+                                <i class="label-group-content fas {{dev_type.type_properties.icon}} icon-lg"></i>
+                                <button class="export-data-btn fas fa-file-export quick-export "
+                                    data-group-id="{{group._id}}" data-default-model="{{dev_type.prefix}}"></button>
+                            </div>
+
                             <div class="date-picker-div">
                                 <label for="#date-picker-{{gateway.sn_number}}-{{dev_type.prefix}}">
                                     Thời gian
@@ -178,7 +188,7 @@
                     {{!-- tab content gateway --}}
                 </div>
             </div>
-            {{/groups}}
+            {{/listGroups}}
             {{!-- end group --}}
         </div>
         <!-- /.row -->
@@ -198,7 +208,13 @@
                 <div class="input-group">
                     <label class="input-group-addon radius-none" for="deviceGroupExport">Chọn group</label>
                     <select id="deviceGroupExport" class="form-control radius-none text-dark text-bold text-cap">
-                        {{#each groups as |group|}}
+                        {{#each userGroups as |group|}}
+                        <option class="text-dark text-bold text-cap" value="{{group._id}}">
+                            {{group.group_name}}
+                        </option>
+                        {{/each}}
+                        <option class="text-cap" disabled>-- Nhóm được chia sẻ --</option>
+                        {{#each listGroupShare as |group|}}
                         <option class="text-dark text-bold text-cap" value="{{group._id}}">
                             {{group.group_name}}
                         </option>

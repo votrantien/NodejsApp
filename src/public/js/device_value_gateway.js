@@ -84,16 +84,18 @@ $(document).ready(function () {
 
     socket.on('realtime_device_value', function (data) {
         // value = {serial: ..., value: {...}}
-        var serial = data.serial;
-        var data = data.data;
-        var rssi = data.rssi;
-        var battery = data.battery;
+        var serial = data?.serial;
+        var data = data?.data;
+        var rssi = data?.rssi;
+        var battery = data?.battery;
         var idGateway = $(`#dev-${serial}`).attr('gateway');
         console.log(idGateway);
-        for (const [key, value] of Object.entries(data.val)) {
-            $(`#${key}-${serial}`).html(value);
+        if(data.val){
+            for (const [key, value] of Object.entries(data.val)) {
+                $(`#${key}-${serial}`).html(value);
+            }
         }
-
+        
         if (!$(`#dev-${serial}`).hasClass('status-1') || !$(`#tab-control-${idGateway}`).hasClass('status-1')) {
             $(`#dev-${serial}`).removeClass('status-1 status-2 status-0 status-na');
             $(`#dev-${serial}`).addClass('status-1');
@@ -479,6 +481,10 @@ $(document).ready(function () {
 
     //event show model export
     $(document).on('click', '.export-data-btn', async function () {
+        var deviceModel = $(this).data('default-model');
+        var groupId = $(this).data('group-id');
+        $('#deviceTypeExport option[value="'+deviceModel+'"]').prop('selected',true);
+        $('#deviceGroupExport option[value="'+groupId+'"]').prop('selected',true);
 
         $('#exportModal').modal('show');
     })

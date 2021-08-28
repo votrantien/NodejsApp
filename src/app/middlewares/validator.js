@@ -74,7 +74,7 @@ let validateUpdateDevice = [
         })
     }),
     body('device_name', 'Nhập tên thiết bị').not().isEmpty(),
-    body('device_name', 'Tên thiết bị phải từ 5 đến 20 ký tự').not().isLength({ min: 6, max: 20 }),
+    body('device_name', 'Tên thiết bị phải từ 5 đến 25 ký tự').isLength({ min: 5, max: 25 }),
     body('device_type', 'Nhập id loại thiết bị').not().isEmpty(),
     body('device_type').custom(value => {
         return DeviceType.findOne({ _id: value }).then(deviceType => {
@@ -304,6 +304,56 @@ let validateAddDeviceValue = [
     //body('data', 'data không được để trống').not().isEmpty(),
 ]
 
+let validateChangeDeviceGroup = [
+    body('serial', 'serial không được để trống').not().isEmpty(),
+    body('serial').custom(async (value) => {
+        const device = await Device.findOne({ sn_number: value })
+        if (!device) {
+            return Promise.reject('device serial không tồn tại')
+        } else {
+            return true
+        }
+    }),
+    body('groupId', 'groupId không được để trống').not().isEmpty(),
+    body('groupId').custom(async (value) => {
+        try {
+            const group = await Group.findById(value)
+            if (!group) {
+                return Promise.reject('groupId không tồn tại')
+            } else {
+                return true
+            }
+        } catch {
+            return Promise.reject('groupId không hợp lệ')
+        }
+    })
+]
+
+// validate group manage
+let validateShareGroupDevice = [
+    body('shareUserName', 'shareUserName không được để trống').not().isEmpty(),
+    body('shareUserName').custom(async (value) => {
+        const user = await User.findOne({ username: value })
+        if (!user) {
+            return Promise.reject('Tên user không tồn tại')
+        } else {
+            return true
+        }
+    }),
+    body('groupId', 'groupId không được để trống').not().isEmpty(),
+    body('groupId').custom(async (value) => {
+        try {
+            const group = await Group.findById(value)
+            if (!group) {
+                return Promise.reject('groupId không tồn tại')
+            } else {
+                return true
+            }
+        } catch {
+            return Promise.reject('groupId không hợp lệ')
+        }
+    })
+]
 
 let validate = {
     validateCreateDevice: validateCreateDevice,
@@ -317,6 +367,8 @@ let validate = {
     validateDeactivateNode: validateDeactivateNode,
     validateAddDeviceValue: validateAddDeviceValue,
     validateDeleteDevice: validateDeleteDevice,
+    validateChangeDeviceGroup: validateChangeDeviceGroup,
+    validateShareGroupDevice: validateShareGroupDevice,
 }
 
 module.exports = { validate }

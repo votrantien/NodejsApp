@@ -6734,6 +6734,20 @@ table.table td .add {
     text-transform: capitalize;
 }
 
+.main-title{
+    color: #039666;
+    font-weight: bold;
+}
+
+.err-msg {
+    width: 100%;
+    text-align: right;
+    margin: 0;
+    padding: 2px;
+    color: #f35d16;
+    font-style: italic;
+}
+
 /* switch */
 
 .switch {
@@ -6990,11 +7004,9 @@ input:checked+.slider:before {
     margin-top: 10px;
     text-align: left;
     padding: 0;
-    margin-top: 10px;
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: center;
+    justify-content: start;
     flex-direction: row;
 }
 
@@ -7004,8 +7016,7 @@ input:checked+.slider:before {
     margin-top: 10px;
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: center;
+    justify-content: start;
     flex-direction: row;
 }
 
@@ -7017,7 +7028,7 @@ input:checked+.slider:before {
     border: none;
     padding: 10px;
     color: white;
-    margin: 2px 0;
+    margin: 2px 5px 0 0;
     width: 150px;
 }
 
@@ -7135,6 +7146,7 @@ input:checked+.slider:before {
     display: inline-block;
     overflow: hidden;
     flex: 1 0 60%;
+    text-transform: uppercase;
 }
 
 .device-item-value .value-wrapper .uom {
@@ -7174,14 +7186,19 @@ input:checked+.slider:before {
 
 
 .export-data-btn{
-    background: #24880f;
+    background: #016343;
     color: white;
     outline: none;
     border: none;
-    border-radius: 25px;
-    padding: 5px 10px 5px;
+    border-radius: 50%;
+    padding: 10px;
     position: absolute;
     top: 0;
     right: 5px;
     font-weight: bold;
+}
+
+.quick-export{
+    position: relative;
+    margin-left: 5px;
 }

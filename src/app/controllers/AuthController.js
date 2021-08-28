@@ -67,7 +67,7 @@ module.exports.signup_post = async (req, res) => {
         let default_group 
         const user = await User.create({ username, email, password, fullname, phone, role })
         if(user){
-            default_group = await Group.create({group_name: `${groupname} - ${username}`,manage_user: user.username,access_user:null})
+            default_group = await Group.create({group_name: `${groupname} - ${username}`,manage_user: user.username,access_user:[]})
         }
         //const token = createToken(user._id)
         //res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000 })

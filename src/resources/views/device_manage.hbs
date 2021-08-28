@@ -3,7 +3,7 @@
         width: 100%;
     }
 
-    .list-device-wrapper tr{
+    .list-device-wrapper tr {
         cursor: pointer;
     }
 
@@ -18,11 +18,11 @@
         border: solid 1px #ddd4d4;
     }
 
-    .list-device .device-item-td .long-text{
+    .list-device .device-item-td .long-text {
         overflow: auto;
         max-height: 39px;
         position: relative;
-        padding-right: 10px;
+        padding-right: 25px;
     }
 
     .list-device .list-device-header th {
@@ -60,13 +60,16 @@
         text-align: center;
     }
 
-    .err-msg {
-        width: 100%;
-        text-align: right;
+
+    .change-group {
+        position: absolute;
+        right: 5px;
+        padding: 0;
         margin: 0;
-        padding: 2px;
-        color: #f35d16;
-        font-style: italic;
+        top: 50%;
+        transform: translate(0, -50%);
+        cursor: pointer;
+        z-index: 1;
     }
 </style>
 
@@ -114,7 +117,10 @@
                     <div class="long-text hide-scroll">{{device.device_type.device_type}}</div>
                 </td>
                 <td class="device-item-td device-group">
+                    {{#if device.group}}
+                    <i class="fas fa-pen change-group" data-serial="{{device.sn_number}}"></i>
                     <div class="long-text hide-scroll">{{device.group.group_name}}</div>
+                    {{/if}}
                 </td>
                 <td class="text-right device-item-td fw-number">{{device.fw_number}}</td>
                 <td class="text-right device-item-td hw-number">{{device.hw_number}}</td>
@@ -313,6 +319,34 @@
     </div>
 </div>
 
+<div class="modal" tabindex="-1" role="dialog" id="changeDeviceGroupModal">
+    <div class="modal-dialog radius-none" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Đổi nhóm thiết bị</h5>
+            </div>
+            <div class="modal-body">
+                <div class="input-group device-active-group">
+                    <label class="input-group-addon radius-none" for="changeDeviceListGroup">Nhóm thiết bị</label>
+                    <select id="changeDeviceListGroup" class="form-control radius-none text-dark text-bold">
+                        {{#each groups as |group|}}
+                        <option class="text-dark text-bold" value="{{group._id}}">
+                            {{group.group_name}}
+                        </option>
+                        {{/each}}
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="changeDeviceGroupModalSubmit" submit-type="none">Xác
+                    nhận</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal"
+                    id="changeDeviceGroupModalCancel">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     // collapse list node of basic gateway
     $(document).on('click', '.show-node', function () {
@@ -322,7 +356,7 @@
     })
 
     //event click row table
-    $(document).on('click','.list-device-item-td, .list-node-item',function(){
+    $(document).on('click', '.list-device-item-td, .list-node-item', function () {
         $('.list-device-item-td').removeClass('row-active');
         $('.list-node-item').removeClass('row-active');
         $(this).toggleClass('row-active');
@@ -825,5 +859,42 @@
             })
         }
     })
-    
+    // change device group
+    $(document).on('click', '.change-group', function () {
+        var serial = $(this).data('serial');
+        var currGroupName = $(this).siblings('div');
+        $('#changeDeviceGroupModalSubmit').data({ serial, currGroupName });
+        $('#changeDeviceGroupModal').modal('show');
+    })
+
+    $(document).on('click', '#changeDeviceGroupModalSubmit', function () {
+        var serial = $(this).data('serial');
+        var groupId = $('#changeDeviceListGroup').val();
+        var groupName = $('#changeDeviceListGroup option:selected').text();
+        var currGroupName = $(this).data('currGroupName');
+
+        var url = '/device/change-device-group';
+        var data = { serial, groupId };
+        var method = 'POST';
+        $('#mask').show();
+
+        var regDevice = CallApi(url, data, method).then((response) => {
+            var status = response.status;
+            if (status == 'success') {
+                currGroupName.text(groupName);
+                $('#mask').hide();
+                $('#changeDeviceGroupModal').modal('hide');
+                alertAction(status, 'Đổi nhóm thiết bị thành công! ');
+            } else {
+                $('#mask').hide();
+                alertAction(status, response.errors[0].msg);
+                $('#changeDeviceGroupModal').modal('hide');
+            }
+        }).catch((err) => {
+            $('#mask').hide();
+            alertAction(status, err);
+        }).finally(() => {
+            $('#mask').hide();
+        })
+    })
 </script>

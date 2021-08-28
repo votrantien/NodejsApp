@@ -1,0 +1,626 @@
+<style>
+    .device-group-wrapper * {
+        color: #fff;
+    }
+
+    .device-group-wrapper {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+        align-items: flex-start;
+        padding: 10px;
+    }
+
+    .device-group-tag {
+        flex: 0 1 300px;
+        background-color: #039666;
+        display: flex;
+        flex-wrap: wrap;
+        padding: 5px;
+        border-radius: 5px;
+        margin-right: 5px;
+        margin-top: 5px;
+    }
+
+    .device-group-header {
+        flex: 1 0 100%;
+        padding: 5px 0 15px;
+    }
+
+    .device-group-name {
+        text-transform: capitalize;
+        font-weight: bold;
+        overflow: hidden;
+    }
+
+    .device-group-control {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        flex-wrap: nowrap;
+        flex-direction: row;
+    }
+
+    .device-group-control button {
+        background: none;
+        border: none;
+    }
+
+    .device-group-content {
+        flex: 1 0 100%;
+    }
+
+    .device-group-desc {
+        flex: 1 0 100%;
+        max-height: 80px;
+        overflow: auto;
+        border-bottom: solid 1px #fff;
+        margin: 5px 0 5px;
+    }
+
+    .manage-user {
+        padding: 10px 0 10px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+        align-items: center;
+        flex-direction: row;
+    }
+
+    .manage-user-label {
+        flex: 1 0 100%;
+    }
+
+    .manage-user-name {
+        padding: 5px 10px;
+        margin-right: 5px;
+        margin-top: 5px;
+        background-color: #083f6f;
+        border-radius: 10px;
+        cursor: pointer;
+    }
+
+    .access-user {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+        align-items: center;
+    }
+
+    .access-user-label {
+        flex: 1 0 100%;
+    }
+
+    .access-user-tag {
+        padding: 5px 10px;
+        margin-right: 5px;
+        margin-top: 5px;
+        background-color: #083f6f;
+        border-radius: 10px;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: space-between;
+        align-items: center;
+        min-width: 90px;
+    }
+
+    .remove-access-user-btn {
+        background: none;
+        border: none;
+    }
+
+    .add-group {
+        position: absolute;
+        right: 10px;
+        background-color: #039666;
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        top: 30px;
+        color: #fff;
+    }
+</style>
+
+<div class="row" id="page-wrapper">
+    {{!-- list device group of user --}}
+    <h1 class="main-title"><i class="fa fa-layer-group"></i> Nhóm thiết bị của bạn</h1>
+    <button class="add-group fas fa-plus" title="Thêm nhóm"></button>
+    <div class="device-group-wrapper" id="userGroup">
+        {{#each listGroup as |group|}}
+        <div class="device-group-tag" id="group-{{group._id}}">
+            <div class="device-group-header">
+                <h4 class="device-group-name">{{group.group_name}}</h4>
+                <div class="device-group-control">
+                    <button class="fas fa-pen edit" value="{{group._id}}"></button>
+                    <button class="fas fa-trash delete" value="{{group._id}}"></button>
+                    <button class="fas fa-share-alt share" value="{{group._id}}"></button>
+                    <button class="fas fa-chevron-circle-down" data-toggle="collapse"
+                        data-target="#{{group._id}}"></button>
+                </div>
+            </div>
+            <div class="device-group-content collapse" id="{{group._id}}">
+                <div class="device-group-desc">
+                    <p>{{group.description}} </p>
+                </div>
+                <div class="manage-user">
+                    <span class="manage-user-label">Người quản lý: </span>
+
+                    <span class="manage-user-name">{{group.manage_user}}</span>
+                </div>
+                <div class="access-user">
+                    <span class="access-user-label">Danh sách chia sẻ: </span>
+                    {{#access_user}}
+                    <div class="access-user-tag">
+                        <span class="access-user-name">{{this.username}}</span>
+                        <button class="fas fa-times remove-access-user-btn" data-userId="{{this._id}}" data-groupId="{{group._id}}"></button>
+                    </div>
+                    {{/access_user}}
+                </div>
+            </div>
+        </div>
+        {{/each}}
+    </div>
+
+    {{!-- list group share --}}
+
+    <h1 class="main-title"><i class="fa fa-share-alt"></i> Nhóm thiết bị được chia sẻ với bạn</h1>
+    {{#if listGroupShare}}
+    <div class="device-group-wrapper" id="shareGroup">
+        {{#each listGroupShare as |group|}}
+        <div class="device-group-tag">
+            <div class="device-group-header">
+                <h4 class="device-group-name">{{group.group_name}}</h4>
+                <div class="device-group-control">
+                    <button class="fas fa-chevron-circle-down" data-toggle="collapse"
+                        data-target="#{{group._id}}"></button>
+                </div>
+            </div>
+            <div class="device-group-content collapse" id="{{group._id}}">
+                <div class="device-group-desc">
+                    <p>{{group.description}} </p>
+                </div>
+                <div class="manage-user">
+                    <span class="manage-user-label">Người quản lý: </span>
+
+                    <span class="manage-user-name">{{group.manage_user}}</span>
+                </div>
+                <div class="access-user">
+                    <span class="access-user-label">Danh sách chia sẻ: </span>
+                    {{#access_user}}
+                    <div class="access-user-tag">
+                        <span class="access-user-name">{{this.username}}</span>
+                        <button class="remove-access-user-btn"></button>
+                    </div>
+                    {{/access_user}}
+                </div>
+            </div>
+        </div>
+        {{/each}}
+    </div>
+    {{else}}
+    <h2 class="text-muted text-center">Không có thiết bị nào</h2>
+    {{/if}}
+</div>
+
+
+<div class="modal" tabindex="-1" role="dialog" id="addGroupModal">
+    <div class="modal-dialog radius-none" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Tạo nhóm thiết bị</h5>
+            </div>
+            <div class="modal-body">
+                <div class="input-group">
+                    <label class="input-group-addon radius-none" for="groupNameInput">Tên nhóm</label>
+                    <input type="text" class="form-control text-dark radius-none text-bold" id="groupNameInput"
+                        placeholder="Tên nhóm" autocomplete="off">
+                </div>
+                <p class="err-msg" id="err-groupNameInput" style="display: none;"></p>
+
+                <div class="input-group">
+                    <label class="input-group-addon radius-none" for="groupDecsInput">Mô tả</label>
+                    <input type="text" class="form-control text-dark radius-none text-bold" id="groupDecsInput"
+                        placeholder="Mô tả" autocomplete="off">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="addGroupModalSubmit" submit-type="none">Xác
+                    nhận</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal" id="addGroupModalCancel">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" tabindex="-1" role="dialog" id="delGroupModal">
+    <div class="modal-dialog radius-none" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Xoá nhóm thiết bị</h5>
+            </div>
+            <div class="modal-body">
+                <p>Xác nhận xoá nhóm !</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="delGroupModalSubmit" submit-type="none">Xác
+                    nhận</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal" id="delGroupModalCancel">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" tabindex="-1" role="dialog" id="removeAccessUserModal">
+    <div class="modal-dialog radius-none" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Huỷ chia sẽ nhóm</h5>
+            </div>
+            <div class="modal-body">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="removeAccessUserModalSubmit" submit-type="none">Xác
+                    nhận</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal" id="removeAccessUserModalCancel">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" tabindex="-1" role="dialog" id="editGroupModal">
+    <div class="modal-dialog radius-none" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Sửa thông tin nhóm thiết bị</h5>
+            </div>
+            <div class="modal-body">
+                <div class="input-group">
+                    <label class="input-group-addon radius-none" for="editGroupNameInput">Tên nhóm</label>
+                    <input type="text" class="form-control text-dark radius-none text-bold" id="editGroupNameInput"
+                        placeholder="Tên nhóm" autocomplete="off">
+                </div>
+                <p class="err-msg" id="err-editGroupNameInput" style="display: none;"></p>
+
+                <div class="input-group">
+                    <label class="input-group-addon radius-none" for="editGroupDecsInput">Mô tả</label>
+                    <input type="text" class="form-control text-dark radius-none text-bold" id="editGroupDecsInput"
+                        placeholder="Mô tả" autocomplete="off">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="editGroupModalSubmit" submit-type="none">Xác
+                    nhận</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal" id="editGroupModalCancel">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" tabindex="-1" role="dialog" id="shareGroupModal">
+    <div class="modal-dialog radius-none" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Chia sẻ nhóm thiết bị</h5>
+            </div>
+            <div class="modal-body">
+                <div class="input-group">
+                    <label class="input-group-addon radius-none" for="shareUserNameInput">Username</label>
+                    <input type="text" class="form-control text-dark radius-none text-bold" id="shareUserNameInput"
+                        placeholder="Username người được chia sẻ" autocomplete="off">
+                </div>
+                <p class="err-msg" id="err-shareUserNameInput" style="display: none;"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="shareGroupModalSubmit" submit-type="none">Xác
+                    nhận</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal" id="shareGroupModalCancel">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    //Contrain validate js
+    var addConstraints = {
+        groupNameInput: {
+            presence: { allowEmpty: false, message: ': Tên Nhóm không được để trống' },
+            length: { minimum: 5, maximum: 20, message: ': Tên thiết bị phải từ 5 đến 25 ký tự' },
+        }
+    };
+
+    var editConstraints = {
+        editGroupNameInput: {
+            presence: { allowEmpty: false, message: ': Tên Nhóm không được để trống' },
+            length: { minimum: 5, maximum: 20, message: ': Tên thiết bị phải từ 5 đến 25 ký tự' },
+        }
+    };
+
+    var shareConstraints = {
+        shareUserNameInput: {
+            presence: { allowEmpty: false, message: ': Username không được để trống' },
+            length: { minimum: 5, maximum: 20, message: ': Username phải từ 5 đến 25 ký tự' },
+        }
+    };
+    //var validation = validate({ groupName: "name"}, constraints);
+
+    $(document).on('click', '.add-group', function () {
+        $('#groupNameInput').val('');
+        $('#groupDecsInput').val('');
+        $('.err-msg').hide();
+        $('#addGroupModal').modal('show');
+    })
+
+    $('#addGroupModalSubmit').on('click', async function () {
+        var groupName = $('#groupNameInput').val();
+        var groupDesc = $('#groupDecsInput').val();
+        var validation = validate({ groupNameInput: groupName }, addConstraints);
+        if (validation) {
+            Object.keys(validation).forEach(key => {
+                var errMsgId = '#err-' + key;
+                var errMsg = validation[key][0].split(' : ');
+                $(errMsgId).html(errMsg[1]);
+                $(errMsgId).show();
+            });
+            return;
+        }
+
+        var url = '/device-group/create';
+        var method = 'POST';
+        var data = {
+            groupName: groupName,
+            groupDesc: groupDesc
+        }
+        $('#mask').show();
+        var createGroup = await CallApi(url, data, method).then(function (res) {
+            var status = res.status;
+            if (status == 'success') {
+                var groupDevice = res.groupDevice;
+
+                var html = `<div class="device-group-tag" id="group-${groupDevice._id}">
+                                <div class="device-group-header">
+                                    <h4 class="device-group-name">${groupDevice.group_name}</h4>
+                                    <div class="device-group-control">
+                                        <button class="fas fa-pen edit" value="${groupDevice._id}"></button>
+                                        <button class="fas fa-trash delete" value="${groupDevice._id}"></button>
+                                        <button class="fas fa-share-alt share" value="${groupDevice._id}"></button>
+                                        <button class="fas fa-chevron-circle-down" data-toggle="collapse"
+                                            data-target="#${groupDevice._id}"></button>
+                                    </div>
+                                </div>
+                                <div class="device-group-content collapse" id="${groupDevice._id}">
+                                    <div class="device-group-desc">
+                                        <p>${groupDevice.description}</p>
+                                    </div>
+                                    <div class="manage-user">
+                                        <span class="manage-user-label">Người quản lý: </span>
+
+                                        <span class="manage-user-name">${groupDevice.manage_user}</span>
+                                    </div>
+                                    <div class="access-user">
+                                        <span class="access-user-label">Danh sách chia sẻ: </span>
+                                    </div>
+                                </div>
+                            </div>`;
+
+                $('#userGroup').append(html);
+                $('#mask').hide();
+                $('#addGroupModal').modal('hide');
+                alertAction(status, 'Thêm thành công');
+            } else {
+                $('#mask').hide();
+                $('#addGroupModal').modal('hide');
+                alertAction(status, res.errors[0].msg);
+            }
+        }).catch(function (err) {
+            $('#mask').hide();
+            $('#addGroupModal').modal('hide');
+            alertAction('failure', err);
+        }).finally(function () {
+            $('#mask').hide();
+            $('#addGroupModal').modal('hide');
+        })
+    })
+    // delete group
+    $(document).on('click', '.delete', function () {
+        $('#delGroupModalSubmit').data({ groupId: '' });
+        var groupId = $(this).val();
+        $('#delGroupModalSubmit').data({ groupId: groupId });
+        $('#delGroupModal').modal('show');
+    })
+    $('#delGroupModalSubmit').on('click', async function () {
+        var groupId = $(this).data('groupId');
+        var groupElem = $('#group-' + groupId);
+
+        var url = '/device-group/delete/' + groupId;
+        var method = 'DELETE';
+        var data = {};
+        $('#mask').show();
+
+        var deleteGroup = await CallApi(url, data, method).then(function (res) {
+            var status = res.status;
+            if (status == 'success') {
+                $(groupElem).remove();
+                $('#mask').hide();
+                $('#delGroupModal').modal('hide');
+                alertAction(status, 'Xoá thành công');
+            } else {
+                $('#mask').hide();
+                $('#delGroupModal').modal('hide');
+                alertAction(status, res.errors[0].msg);
+            }
+        }).catch(function (err) {
+            $('#mask').hide();
+            $('#delGroupModal').modal('hide');
+            alertAction('failure', err);
+        }).finally(function () {
+            $('#mask').hide();
+            $('#delGroupModal').modal('hide');
+        })
+    })
+
+    //edit group
+    $(document).on('click', '.edit', function () {
+        var groupId = $(this).val();
+        var currName = $('#group-'+groupId+' .device-group-name').text();
+        var currDecs = $('#group-'+groupId+' .device-group-desc p').text();
+        $('#editGroupNameInput').val(currName);
+        $('#editGroupDecsInput').val(currDecs);
+        $('#editGroupModalSubmit').data({groupId: groupId});
+        $('.err-msg').hide();
+        $('#editGroupModal').modal('show');
+    })
+
+    $('#editGroupModalSubmit').on('click', async function () {
+        var groupName = $('#editGroupNameInput').val();
+        var groupDesc = $('#editGroupDecsInput').val();
+        var groupId = $(this).data('groupId');
+        var validation = validate({ editGroupNameInput: groupName }, editConstraints);
+        if (validation) {
+            Object.keys(validation).forEach(key => {
+                var errMsgId = '#err-' + key;
+                var errMsg = validation[key][0].split(' : ');
+                $(errMsgId).html(errMsg[1]);
+                $(errMsgId).show();
+            });
+            return;
+        }
+
+        var url = '/device-group/update/' + groupId;
+        var method = 'PUT';
+        var data = {
+            groupName: groupName,
+            groupDesc: groupDesc
+        }
+        $('#mask').show();
+        var createGroup = await CallApi(url, data, method).then(function (res) {
+            var status = res.status;
+            if (status == 'success') {
+                $('#group-'+groupId+' .device-group-name').text(groupName);
+                $('#group-'+groupId+' .device-group-desc p').text(groupDesc);
+                $('#mask').hide();
+                $('#editGroupModal').modal('hide');
+                alertAction(status, 'Sửa thành công');
+            } else {
+                $('#mask').hide();
+                $('#editGroupModal').modal('hide');
+                alertAction(status, res.errors[0].msg);
+            }
+        }).catch(function (err) {
+            $('#mask').hide();
+            $('#editGroupModal').modal('hide');
+            alertAction('failure', err);
+        }).finally(function () {
+            $('#mask').hide();
+            $('#editGroupModal').modal('hide');
+        })
+    })
+
+    //share group
+
+    $(document).on('click', '.share', function () {
+        var groupId = $(this).val();
+        $('#shareUserNameInput').val('');
+        $('#shareGroupModalSubmit').data({groupId: groupId});
+        $('.err-msg').hide();
+        $('#shareGroupModal').modal('show');
+    })
+
+    $('#shareGroupModalSubmit').on('click', async function () {
+        var userName = $('#shareUserNameInput').val();
+        var groupId = $(this).data('groupId');
+        var validation = validate({ shareUserNameInput: userName }, shareConstraints);
+        if (validation) {
+            Object.keys(validation).forEach(key => {
+                var errMsgId = '#err-' + key;
+                var errMsg = validation[key][0].split(' : ');
+                $(errMsgId).html(errMsg[1]);
+                $(errMsgId).show();
+            });
+            return;
+        }
+        
+        var url = '/device-group/share-group';
+        var method = 'POST';
+        var data = {
+            shareUserName: userName,
+            groupId: groupId
+        }
+        $('#mask').show();
+        var createGroup = await CallApi(url, data, method).then(function (res) {
+            var status = res.status;
+            console.log(res)
+            if (status == 'success') {
+                var accessUserElem = $('#group-'+groupId+' .access-user');
+                var shareUser = res.shareUser;
+                var html = `<div class="access-user-tag">
+                                <span class="access-user-name">${userName}</span>
+                                <button class="fas fa-times remove-access-user-btn" data-userId="${shareUser._id}" data-groupId="${groupId}"></button>
+                            </div>`;
+                accessUserElem.append(html);
+                $('#mask').hide();
+                $('#shareGroupModal').modal('hide');
+                alertAction(status, 'Chia sẻ thành công');
+            } else {
+                $('#mask').hide();
+                alertAction(status, res.errors[0].msg);
+            }
+        }).catch(function (err) {
+            $('#mask').hide();
+            $('#shareGroupModal').modal('hide');
+            alertAction('failure', err);
+        }).finally(function () {
+            $('#mask').hide();
+            $('#shareGroupModal').modal('hide');
+        })
+    })
+
+    // remove access user
+    $(document).on('click', '.remove-access-user-btn', function(){
+        var accessUserId = $(this).data('userid');
+        var groupId = $(this).data('groupid');
+        var userName = $(this).siblings('.access-user-name').text();
+        var accessUserElem = $(this).parent('.access-user-tag');
+
+        $('#removeAccessUserModal .modal-body').html('Huỷ chia sẻ với user : ' + userName);
+        $('#removeAccessUserModalSubmit').data({accessUserId, groupId, accessUserElem})
+        $('#removeAccessUserModal').modal('show');
+    })
+
+    $('#removeAccessUserModalSubmit').on('click',async function(){
+        var groupId = $(this).data('groupId');
+        var accessUserId = $(this).data('accessUserId');
+        var accessUserElem = $(this).data('accessUserElem');
+
+        var url = '/device-group/remove-access-user';
+        var method = 'POST';
+        var data = {
+            accessUserId: accessUserId,
+            groupId: groupId
+        }
+        $('#mask').show();
+        var removeAccessUser = await CallApi(url, data, method).then(function (res) {
+            var status = res.status;
+            if (status == 'success') {
+                accessUserElem.remove();
+                $('#mask').hide();
+                $('#removeAccessUserModal').modal('hide');
+                alertAction(status, 'Huỷ chia sẻ thành công');
+            } else {
+                $('#mask').hide();
+                alertAction(status, res.errors[0].msg);
+            }
+        }).catch(function (err) {
+            $('#mask').hide();
+            $('#removeAccessUserModal').modal('hide');
+            alertAction('failure', err);
+        }).finally(function () {
+            $('#mask').hide();
+            $('#removeAccessUserModal').modal('hide');
+        })
+    })
+
+</script>

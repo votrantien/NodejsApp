@@ -42,13 +42,6 @@ const deviceSchema = new mongoose.Schema({
   group: { type: Schema.Types.ObjectId, ref: 'GroupDevice', default: null },
   gateway: { type: String, default: 'none' },
   data: {},
-  type_properties: {
-    color: { type: String},
-    icon: { type: String},
-    environment: { type: String},
-    display_name: { type: String},
-    order_number: { type: Number}
-  },
   description: { type: String, default: 'Mô tả thiết bị' },
   status: { type: Number, default: 0 },
 },

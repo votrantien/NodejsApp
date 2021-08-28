@@ -78,16 +78,19 @@ $(document).ready(function () {
     socket.on('realtime_device_value', function (data) {
         // value = {serial: ..., value: {...}}
         // console.log(data);
-        var serial = data.serial;
-        for (const [key, value] of Object.entries(data.data.val)) {
-            var idxValue = key;
-            var idValueType = 'val-' + serial + '-' + idxValue;
-            if (!$(`#tab-${serial}`).hasClass('status-1')) {
-                $(`#tab-${serial}`).removeClass('status-1 status-2 status-0 status-na');
-                $(`#tab-${serial}`).addClass('status-1');
+        var serial = data?.serial;
+        if (data.data.val) {
+            for (const [key, value] of Object.entries(data.data.val)) {
+                var idxValue = key;
+                var idValueType = 'val-' + serial + '-' + idxValue;
+                if (!$(`#tab-${serial}`).hasClass('status-1')) {
+                    $(`#tab-${serial}`).removeClass('status-1 status-2 status-0 status-na');
+                    $(`#tab-${serial}`).addClass('status-1');
+                }
+                $(`#${idValueType} .device-item-value .value`).html(value);
             }
-            $(`#${idValueType} .device-item-value .value`).html(value);
         }
+
         //console.log(deviceSn, value)
     });
 
@@ -440,6 +443,8 @@ $(document).ready(function () {
 
     //event show model export
     $(document).on('click', '.export-data-btn', async function () {
+        var groupId = $(this).data('group-id');
+        $('#deviceGroupExport option[value="'+groupId+'"]').prop('selected',true);
 
         $('#exportModal').modal('show');
     })
