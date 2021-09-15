@@ -32,7 +32,7 @@ class DeviceController {
         }
         const device_type = await DeviceType.find().lean()
         // console.log(device)
-        res.render('device', { username: res.locals.user.username, groups, idUser: res.locals.user.id, devices: device, device_types: device_type, title: "Quản lý thiết bị" })
+        res.render('device', { username: res.locals.user.username, user, groups, idUser: res.locals.user.id, devices: device, device_types: device_type, title: "Quản lý thiết bị" })
     }
 
     async get_DeviceManage(req, res) {
@@ -56,12 +56,12 @@ class DeviceController {
         const user = res.locals.user
         const username = res.locals.user.username
         let devices, listGroups, gateways, listGroupShare, userGroups
-        const device_types = await DeviceType.find().sort({ 'type_properties.order_number': 1 }).lean()
+        const device_types = await DeviceType.find({ type_group: 'sensor' }).sort({ 'type_properties.order_number': 1 }).lean()
         if (user.role == 'admin') {
             listGroups = await GroupDevice.find().lean()
             userGroups = listGroups
             gateways = await Device.find({ device_model: 'BSGW' }).lean()
-            devices = await Device.find({ device_model: { $nin: ['BSGW', 'AHSD'] } }).populate('device_type').populate('user_active_device', 'username').populate('group').lean()
+            devices = await Device.find({ device_model: { $nin: ['BSGW', 'AHSD', 'MCC2', 'MCC3', 'MCC4', 'MCC8'] } }).populate('device_type').populate('user_active_device', 'username').populate('group').lean()
         } else {
             userGroups = await GroupDevice.find({ manage_user: user.username }).lean()
             listGroupShare = await GroupDevice.find({ access_user: user._id }).lean()
@@ -69,7 +69,7 @@ class DeviceController {
             const groupId = listGroups.map((group) => group._id)
 
             gateways = await Device.find({ group: groupId, device_model: 'BSGW' }).lean()
-            devices = await Device.find({ group: groupId, device_model: { $nin: ["BSGW", "AHSD"] } }).populate('device_type').populate('user_active_device', 'username').populate('group').lean()
+            devices = await Device.find({ group: groupId, device_model: { $nin: ['BSGW', 'AHSD', 'MCC2', 'MCC3', 'MCC4', 'MCC8'] } }).populate('device_type').populate('user_active_device', 'username').populate('group').lean()
         }
         // devices.sort(function (a, b) {
         //     return a.device_model.localeCompare(b.device_model);
@@ -144,7 +144,7 @@ class DeviceController {
             res.io.emit('update_device_values', { serial: serial, data: data })
             res.status(201).json({ status: 'success' })
         } catch (e) {
-            res.status(422).json({ status: 'failure', errors: e })
+            res.status(422).json({ status: 'failure', errors: [{ msg: e.message }] })
         }
     }
 
@@ -468,6 +468,62 @@ class DeviceController {
             // await device.save()
             // console.log(logs, groupId, deviceModel, deviceSerials)
             res.status(200).json({ status: 'success', deviceLogs: logs, deviceType: deviceType })
+        } catch (err) {
+            // console.log(err)
+            const errors = handleErrors(err)
+            res.status(400).json({ status: 'failure', err: err.message })
+        }
+    }
+
+    // irrigation Scheduling api
+    async put_updateMCCData(req, res) {
+        try {
+            const errors = validationResult(req)
+            if (!errors.isEmpty()) {
+                res.status(422).json({ status: 'failure', errors: errors.array() })
+                return
+            }
+            const serial = req.params.serial
+            let { data } = req.body
+            const update = await Device.updateOne({ sn_number: serial }, { data: data }, { upsert: true, new: true })
+
+            res.status(200).json({ status: 'success' })
+        } catch (err) {
+            // console.log(err)
+            const errors = handleErrors(err)
+            res.status(400).json({ status: 'failure', err: err.message })
+        }
+    }
+
+    async post_getMCCData(req, res) {
+        try {
+            const errors = validationResult(req)
+            if (!errors.isEmpty()) {
+                res.status(422).json({ status: 'failure', errors: errors.array() })
+                return
+            }
+            let { serial } = req.body
+            const data = await Device.findOne({ sn_number: serial }, 'data')
+
+            res.status(200).json({ status: 'success', schedule: data })
+        } catch (err) {
+            // console.log(err)
+            const errors = handleErrors(err)
+            res.status(400).json({ status: 'failure', err: err.message })
+        }
+    }
+
+    async post_clearMCCData(req, res) {
+        try {
+            const errors = validationResult(req)
+            if (!errors.isEmpty()) {
+                res.status(422).json({ status: 'failure', errors: errors.array() })
+                return
+            }
+            let { serial } = req.body
+            const update = await Device.updateOne({ sn_number: serial }, { data: {} })
+
+            res.status(200).json({ status: 'success' })
         } catch (err) {
             // console.log(err)
             const errors = handleErrors(err)

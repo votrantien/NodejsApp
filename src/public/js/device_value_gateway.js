@@ -37,6 +37,8 @@ $(document).ready(function () {
             separator: ' ~ ',
             maxDays: 2,
             minDays: 1,
+            startDate: moment().subtract(3, 'months').format('YYYY-MM-DD'),
+            endDate: moment().endOf('day').format('YYYY-MM-DD'),
             format: 'DD-MM-YYYY HH:mm',
             autoClose: true,
             time: {
@@ -90,12 +92,12 @@ $(document).ready(function () {
         var battery = data?.battery;
         var idGateway = $(`#dev-${serial}`).attr('gateway');
         console.log(idGateway);
-        if(data.val){
+        if (data.val) {
             for (const [key, value] of Object.entries(data.val)) {
                 $(`#${key}-${serial}`).html(value);
             }
         }
-        
+
         if (!$(`#dev-${serial}`).hasClass('status-1') || !$(`#tab-control-${idGateway}`).hasClass('status-1')) {
             $(`#dev-${serial}`).removeClass('status-1 status-2 status-0 status-na');
             $(`#dev-${serial}`).addClass('status-1');
@@ -224,8 +226,10 @@ $(document).ready(function () {
                         }
                     }
                     var value = dbValue;
-                    var data = { x: log.createdAt, y: value * 1 }
-                    dataset.data.push(data);
+                    if (!isNaN(value)) {
+                        var data = { x: log.createdAt, y: value * 1 }
+                        dataset.data.push(data);
+                    }
                 });
             }
             if (!chart) {
@@ -254,7 +258,8 @@ $(document).ready(function () {
                         x: {
                             type: 'time',
                             time: {
-                                unit: 'hour'
+                                unit: 'hour',
+                                tooltipFormat: 'dd/MM/yyyy HH:mm'
                             },
                             ticks: {
                                 color: "#fff"
@@ -265,6 +270,7 @@ $(document).ready(function () {
                             },
                         },
                         y: {
+                            scaleSteps : 10,
                             beginAtZero: true,
                             ticks: {
                                 color: "#fff"
@@ -340,7 +346,6 @@ $(document).ready(function () {
         var datasets = [];
 
         var deviceLogs = await PrepareChartData(serials, startDate, endDate);
-
         if (deviceLogs) {
             serials.forEach(function (serial) {
                 var colorIdx = $(`#dev-${serial}`).attr('color-idx');
@@ -369,8 +374,10 @@ $(document).ready(function () {
                         }
 
                         var value = dbValue;
-                        var data = { x: log.createdAt, y: value * 1 }
-                        dataset.data.push(data);
+                        if (!isNaN(value)) {
+                            var data = { x: log.createdAt, y: value * 1 }
+                            dataset.data.push(data);
+                        }
                     }
                 })
 
@@ -382,7 +389,6 @@ $(document).ready(function () {
             chart.update();
             ScrollToElement(chartId);
         }
-        //console.log(datasets);
         $('#mask').hide();
     }
 
@@ -469,22 +475,35 @@ $(document).ready(function () {
         yearSelect: true,
         startOfWeek: 'monday',
         separator: ' ~ ',
-        maxDays: 31,
-        minDays: 1,
+        startDate: moment().subtract(3, 'months').format('DD-MM-YYYY'),
+        endDate: moment().endOf('day').format('DD-MM-YYYY HH:mm'),
         format: 'DD-MM-YYYY HH:mm',
         autoClose: true,
         time: {
             enabled: true
         }
     }
-    $('#dateExport').dateRangePicker(options);
+    $('#dateExportBtn').dateRangePicker(options).bind('datepicker-change', function (event, obj) {
+        /* This event will be triggered when second date is selected */
+        // console.log(obj);
+        // obj will be something like this:
+        // {
+        // 		date1: (Date object of the earlier date),
+        // 		date2: (Date object of the later date),
+        //	 	value: "2013-06-05 to 2013-06-07"
+        // }
+        $('#dateExport').val(obj.value);
+    });
 
     //event show model export
     $(document).on('click', '.export-data-btn', async function () {
         var deviceModel = $(this).data('default-model');
         var groupId = $(this).data('group-id');
-        $('#deviceTypeExport option[value="'+deviceModel+'"]').prop('selected',true);
-        $('#deviceGroupExport option[value="'+groupId+'"]').prop('selected',true);
+        $('#dateExport').val(startDate + ' ~ ' + endDate);
+        $('#dateExportBtn').data('dateRangePicker').clear();
+
+        $('#deviceTypeExport option[value="' + deviceModel + '"]').prop('selected', true);
+        $('#deviceGroupExport option[value="' + groupId + '"]').prop('selected', true);
 
         $('#exportModal').modal('show');
     })
@@ -529,7 +548,7 @@ $(document).ready(function () {
                 return data;
             });
             // console.log(exportData);
-            await ExportDataToFile(exportData, fileName, fileExtension, title, deviceTypes).finally(function(){
+            await ExportDataToFile(exportData, fileName, fileExtension, title, deviceTypes).finally(function () {
                 $('#mask').hide();
             });
         } else {

@@ -14,8 +14,9 @@ function route(app) {
     app.use('/device-type', deviceTypeRouter)
     app.use('/device-group', deviceGroupRouter)
     app.get('/', requireLogin, (req, res) => {
-        // console.log(res.locals.user)
-        res.render('home', { username: res.locals.user.username, title: "Trang chủ" })
+        const user = res.locals.user
+        // console.log(user)
+        res.render('home', { username: res.locals.user.username, user, title: "Trang chủ" })
     })
 }
 

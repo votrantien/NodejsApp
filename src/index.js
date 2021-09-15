@@ -11,7 +11,8 @@ var cookieParser = require('cookie-parser')
 app.use(cookieParser())
 //chartjs
 const Chart = require('chart.js');
-
+//global variable
+global.otp = '';
 //socket io
 const http = require('http');
 const server = http.createServer(app);
@@ -108,7 +109,7 @@ hbs.registerHelper('if_', function (a, e, b, opts) {
             break
         case 'isIn':
             console.log(b);
-            if ( b.indexOf(a.toString()) != -1) {
+            if (b.indexOf(a.toString()) != -1) {
                 return opts.fn(this);
             } else {
                 return opts.inverse(this);
@@ -182,6 +183,8 @@ io.on("connection", function (Socket) {
                 } else if (room.size > 1) {
                     console.log(user, ' join room')
                     Socket.join(idRoom)
+                } else if (!room.size) {
+                    io.to(Socket.id).emit('device_disconnect', serial)
                 }
             })
             //console.log(io.of("/").adapter.rooms)
@@ -198,11 +201,9 @@ io.on("connection", function (Socket) {
             console.log(userRooms)
             Socket.broadcast.emit('device_connect', data);
 
-            // if (String(serial).slice(0, 4) == 'BSGW') {
-            //     const update_status = await Device.updateMany({ gateway: serial }, { status: 1 })
-            // } else {
-            //     const update_status = await Device.findOneAndUpdate({ sn_number: serial }, { status: 1 })
-            // }
+            const update_status = Device.updateOne({ sn_number: serial }, { status: 1 })
+            update_status.then()
+
             // console.log(String(serial).slice(0, 4))
             console.log('device connect id socket', Socket.id, 'arr device ', devices)
             const dataSend = JSON.stringify({ status: "Connnect success" })
@@ -262,6 +263,11 @@ io.on("connection", function (Socket) {
                     console.log('device ' + devices[Socket.id] + ' disconnected')
                     Socket.to(room).emit('device_disconnect', devices[Socket.id])
 
+                    const update_status = Device.updateOne({ sn_number: serial }, { status: 0 })
+                    const update_status_node = Device.updateMany({ gateway: serial }, { status: 0 })
+                    update_status_node.then()
+                    update_status.then()
+
                     //leave all client of room
                     io.socketsLeave(room)
 
@@ -270,6 +276,9 @@ io.on("connection", function (Socket) {
                 } else {
                     console.log('device ' + devices[Socket.id] + ' disconnected')
                     Socket.to(room).emit('device_disconnect', devices[Socket.id])
+
+                    const update_status = Device.updateOne({ sn_number: serial }, { status: 0 })
+                    update_status.then()
 
                     //leave all client of room
                     io.socketsLeave(room)
@@ -286,13 +295,19 @@ io.on("connection", function (Socket) {
     // node_disconnected
     Socket.on("node_status", (data) => {
         try {
+            if (typeof data !== 'object') {
+                data = JSON.parse(data)
+            }
             const { serial, status } = data
-            const room = 'r' + Socket.id
+            const serialGw = devices[Socket.id]
+            const room = serialGw
             // console.log(data)
             // status : 1 -online; 2 - sleep; 0 - ofline
             // serial : sn number node
             // const update_status = await Device.findOneAndUpdate({ sn_number: serial }, { status: status })
-            io.to(room).emit('node_status', { serial, status })
+            const update_status = Device.updateOne({ sn_number: serial }, { status: status })
+            update_status.then()
+            Socket.to(room).emit('node_status', { serial, status })
         } catch (e) {
             console.log(e)
         }

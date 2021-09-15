@@ -40,13 +40,13 @@
     .list-node .list-node-header th {
         border: solid 1px #444040;
         padding: 5px;
-        text-align: center;
+        text-align: left;
     }
 
     .list-node .list-node-item td {
         border: solid 1px #444040;
         padding: 5px;
-        text-align: center;
+        text-align: left;
     }
 
 
@@ -74,6 +74,7 @@
 </style>
 
 <div id="page-wrapper">
+    <h3 class="main-title"><i class="fa fa-microchip"></i> Danh sách thiết bị</h3>
     {{!-- device table --}}
     <div class="list-device-wrapper" style="overflow-x:auto;">
         <table class="list-device" id="tableDevice">
@@ -96,12 +97,14 @@
             <tr class="list-device-item-td" id="dev-{{device.sn_number}}" height="40px">
                 <td class="device-item-td device-serial" nowrap>
                     <div class="space-beetween">
+                        {{#if_ device.device_model "==" "BSGW"}}
+                        <button class="controll-button show-node fas fa-plus" value="{{device.sn_number}}"></button>
+                        {{else}}
+                        <span></span>
+                        {{/if_}}
                         <span>
                             {{device.sn_number}}
                         </span>
-                        {{#if_ device.device_model "==" "BSGW"}}
-                        <button class="controll-button show-node fas fa-plus" value="{{device.sn_number}}"></button>
-                        {{/if_}}
                     </div>
                 </td>
                 <td class="device-item-td device-name">

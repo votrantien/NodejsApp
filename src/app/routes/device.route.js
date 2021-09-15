@@ -24,5 +24,8 @@ router.put('/update/:id', requireAuth, validate.validateUpdateDevice, deviceCont
 router.delete('/delete/:id', requireAuth, validate.validateDeleteDevice, deviceController.delete_deleteDevice)
 router.post('/device-logs', deviceController.post_logDevice)
 router.post('/export-device-logs', deviceController.post_exportLogDevice)
+router.put('/edit-mcc-schedule/:serial', validate.validateUpdateMCCData, deviceController.put_updateMCCData)
+router.post('/get-mcc-schedule', validate.validateGetMCCData, deviceController.post_getMCCData)
+router.post('/clear-mcc-schedule', validate.validateClearMCCData, deviceController.post_clearMCCData)
 router.get('/*', requireLogin, deviceController.index)
 module.exports = router;

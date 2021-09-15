@@ -126,7 +126,7 @@
 
 <div class="row" id="page-wrapper">
     {{!-- list device group of user --}}
-    <h1 class="main-title"><i class="fa fa-layer-group"></i> Nhóm thiết bị của bạn</h1>
+    <h3 class="main-title"><i class="fa fa-layer-group"></i> Danh sách Nhóm thiết bị</h3>
     <button class="add-group fas fa-plus" title="Thêm nhóm"></button>
     <div class="device-group-wrapper" id="userGroup">
         {{#each listGroup as |group|}}
@@ -166,7 +166,7 @@
 
     {{!-- list group share --}}
 
-    <h1 class="main-title"><i class="fa fa-share-alt"></i> Nhóm thiết bị được chia sẻ với bạn</h1>
+    <h3 class="main-title"><i class="fa fa-share-alt"></i> Danh sách nhóm thiết bị được chia sẻ</h3>
     {{#if listGroupShare}}
     <div class="device-group-wrapper" id="shareGroup">
         {{#each listGroupShare as |group|}}

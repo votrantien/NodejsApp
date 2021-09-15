@@ -301,6 +301,20 @@ let validateAddDeviceValue = [
     }),
     body('amount_of_values', 'số lượng values không được để trống').not().isEmpty(),
     body('amount_of_values', 'số lượng values phải là số >= 1').isInt({ min: 1 }),
+    body('data', 'data không được để trống').not().isEmpty(),
+    body('data').custom((data) => {
+        const values = data?.val
+        if (values) {
+            for (const [key, value] of Object.entries(values)) {
+                if (isNaN(value)) {
+                    return Promise.reject(key + ' giá trị phải là số')
+                }
+            }
+            return true
+        } else {
+            return Promise.reject('Thiếu giá trị của thiết bị')
+        }
+    }),
     //body('data', 'data không được để trống').not().isEmpty(),
 ]
 
@@ -355,6 +369,96 @@ let validateShareGroupDevice = [
     })
 ]
 
+//user validate
+let validateChangeEmail = [
+    body('userName', 'userName không được để trống').not().isEmpty(),
+    body('userName').custom(async (value) => {
+        const user = await User.findOne({ username: value })
+        if (!user) {
+            return Promise.reject('Tên user không tồn tại')
+        } else {
+            return true
+        }
+    }),
+    body('newEmail', 'Email không được để trống').not().isEmpty(),
+    body('newEmail', 'Email không đúng định dạng').isEmail(),
+    body('newEmail').custom(async (value) => {
+        const user = await User.find({ email: value })
+        if (user.length > 0) {
+            return Promise.reject('Địa chỉ email này đã được sử dụng')
+        } else {
+            return true
+        }
+    }),
+    body('otpCode', 'Otp không được để trống').not().isEmpty(),
+]
+// mcc schedule valitade
+
+//// update schedule
+let validateUpdateMCCData = [
+    param('serial', 'Nhập serial thiết bị').not().isEmpty(),
+    param('serial').custom(value => {
+        return Device.findOne({ sn_number: value }).then(device => {
+            if (!device) {
+                return Promise.reject('serial thiết bị không tồn tại')
+            }
+        })
+    }),
+    body('data', 'Nhập data thiết bị').not().isEmpty(),
+    body('token', 'Nhập token').not().isEmpty(),
+    body('token', 'Nhập token').custom((value, { req }) => {
+        const token = value
+        const checkMd5 = CryptoJS.MD5(req.params.serial + mdfSecretKey).toString()
+        if (token === checkMd5) {
+            return true
+        } else {
+            return Promise.reject('Token không hợp lệ')
+        }
+    }),
+]
+
+let validateGetMCCData = [
+    body('serial', 'Nhập serial thiết bị').not().isEmpty(),
+    body('serial', 'Nhập serial thiết bị').custom(value => {
+        return Device.findOne({ sn_number: value }).then(device => {
+            if (!device) {
+                return Promise.reject('serial thiết bị không tồn tại')
+            }
+        })
+    }),
+    body('token', 'Nhập token').not().isEmpty(),
+    body('token', 'Nhập token').custom((value, { req }) => {
+        const token = value
+        const checkMd5 = CryptoJS.MD5(req.body.serial + mdfSecretKey).toString()
+        if (token === checkMd5) {
+            return true
+        } else {
+            return Promise.reject('Token không hợp lệ')
+        }
+    }),
+]
+
+let validateClearMCCData = [
+    body('serial', 'Nhập serial thiết bị').not().isEmpty(),
+    body('serial', 'Nhập serial thiết bị').custom(value => {
+        return Device.findOne({ sn_number: value }).then(device => {
+            if (!device) {
+                return Promise.reject('serial thiết bị không tồn tại')
+            }
+        })
+    }),
+    body('token', 'Nhập token').not().isEmpty(),
+    body('token', 'Nhập token').custom((value, { req }) => {
+        const token = value
+        const checkMd5 = CryptoJS.MD5(req.body.serial + mdfSecretKey).toString()
+        if (token === checkMd5) {
+            return true
+        } else {
+            return Promise.reject('Token không hợp lệ')
+        }
+    }),
+]
+
 let validate = {
     validateCreateDevice: validateCreateDevice,
     validateUpdateDevice: validateUpdateDevice,
@@ -369,6 +473,10 @@ let validate = {
     validateDeleteDevice: validateDeleteDevice,
     validateChangeDeviceGroup: validateChangeDeviceGroup,
     validateShareGroupDevice: validateShareGroupDevice,
+    validateChangeEmail: validateChangeEmail,
+    validateUpdateMCCData: validateUpdateMCCData,
+    validateGetMCCData: validateGetMCCData,
+    validateClearMCCData: validateClearMCCData,
 }
 
 module.exports = { validate }

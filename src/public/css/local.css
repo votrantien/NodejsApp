@@ -6708,8 +6708,9 @@ table.table td .add {
     background: none;
     color: #fff;
     text-align: left;
-    width: 300px;
+    width: 250px;
     border: none;
+    cursor: default;
 }
 
 .date-picker-wrapper table {
@@ -7201,4 +7202,13 @@ input:checked+.slider:before {
 .quick-export{
     position: relative;
     margin-left: 5px;
+}
+
+#dateExportBtn{
+    padding: 0px;
+    border: none;
+    outline: none;
+    background: none;
+    font-size: 1.6rem;
+    color: #fff;
 }

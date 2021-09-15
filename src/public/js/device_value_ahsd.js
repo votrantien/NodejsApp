@@ -140,7 +140,7 @@ $(document).ready(function () {
         var endDate = dpValue[1];
         var startTime = startDate.slice(11);
         var endTime = endDate.slice(11);
-        var chartTitle = String(`Thông số dinh dưỡng - Từ ${startTime} đến ${endTime}`).toUpperCase();
+        var chartTitle = String(`Thông số dinh dưỡng - Ngày ${startDate.slice(0, 11)} Từ ${startTime} đến ${endTime}`).toUpperCase();
         var idYaxis = 'y' + keyValue;
 
         var onChart = $(this).attr('on-chart');
@@ -172,9 +172,11 @@ $(document).ready(function () {
 
             if (chartData) {
                 chartData.forEach((log, index) => {
-                    var value = log.device_value[keyValue];
-                    var data = { x: log.createdAt, y: value * 1 }
-                    dataset.data.push(data);
+                    var value = log?.device_value[keyValue];
+                    if (!isNaN(value)) {
+                        var data = { x: log.createdAt, y: value * 1 }
+                        dataset.data.push(data);
+                    }
                 });
                 dataset.yAxisID = idYaxis;
             }
@@ -201,7 +203,8 @@ $(document).ready(function () {
                 x: {
                     type: 'time',
                     time: {
-                        unit: 'hour'
+                        unit: 'hour',
+                        tooltipFormat:'dd/MM/yyyy HH:mm'
                     },
                     ticks: {
                         color: "#fff"
@@ -227,6 +230,8 @@ $(document).ready(function () {
                 },
                 yph: {
                     //PH
+                    min: 0,
+                    max: 14,
                     ticks: {
                         color: "#fff"
                     },
@@ -345,7 +350,7 @@ $(document).ready(function () {
         var endDate = dpValue[1];
         var startTime = startDate.slice(11);
         var endTime = endDate.slice(11);
-        var chartTitle = String(`Thông số dinh dưỡng - Từ ${startTime} đến ${endTime}`).toUpperCase();
+        var chartTitle = String(`Thông số dinh dưỡng - Ngày ${startDate.slice(0, 11)} Từ ${startTime} đến ${endTime}`).toUpperCase();
         var chartData = await PrepareChartData(serial, startDate, endDate);
         var newDatasets = [];
         idDatasets.forEach((idDataset) => {
@@ -364,8 +369,10 @@ $(document).ready(function () {
             if (chartData) {
                 chartData.forEach((log, index) => {
                     var value = log.device_value[idDataset];
-                    var data = { x: log.createdAt, y: value * 1 }
-                    dataset.data.push(data);
+                    if (!isNaN(value)) {
+                        var data = { x: log.createdAt, y: value * 1 }
+                        dataset.data.push(data);
+                    }
                 });
                 dataset.yAxisID = 'y' + idDataset;
                 newDatasets.push(dataset);
@@ -444,7 +451,7 @@ $(document).ready(function () {
     //event show model export
     $(document).on('click', '.export-data-btn', async function () {
         var groupId = $(this).data('group-id');
-        $('#deviceGroupExport option[value="'+groupId+'"]').prop('selected',true);
+        $('#deviceGroupExport option[value="' + groupId + '"]').prop('selected', true);
 
         $('#exportModal').modal('show');
     })

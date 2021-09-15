@@ -252,7 +252,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwZTk3NzQ5N
    "groupDesc": "Mô tả group 3"
 }
 
-### create device group
+### delete device group
 
 DELETE http://{{host}}/device-group/delete/6125c8d472b2c72300374dd8 HTTP/1.1
 Content-Type: application/json
@@ -286,4 +286,51 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwZTk3NzQ5N
 {
    "accessUserId": "id",
    "groupId": "6125f540d27dc507308648cf"
+}
+
+###irrigationScheduling api
+### update schedule
+PUT http://{{host}}/device/edit-mcc-schedule/MCC2MCC2TEST1 HTTP/1.1
+Content-Type: application/json
+
+{
+   "data": {
+            "num_cal":"2",
+            "1": {
+               "outp":"1",
+               "time_start":"00:00",
+               "time_stop":"23:59",
+               "pow":"100",
+               "we_day":"246",
+               "rep_we":"1"
+                  },
+            "2": {
+               "output":"1",
+               "time_start":"00:00",
+               "time_stop":"23:59",
+               "pow":"100",
+               "we_day":"246",
+               "rep_we":"1"
+               }
+         },
+   "token": "1aef8bd60c74f8a296890fae8117b8ae"
+}
+
+### get schedule
+POST  http://{{host}}/device/get-mcc-schedule HTTP/1.1
+Content-Type: application/json
+
+{
+   "serial": "MCC2MCC2TEST1",
+   "token": "1aef8bd60c74f8a296890fae8117b8ae"
+}
+
+### clear schedule
+
+POST  http://{{host}}/device/clear-mcc-schedule HTTP/1.1
+Content-Type: application/json
+
+{
+   "serial": "MCC2MCC2TEST1",
+   "token": "1aef8bd60c74f8a296890fae8117b8ae"
 }

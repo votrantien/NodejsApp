@@ -81,7 +81,7 @@
                         {{!-- device type controll --}}
 
                         {{!-- device item --}}
-
+                        <div class="fix-height"></div>
                         {{#each ../../device_types as |dev_type|}}
                         <div class="collapse device-group" id="dev-type-{{gateway.sn_number}}-{{dev_type.prefix}}"
                             group-label="{{dev_type.device_type}}"
@@ -203,7 +203,8 @@
             <div class="modal-body">
                 <div class="date-picker-div">
                     <label for="dateExport">Thời gian</label>
-                    <input type="button" class="date-picker-export" id="dateExport">
+                    <input type="text" readonly class="date-picker-export" id="dateExport">
+                    <button id="dateExportBtn" class="fas fa-calendar-alt"></button>
                 </div>
                 <div class="input-group">
                     <label class="input-group-addon radius-none" for="deviceGroupExport">Chọn group</label>

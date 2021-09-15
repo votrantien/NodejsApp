@@ -3,7 +3,9 @@ const { user } = require("../models");
 class SiteController{
     //GET trả về trang home
     index(req, res){
-        res.render('home',{title: "Trang chủ"})
+        const user = res.locals.user
+        console.log(user)
+        res.render('home',{title: "Trang chủ", user})
     }
 }
 

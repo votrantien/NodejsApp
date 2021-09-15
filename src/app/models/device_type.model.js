@@ -17,6 +17,7 @@ const deviceTypeSchema = new mongoose.Schema({
   },
   amount_of_values: {type: Number, default: 1},
   uom_values: {},
+  type_group: {type: String, unique: true},
   type_properties: {},
   status: {type: Number, default: 1},
 });

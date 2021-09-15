@@ -44,7 +44,7 @@ class UserController {
         const username = res.locals.user.username
         try {
             const user = await User.findOne({ username: username }).lean()
-            res.render('profile', { username: username, user_info: user })
+            res.render('profile', { username: username, user_info: user, title: 'Thông tin tài khoản' })
         } catch {
             res.render('home')
         }
@@ -70,6 +70,7 @@ class UserController {
     }
 
     async post_resetPassword(req, res) {
+        const { email, userName } = req.body
         let testAccount = await nodemailer.createTestAccount();
         let transporter = nodemailer.createTransport({
             service: "Gmail",
@@ -77,7 +78,7 @@ class UserController {
                 user: "fatbearz94@gmail.com",
                 pass: "Tien22081994"
             }
-        });
+        })
 
         let info = await transporter.sendMail({
             from: '"Thuỷ canh" <sender@gmail.com>', // sender address
@@ -85,11 +86,73 @@ class UserController {
             subject: "Test send email ✔", // Subject line
             text: "Hello world?", // plain text body
             html: "<b>Test chức năng gửi mail ứng dụng Nodejs với Nodemailer</b>" // html body
-        });
+        })
         // console.log("Message sent: %s", info.messageId);
         // console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
         res.json(info.messageId)
     }
+
+    async post_RequestOtp(req, res) {
+        try {
+            const { userName } = req.body
+            otp = parseInt(Math.random() * 1000000);
+            const user = await User.findOne({ username: userName })
+            const email = user?.email
+            if (email) {
+                let testAccount = await nodemailer.createTestAccount();
+                let transporter = nodemailer.createTransport({
+                    service: "Gmail",
+                    auth: {
+                        user: "fatbearz94@gmail.com",
+                        pass: "Tien22081994"
+                    }
+                })
+
+                let info = await transporter.sendMail({
+                    from: '"Thuỷ canh" <sender@gmail.com>', // sender address
+                    to: email, // list of receivers
+                    subject: "Thuỷ canh app OTP", // Subject line
+                    text: "", // plain text body
+                    html: '<p>Mã otp của bạn</p></br><b style="padding: 10px;font-size: 2rem;background-color: aquamarine;margin: auto;">' + otp + '</b>' // html body
+                })
+                return res.status(201).json({ status: 'success', msg: 'Một mã otp vừa được gửi đến mail bạn' })
+            } else {
+                res.status(400).json({ status: 'failure', errors: [{ msg: 'User không tồn tại' }] })
+            }
+        } catch (err) {
+            res.status(400).json({ status: 'failure', errors: [{ msg: err.message }] })
+        }
+
+        // console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
+    }
+
+    async post_ChangeEmail(req, res) {
+        const errors = validationResult(req)
+        if (!errors.isEmpty()) {
+            res.status(422).json({ status: 'failure', errors: errors.array() })
+            return
+        }
+        try {
+            const { newEmail, userName, otpCode } = req.body
+            if (otpCode == otp && otp != '0') {
+                otp = 0
+                const updateUser = await User.updateOne({ username: userName }, { email: newEmail })
+                if (updateUser.n != 0) {
+                    return res.status(201).json({ status: 'success', msg: 'Thay đổi email thành công' })
+                } else {
+                    res.status(400).json({ status: 'failure', errors: [{ msg: 'Không tìm thấy user tương ứng' }] })
+                }
+            } else {
+                res.status(400).json({ status: 'failure', errors: [{ msg: 'Mã otp không hợp lệ' }] })
+            }
+
+        } catch (err) {
+            res.status(400).json({ status: 'failure', errors: [{ msg: err.message }] })
+        }
+
+    }
+
+
     async put_changePassword(req, res) {
         const errors = validationResult(req)
         if (!errors.isEmpty()) {
@@ -110,8 +173,8 @@ class UserController {
                     password: password_update
                 }, opts)
                 res.status(201).json({ status: 'success', msg: 'đổi mật khẩu thành công' })
-            }else{
-                res.status(422).json({ status: 'failure', msg:'password cũ không đúng' })
+            } else {
+                res.status(422).json({ status: 'failure', errors: [{ msg: 'Mật khẩu cũ không đúng' }] })
             }
         }
         catch (err) {
