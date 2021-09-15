@@ -234,6 +234,11 @@ io.on("connection", function (Socket) {
         }
     })
 
+    // update schedule mcc
+    Socket.on("update_device_data", (data)=>{
+        Socket.broadcast.emit('update_device_data', data)
+    })
+
     //disconnect
     Socket.on("disconnect", (reason) => {
         try {

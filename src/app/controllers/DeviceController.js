@@ -486,7 +486,7 @@ class DeviceController {
             const serial = req.params.serial
             let { data } = req.body
             const update = await Device.updateOne({ sn_number: serial }, { data: data }, { upsert: true, new: true })
-
+            res.io.emit('update_device_data', {serial: serial, msg: 'update_mcc_schedule'})
             res.status(200).json({ status: 'success' })
         } catch (err) {
             // console.log(err)
@@ -522,7 +522,7 @@ class DeviceController {
             }
             let { serial } = req.body
             const update = await Device.updateOne({ sn_number: serial }, { data: {} })
-
+            res.io.emit('update_device_data', {serial: serial, msg: 'clear_mcc_schedule'})
             res.status(200).json({ status: 'success' })
         } catch (err) {
             // console.log(err)
