@@ -124,6 +124,24 @@ $(document).ready(function () {
         return response;
     }
 
+    // range yaxis chart
+
+    var yAxisRanges = {
+        tempa: [[0, 50], [0, 100], [0, 200], [-50, 200], [-1000, 1000]],
+        rh: [[0, 100]],
+        lux: [[0, 5000], [0, 50000], [0, 100000], [0, 200000], [0, 500000]],
+        flow: [[0, 10], [0, 50], [0, 100], [0, 500]],
+        oxy: [[0, 50], [0, 100]],
+        co2: [[0, 500], [0, 1000], [0, 5000], [0, 10000], [0, 20000]],
+        pres: [[0, 100], [0, 1000], [0, 10000], [0, 50000]],
+        wlevel: [[0, 100], [0, 500], [0, 1000], [0, 5000]],
+        temps: [[0, 50], [0, 100], [-50, 50], [-200, 200], [-500, 1000], [-500, 2000]],
+        orp: [[-100, 100], [-200, 200], [-500, 500], [-1000, 1000], [-2000, 2000], [-5000, 5000]],
+        do: [[0, 5], [0, 10], [0, 20], [0, 50], [0, 100], [0, 500]],
+        ph: [[0, 14]],
+        ec: [[0, 5], [0, 10], [0, 50], [0, 200], [0, 500], [0, 1000]]
+    }
+
     // event draw chart
     $(document).on('click', '.device-item', async function () {
         $('#mask').show();
@@ -142,6 +160,8 @@ $(document).ready(function () {
         var endTime = endDate.slice(11);
         var chartTitle = String(`Thông số dinh dưỡng - Ngày ${startDate.slice(0, 11)} Từ ${startTime} đến ${endTime}`).toUpperCase();
         var idYaxis = 'y' + keyValue;
+        var minYaxis = 0;
+        var maxYaxis = 0;
 
         var onChart = $(this).attr('on-chart');
 
@@ -175,17 +195,34 @@ $(document).ready(function () {
                     var value = log?.device_value[keyValue];
                     if (!isNaN(value)) {
                         var data = { x: log.createdAt, y: value * 1 }
+                        minYaxis = (value < minYaxis) ? value : minYaxis;
+                        maxYaxis = (value > maxYaxis) ? value : maxYaxis;
                         dataset.data.push(data);
                     }
                 });
                 dataset.yAxisID = idYaxis;
             }
+
+            var yAxisRange = yAxisRanges[keyValue];
+            if (yAxisRange) {
+                var checkRange = yAxisRange.some(function (range) {
+                    if (minYaxis >= range[0] && maxYaxis <= range[1]) {
+                        minYaxis = range[0];
+                        maxYaxis = range[1];
+                        return true;
+                    }
+                })
+            }
+
+
             if (!chart) {
                 $(`#dev-${serial} .chart-area`).show();
-                RenderChart(chartId, dataset, chartTitle, idYaxis);
+                RenderChart(chartId, dataset, chartTitle, idYaxis, minYaxis, maxYaxis);
             } else {
                 chart.data.datasets.push(dataset);
                 chart.options.scales[idYaxis].display = true;
+                chart.options.scales[idYaxis].suggestedMin = minYaxis;
+                chart.options.scales[idYaxis].suggestedMax = maxYaxis;
                 chart.update();
                 ScrollToElement(chartId);
             }
@@ -196,7 +233,7 @@ $(document).ready(function () {
     })
 
     //render chart
-    function RenderChart(chartId, dataset, chartTitle, idYaxis) {
+    function RenderChart(chartId, dataset, chartTitle, idYaxis, minYaxis, maxYaxis) {
         var ctx = document.getElementById(chartId);
         var options = {
             scales: {
@@ -204,7 +241,7 @@ $(document).ready(function () {
                     type: 'time',
                     time: {
                         unit: 'hour',
-                        tooltipFormat:'dd/MM/yyyy HH:mm'
+                        tooltipFormat: 'dd/MM/yyyy HH:mm'
                     },
                     ticks: {
                         color: "#fff"
@@ -230,8 +267,6 @@ $(document).ready(function () {
                 },
                 yph: {
                     //PH
-                    min: 0,
-                    max: 14,
                     ticks: {
                         color: "#fff"
                     },
@@ -312,6 +347,9 @@ $(document).ready(function () {
             },
         };
         options.scales[idYaxis].display = true;
+        options.scales[idYaxis].suggestedMin = minYaxis;
+        options.scales[idYaxis].suggestedMax = maxYaxis;
+
         if (ctx) {
             var myChart = new Chart(ctx, {
                 type: 'line',
@@ -353,10 +391,13 @@ $(document).ready(function () {
         var chartTitle = String(`Thông số dinh dưỡng - Ngày ${startDate.slice(0, 11)} Từ ${startTime} đến ${endTime}`).toUpperCase();
         var chartData = await PrepareChartData(serial, startDate, endDate);
         var newDatasets = [];
+
         idDatasets.forEach((idDataset) => {
             var idTypeDevice = `#val-${serial}-${idDataset}`
             var valueName = $(idTypeDevice).attr('value-name');
             var color = $(idTypeDevice).attr('color');
+            var minYaxis = 0;
+            var maxYaxis = 0;
             var dataset = {
                 id: idDataset,
                 label: valueName,
@@ -371,12 +412,28 @@ $(document).ready(function () {
                     var value = log.device_value[idDataset];
                     if (!isNaN(value)) {
                         var data = { x: log.createdAt, y: value * 1 }
+                        minYaxis = (value < minYaxis) ? value : minYaxis;
+                        maxYaxis = (value > maxYaxis) ? value : maxYaxis;
                         dataset.data.push(data);
                     }
                 });
                 dataset.yAxisID = 'y' + idDataset;
                 newDatasets.push(dataset);
             }
+
+            var yAxisRange = yAxisRanges[idDataset];
+            if (yAxisRange) {
+                var checkRange = yAxisRange.some(function (range) {
+                    if (minYaxis >= range[0] && maxYaxis <= range[1]) {
+                        minYaxis = range[0];
+                        maxYaxis = range[1];
+                        return true;
+                    }
+                })
+            }
+            var yAxisId = 'y' + idDataset;
+            chart.options.scales[yAxisId].suggestedMin = minYaxis;
+            chart.options.scales[yAxisId].suggestedMax = maxYaxis;
         });
         chart.data.datasets = newDatasets;
         chart.options.plugins.title.text = chartTitle;
@@ -438,19 +495,31 @@ $(document).ready(function () {
         yearSelect: true,
         startOfWeek: 'monday',
         separator: ' ~ ',
-        maxDays: 31,
-        minDays: 1,
+        startDate: moment().subtract(3, 'months').format('DD-MM-YYYY'),
+        endDate: moment().endOf('day').format('DD-MM-YYYY HH:mm'),
         format: 'DD-MM-YYYY HH:mm',
         autoClose: true,
         time: {
             enabled: true
         }
     }
-    $('#dateExport').dateRangePicker(options);
+    $('#dateExportBtn').dateRangePicker(options).bind('datepicker-change', function (event, obj) {
+        /* This event will be triggered when second date is selected */
+        // console.log(obj);
+        // obj will be something like this:
+        // {
+        // 		date1: (Date object of the earlier date),
+        // 		date2: (Date object of the later date),
+        //	 	value: "2013-06-05 to 2013-06-07"
+        // }
+        $('#dateExport').val(obj.value);
+    });
 
     //event show model export
     $(document).on('click', '.export-data-btn', async function () {
         var groupId = $(this).data('group-id');
+        $('#dateExport').val(startDate + ' ~ ' + endDate);
+        $('#dateExportBtn').data('dateRangePicker').clear();
         $('#deviceGroupExport option[value="' + groupId + '"]').prop('selected', true);
 
         $('#exportModal').modal('show');

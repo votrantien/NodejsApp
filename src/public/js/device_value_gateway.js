@@ -37,8 +37,6 @@ $(document).ready(function () {
             separator: ' ~ ',
             maxDays: 2,
             minDays: 1,
-            startDate: moment().subtract(3, 'months').format('YYYY-MM-DD'),
-            endDate: moment().endOf('day').format('YYYY-MM-DD'),
             format: 'DD-MM-YYYY HH:mm',
             autoClose: true,
             time: {
@@ -164,6 +162,23 @@ $(document).ready(function () {
         });
         return response;
     }
+    // range yaxis chart
+
+    var yAxisRanges = {
+        tempa: [[0, 50], [0, 100], [0, 200], [-50, 200], [-1000, 1000]],
+        rh: [[0, 100]],
+        lux: [[0, 5000], [0, 50000], [0, 100000], [0, 200000], [0, 500000]],
+        flow: [[0, 10], [0, 50], [0, 100], [0, 500]],
+        oxy: [[0, 50], [0, 100]],
+        co2: [[0, 500], [0, 1000], [0, 5000], [0, 10000], [0, 20000]],
+        pres: [[0, 100], [0, 1000], [0, 10000], [0, 50000]],
+        wlevel: [[0, 100], [0, 500], [0, 1000], [0, 5000]],
+        temps: [[0, 50], [0, 100], [-50, 50], [-200, 200], [-500, 1000], [-500, 2000]],
+        orp: [[-100, 100], [-200, 200], [-500, 500], [-1000, 1000], [-2000, 2000], [-5000, 5000]],
+        do: [[0, 5], [0, 10], [0, 20], [0, 50], [0, 100], [0, 500]],
+        ph: [[0, 14]],
+        ec: [[0, 5], [0, 10], [0, 50], [0, 200], [0, 500], [0, 1000]]
+    }
 
     // event draw chart
     $(document).on('click', '.device-item', async function () {
@@ -216,6 +231,8 @@ $(document).ready(function () {
                 ],
                 borderWidth: 1
             };
+            var minYaxis = 0;
+            var maxYaxis = 0;
 
             if (chartData) {
                 chartData.forEach((log) => {
@@ -228,15 +245,35 @@ $(document).ready(function () {
                     var value = dbValue;
                     if (!isNaN(value)) {
                         var data = { x: log.createdAt, y: value * 1 }
+                        minYaxis = (value < minYaxis) ? value : minYaxis;
+                        maxYaxis = (value > maxYaxis) ? value : maxYaxis;
                         dataset.data.push(data);
                     }
                 });
             }
+
+            var yAxisRange = yAxisRanges[uomKey];
+            if (yAxisRange) {
+                var checkRange = yAxisRange.some(function (range) {
+                    if (minYaxis >= range[0] && maxYaxis <= range[1]) {
+                        minYaxis = range[0];
+                        maxYaxis = range[1];
+                        return true;
+                    }
+                })
+            }
+
             if (!chart) {
                 $(`#dev-type-${gateway}-${devType} .chart-area`).show();
-                RenderChart(chartId, dataset, chartTitle);
+                RenderChart(chartId, dataset, chartTitle, minYaxis, maxYaxis);
             } else {
+                var currMinYaxis = chart.options.scales.y.suggestedMin;
+                var currMaxYaxis = chart.options.scales.y.suggestedMax;
                 chart.data.datasets.push(dataset);
+                if (minYaxis < currMinYaxis || maxYaxis > currMaxYaxis) {
+                    chart.options.scales.y.suggestedMin = minYaxis;
+                    chart.options.scales.y.suggestedMax = maxYaxis;
+                }
                 chart.update();
                 ScrollToElement(chartId);
             }
@@ -245,7 +282,7 @@ $(document).ready(function () {
     })
 
     //render chart
-    function RenderChart(chartId, dataset, chartTitle) {
+    function RenderChart(chartId, dataset, chartTitle, minYaxis, maxYaxis) {
         var ctx = document.getElementById(chartId);
         if (ctx) {
             var myChart = new Chart(ctx, {
@@ -270,7 +307,9 @@ $(document).ready(function () {
                             },
                         },
                         y: {
-                            scaleSteps : 10,
+                            suggestedMin: minYaxis,
+                            suggestedMax: maxYaxis,
+                            scaleSteps: 10,
                             beginAtZero: true,
                             ticks: {
                                 color: "#fff"
@@ -344,6 +383,9 @@ $(document).ready(function () {
         var typeName = $(`#${devGroup}`).attr('group-label');
         var chartTitle = String(`Thông số ${uomName} ( ${uom} )  - Ngày ${startDate.slice(0, 11)} Từ ${startDate.slice(11)} đến ${endDate.slice(11)}`).toUpperCase();
         var datasets = [];
+        var minYaxis = 0;
+        var maxYaxis = 0;
+
 
         var deviceLogs = await PrepareChartData(serials, startDate, endDate);
         if (deviceLogs) {
@@ -376,6 +418,8 @@ $(document).ready(function () {
                         var value = dbValue;
                         if (!isNaN(value)) {
                             var data = { x: log.createdAt, y: value * 1 }
+                            minYaxis = (value < minYaxis) ? value : minYaxis;
+                            maxYaxis = (value > maxYaxis) ? value : maxYaxis;
                             dataset.data.push(data);
                         }
                     }
@@ -383,6 +427,20 @@ $(document).ready(function () {
 
                 datasets.push(dataset);
             })
+
+            var yAxisRange = yAxisRanges[uomKey];
+            if (yAxisRange) {
+                var checkRange = yAxisRange.some(function (range) {
+                    if (minYaxis >= range[0] && maxYaxis <= range[1]) {
+                        minYaxis = range[0];
+                        maxYaxis = range[1];
+                        return true;
+                    }
+                })
+            }
+
+            chart.options.scales.y.suggestedMin = minYaxis;
+            chart.options.scales.y.suggestedMax = maxYaxis;
 
             chart.data.datasets = datasets;
             chart.options.plugins.title.text = chartTitle;
