@@ -14,7 +14,13 @@ GET http://localhost:3000/auth/sign-out/ HTTP/1.1
 POST http://localhost:3000/auth/signup/ HTTP/1.1
 Content-Type: application/json
 
-{"username":"usertest", "email":"test@ymail.com","password":"123456789","fullname":"test user","phone":"0255845825","groupname":"group 1"}
+{
+   "username":"usertest", 
+   "email":"test@ymail.com",
+   "password":"123456789",
+   "fullname":"test user",
+   "phone":"0255845825",
+   "groupname":"group 1"}
 
 
 ### vao trang user
@@ -123,7 +129,14 @@ GET http://localhost:3000/device/GetTimeServer HTTP/1.1
 POST http://{{host}}/auth/signup/ HTTP/1.1
 Content-Type: application/json
 
-{"username":"usertest5", "email":"votrantien5@ymail.com","password":"123456789","fullname":"test user","phone":"0255848254","groupname":"group default 1"}
+{
+   "username":"usertest5", 
+   "email":"votrantien5@ymail.com",
+   "password":"123456789",
+   "fullname":"test user",
+   "phone":"0255848254",
+   "groupname":"group default 1"
+}
 
 ### Login và lấy jwt
 
@@ -334,3 +347,33 @@ Content-Type: application/json
    "serial": "MCC2MCC2TEST1",
    "token": "1aef8bd60c74f8a296890fae8117b8ae"
 }
+
+### 17-09-2021 user manage api
+### change info user
+PUT  http://{{host}}/user/change-info/<ID_USER> HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwZTk3NzQ5NTE3MzIyMTZkOGFjNTQ1OSIsImlhdCI6MTYyOTg2MzQ1NSwiZXhwIjoxNjMwMTIyNjU1fQ.eztNj0KTWhiZ4dTXo3w1l2XCwwtWFgLIwuddUGa7IUU
+
+{
+   "email": "emailInput",
+   "fullname": "fullNameInput",
+   "phone": "phoneInput"
+}
+
+### lock account for admin
+PUT  http://{{host}}/user/in-active/<ID_USER> HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwZTk3NzQ5NTE3MzIyMTZkOGFjNTQ1OSIsImlhdCI6MTYyOTg2MzQ1NSwiZXhwIjoxNjMwMTIyNjU1fQ.eztNj0KTWhiZ4dTXo3w1l2XCwwtWFgLIwuddUGa7IUU
+
+### unlock account for admin
+
+PUT  http://{{host}}/user/active/<ID_USER> HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwZTk3NzQ5NTE3MzIyMTZkOGFjNTQ1OSIsImlhdCI6MTYyOTg2MzQ1NSwiZXhwIjoxNjMwMTIyNjU1fQ.eztNj0KTWhiZ4dTXo3w1l2XCwwtWFgLIwuddUGa7IUU
+
+
+### Reset password for admin
+
+PUT  http://{{host}}/user/reset-password/<ID_USER> HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwZTk3NzQ5NTE3MzIyMTZkOGFjNTQ1OSIsImlhdCI6MTYyOTg2MzQ1NSwiZXhwIjoxNjMwMTIyNjU1fQ.eztNj0KTWhiZ4dTXo3w1l2XCwwtWFgLIwuddUGa7IUU

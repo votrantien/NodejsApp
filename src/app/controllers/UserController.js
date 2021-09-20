@@ -26,8 +26,10 @@ const handleErrors = (err) => {
 
 class UserController {
     //GET trả về trang home
-    index(req, res) {
-        res.render('home')
+    async index(req, res) {
+        const userList = await User.find({ username: { $ne: 'admin' } }).lean();
+        const user = res.locals.user
+        res.render('user_manage', { userList, title: 'Quản lý user', username: user.username })
     }
     signin(req, res, next) {
         const user = req.user
@@ -175,6 +177,124 @@ class UserController {
                 res.status(201).json({ status: 'success', msg: 'đổi mật khẩu thành công' })
             } else {
                 res.status(422).json({ status: 'failure', errors: [{ msg: 'Mật khẩu cũ không đúng' }] })
+            }
+        }
+        catch (err) {
+            // console.log(err)
+            const errors = handleErrors(err)
+            res.status(400).json({ status: 'failure', errors })
+        }
+    }
+
+    async put_changeInfo(req, res) {
+        const errors = validationResult(req)
+        if (!errors.isEmpty()) {
+            res.status(422).json({ status: 'failure', errors: errors.array() })
+            return
+        }
+        const { fullname, phone, email } = req.body
+        const id = req.params.id
+        const user = res.locals.user
+        try {
+            if (user.role == 'admin') {
+                const userInfo = await User.updateOne({ _id: id }, { fullname: fullname, email: email, phone: phone })
+                if (userInfo.n == 0) {
+                    res.status(400).json({ status: 'failure', msg: 'Không tìm thấy user' })
+                }
+                res.status(201).json({ status: 'success' })
+            } else {
+                if (user._id == id) {
+                    const userInfo = await User.updateOne({ _id: id }, { fullname: fullname, email: email, phone: phone })
+                    if (userInfo.n == 0) {
+                        res.status(400).json({ status: 'failure', msg: 'Không tìm thấy user' })
+                    }
+                    res.status(201).json({ status: 'success' })
+                } else {
+                    res.status(422).json({ status: 'failure', msg: 'not permission' })
+                }
+            }
+        }
+        catch (err) {
+            // console.log(err)
+            const errors = handleErrors(err)
+            res.status(400).json({ status: 'failure', errors })
+        }
+    }
+
+    async put_InactiveUser(req, res) {
+        const errors = validationResult(req)
+        if (!errors.isEmpty()) {
+            res.status(422).json({ status: 'failure', errors: errors.array() })
+            return
+        }
+        const id = req.params.id
+        const userRole = res.locals.user.role
+        try {
+            if (userRole == 'admin') {
+                const userInfo = await User.updateOne({ _id: id }, { status: 0 })
+                if (userInfo.n == '0') {
+                    res.status(201).json({ status: 'success', msg: 'không tìm thấy user' })
+                }
+                res.status(201).json({ status: 'success' })
+            } else {
+                res.status(422).json({ status: 'failure', errors: 'Not permission' })
+            }
+        }
+        catch (err) {
+            // console.log(err)
+            const errors = handleErrors(err)
+            res.status(400).json({ status: 'failure', errors })
+        }
+    }
+
+    async put_ActiveUser(req, res) {
+        const errors = validationResult(req)
+        if (!errors.isEmpty()) {
+            res.status(422).json({ status: 'failure', errors: errors.array() })
+            return
+        }
+        const id = req.params.id
+        const userRole = res.locals.user.role
+        try {
+            if (userRole == 'admin') {
+                const userInfo = await User.updateOne({ _id: id }, { status: 1 })
+                if (userInfo.n == '0') {
+                    res.status(201).json({ status: 'success', msg: 'không tìm thấy user' })
+                }
+                res.status(201).json({ status: 'success' })
+            } else {
+                res.status(422).json({ status: 'failure', errors: 'Not permission' })
+            }
+        }
+        catch (err) {
+            // console.log(err)
+            const errors = handleErrors(err)
+            res.status(400).json({ status: 'failure', errors })
+        }
+    }
+
+    async put_ResetPassword(req, res) {
+        const errors = validationResult(req)
+        if (!errors.isEmpty()) {
+            res.status(422).json({ status: 'failure', errors: errors.array() })
+            return
+        }
+        const id = req.params.id
+        const userRole = res.locals.user.role
+        const salt = await bcrypt.genSalt()
+        try {
+            if (userRole == 'admin') {
+                const defaultPassword = process.env.DEFAULT_USER_PASS
+                const password_update = await bcrypt.hash(defaultPassword, salt)
+                const user_result = await User.updateOne({ _id: id }, {
+                    password: password_update
+                })
+                if (user_result.n == '0') {
+                    res.status(201).json({ status: 'success', msg: 'không tìm thấy user' })
+                }
+                res.status(201).json({ status: 'success' })
+            } else {
+                res.status(422).json({ status: 'failure', errors: 'Not permission' })
             }
         }
         catch (err) {

@@ -80,6 +80,14 @@ $(document).ready(function () {
             socket.emit('start_real_time_device', { listDevices, user });
         }
     })
+
+    //check Device online
+    socket.on('device_online', function (data) {
+        if (listDevices.indexOf(data) != -1) {
+            $(`#tab-control-${data}`).removeClass('status-1 status-2 status-0 status-na');
+            $(`#tab-control-${data}`).addClass('status-1');
+        }
+    })
     //on realtime value
 
     socket.on('realtime_device_value', function (data) {
@@ -89,7 +97,7 @@ $(document).ready(function () {
         var rssi = data?.rssi;
         var battery = data?.battery;
         var idGateway = $(`#dev-${serial}`).attr('gateway');
-        console.log(idGateway);
+        // console.log(idGateway);
         if (data.val) {
             for (const [key, value] of Object.entries(data.val)) {
                 $(`#${key}-${serial}`).html(value);

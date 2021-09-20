@@ -1,17 +1,36 @@
-<div id="page-wrapper">
-    <div class="row">
+<style>
+    .icon-logo {
+        font-size: 130px;
+        padding: 0;
+        margin: 0;
+        color: #fff;
+    }
 
+    #wrapper {
+        padding-left: 0px;
+    }
+
+    .err-msg{
+        text-align: center;
+    }
+    
+    .web-title {
+        padding: 0;
+        margin: 0;
+    }
+</style>
+<div id="page-wrapper" style="padding: 30px;">
+    <div class="row">
         <div class="col-lg-12 text-center v-center">
 
-            <h1>Đăng nhập</h1>
-
+            <div>
+                <i class="icon-logo"></i>
+                <h1 class="web-title">Teficod System</h1>
+            </div>
             <br>
-            <br>
-            <br>
-
             <form class="col-lg-12" method="POST" action="/auth/login">
                 <div style="width: 340px; text-align: center; margin: 0 auto;">
-                    <p id="err_msg" style="display: block;"></p>
+                    <p id="err_msg" class="err-msg" style="display: none;"></p>
                     <br>
                     <input class="form-control input-lg" title="User name" placeholder="User name" type="text"
                         name="username" id="username">
@@ -20,7 +39,7 @@
                         name="password" id="password">
                     <br>
                     <span class="">
-                        <button class="btn btn-lg btn-primary" type="button" id="signin">Đăng nhập</button>
+                        <button class="btn btn-lg btn-primary" type="submit" id="signin">Đăng nhập</button>
                     </span>
                 </div>
             </form>
@@ -28,28 +47,12 @@
     </div>
 </div>
 <script>
-    $('#wrapper').attr('style', 'padding-left: 0;')
-    async function postData(url = '', data = {}) {
-        // Default options are marked with *
-        const response = await fetch(url, {
-            method: 'POST', // *GET, POST, PUT, DELETE, etc.
-            mode: 'cors', // no-cors, *cors, same-origin
-            cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-            credentials: 'same-origin', // include, *same-origin, omit
-            headers: {
-                //'Content-Type': 'application/json'
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'Accept': 'application/json'
-            },
-            redirect: 'follow', // manual, *follow, error
-            referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-            body: `username=${data.username}&password=${data.password}` // body data type must match "Content-Type" header
-        });
-        if (response.status == 200)
-            return response.json(); // parses JSON response into native JavaScript objects
-        return response
-    }
-    $('#signin').on('click', (e) => {
+
+    $('form').submit(async function (/*DOMEvent*/ e) {
+        e.preventDefault();
+
+        var url = $(this).attr('action'),
+            data = $(this).serialize();
         var username = $('#username').val();
         var password = $('#password').val();
 
@@ -59,20 +62,28 @@
             return;
         }
         $('#mask').show();
-        setTimeout(() => {
-            postData('/auth/sign-in', { username: username, password: password })
-                .then(data => {
-                    if (data.status == 400) {
-                        $('#mask').hide();
-                        $('#err_msg').html('Sai tài khoản hoặc mật khẩu');
-                    }
-                    else {
-                        $('#mask').hide();
-                        document.location.href = "/";
-                    }
-                });
-        },1000)
+        var url = '/auth/sign-in';
+        var method = 'POST';
+        var data = { username: username, password: password };
 
-    })
-
+        $('#mask').show();
+        var addUser = await CallApi(url, data, method).then(function (res) {
+            var status = res.status;
+            if (status == 'success') {
+                $('#mask').hide();
+                alertAction(status, 'Đăng nhập thành công');
+                document.location.href = "/";
+            } else {
+                $('#mask').hide();
+                $('#err_msg').html(res.errors[0].msg);
+                $('#err_msg').show();
+                //alertAction(status, res.errors[0].msg);
+            }
+        }).catch(function (err) {
+            $('#mask').hide();
+            alertAction('failure', err);
+        }).finally(function () {
+            $('#mask').hide();
+        })
+    });
 </script>

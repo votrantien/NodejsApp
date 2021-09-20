@@ -55,8 +55,8 @@
     <div class="row info-wrapper">
         <div class="col-sm-4 avatar">
             <i class="fas fa-user-tie"></i>
-            <div class="control-bar">
-                <button class="btn btn-success" id="updateAvartaBtn">Đổi avarta</button>
+            <div class="control-bar" hidden>
+                <button class="btn btn-success" id="updateAvartaBtn" >Đổi avarta</button>
             </div>
         </div>
         <div class="col-sm-8 info">
@@ -66,8 +66,8 @@
                     placeholder="Tên đăng nhập" autocomplete="off" readonly value="{{user_info._id}}">
             </div>
             <div class="input-group">
-                <label class="input-group-addon radius-none text-cap" for="userNameInput">Tên đăng nhập</label>
-                <input type="text" class="form-control text-dark radius-none text-bold" id="userNameInput"
+                <label class="input-group-addon radius-none text-cap" for="userNameInfo">Tên đăng nhập</label>
+                <input type="text" class="form-control text-dark radius-none text-bold" id="userNameInfo"
                     placeholder="Tên đăng nhập" autocomplete="off" readonly value="{{user_info.username}}">
             </div>
             <div class="input-group">
@@ -79,7 +79,7 @@
                 <label class="input-group-addon radius-none text-cap" for="email">email</label>
                 <input type="text" class="form-control text-dark radius-none text-bold" id="email" placeholder="email"
                     autocomplete="off" readonly value="{{user_info.email}}">
-                <button class="fas fa-edit change-email" id="changeEmailBtn"></button>
+                <button class="fas fa-edit change-email" id="changeEmailBtn" hidden></button>
             </div>
             <div class="input-group">
                 <label class="input-group-addon radius-none text-cap" for="phone">điện thoại</label>
@@ -92,10 +92,53 @@
                     placeholder="Loại tài khoản" autocomplete="off" readonly value="{{user_info.role}}">
             </div>
             <div class="control-bar">
-                <button class="btn btn-success" id="updateInfoBtn">Cập nhật thông
+                <button class="btn btn-success" id="updateInfoBtn" data-uid="{{user_info._id}}">Cập nhật thông
                     tin</button>
                 <button class="btn btn-success" id="changePasswordBtn">Đổi mật
                     khẩu</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Modal edit user info-->
+    <div class="modal fade" id="userModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Modal title</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="input-group">
+                        <label class="input-group-addon radius-none" for="userNameInput">Tên đăng nhập</label>
+                        <input type="text" class="form-control text-dark radius-none text-bold" id="userNameInput"
+                            placeholder="Tên đăng nhập" autocomplete="off">
+                    </div>
+                    <p class="err-msg" id="err-userNameInput" style="display: none;"></p>
+                    <div class="input-group">
+                        <label class="input-group-addon radius-none" for="fullNameInput">Tên đầy đủ</label>
+                        <input type="text" class="form-control text-dark radius-none text-bold" id="fullNameInput"
+                            placeholder="Họ và tên" autocomplete="off">
+                    </div>
+                    <p class="err-msg" id="err-fullNameInput" style="display: none;"></p>
+                    <div class="input-group">
+                        <label class="input-group-addon radius-none" for="emailInput">Email</label>
+                        <input type="text" class="form-control text-dark radius-none text-bold" id="emailInput"
+                            placeholder="Email" autocomplete="off">
+                    </div>
+                    <p class="err-msg" id="err-emailInput" style="display: none;"></p>
+                    <div class="input-group">
+                        <label class="input-group-addon radius-none" for="phoneInput">Số điện thoại</label>
+                        <input type="number" class="form-control text-dark radius-none text-bold" id="phoneInput"
+                            placeholder="Số điện thoại" autocomplete="off">
+                    </div>
+                    <p class="err-msg" id="err-phoneInput" style="display: none;"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal" id="userModalCancel">Đóng</button>
+                    <button type="button" class="btn btn-primary" id="userModalSubmit" data-action="add">Xác
+                        nhận</button>
+                </div>
             </div>
         </div>
     </div>
@@ -173,6 +216,8 @@
         </div>
     </div>
 </div>
+
+
 <script>
     //change password
     var changePasswordConstraints = {
@@ -266,7 +311,7 @@
 
     $('#changeEmailModalNext').on('click', async function () {
         var newEmail = $('#newEmail').val();
-        var userName = $('#userNameInput').val();
+        var userName = $('#userNameInfo').val();
         console.log(userName)
         $('#changeEmailModal .err-msg').hide();
 
@@ -309,10 +354,10 @@
     })
 
 
-    $('#changeEmailModalSubmit').on('click',async function () {
+    $('#changeEmailModalSubmit').on('click', async function () {
         var otpCode = $('#otpCode').val();
         var newEmail = $('#newEmail').val();
-        var userName = $('#userNameInput').val();
+        var userName = $('#userNameInfo').val();
 
         var validation = validate({ newEmail }, changeEmailConstraints);
         if (validation) {
@@ -353,4 +398,96 @@
         })
     })
 
+    $('#updateInfoBtn').on('click', function(){
+        var uid = $(this).data('uid');
+        var currFullName = $('#fullName').val();
+        var currEmail = $('#email').val();
+        var currPhone = $('#phone').val();
+        var userName = $('#userNameInfo').val();
+
+        $('#fullNameInput').val(currFullName);
+        $('#emailInput').val(currEmail);
+        $('#phoneInput').val(currPhone);
+        $('#userNameInput').val(userName);
+
+        $('#userNameInput').attr('readonly', 'readonly')
+        $('#userModalSubmit').data('action', 'edit');
+        $('#userModalSubmit').data('uid', uid);
+        $('#userModal .modal-title').html('Sửa thông tin user');
+        $('#userModal').modal('show');
+    })
+
+    var editUserConstraints = {
+        fullNameInput: {
+            presence: { allowEmpty: false, message: ': Tên user không được để trống' },
+            length: { minimum: 6, maximum: 30, message: ': Tên user phải từ 6 đến 30 ký tự' },
+        },
+        emailInput: {
+            presence: { allowEmpty: false, message: ' : Email không được để trống' },
+            email: { message: ": Sai định dạng email" }
+        },
+        phoneInput: {
+            presence: { allowEmpty: false, message: ' : Số điện thoại không được để trống' },
+            length: { minimum: 9, message: ': Số điện thoại phải từ 9 số' },
+            format: {
+                pattern: "[0-9]+",
+                flags: "i",
+                message: "Số điện thoại phải là số từ 0-9"
+            }
+        },
+    };
+
+    $('#userModalSubmit').on('click', async function () {
+        $('#userModal .err-msg').hide();
+
+        var action = $(this).data('action');
+        if (action == 'edit') {
+            var fullNameInput = $('#fullNameInput').val().trim();
+            var emailInput = $('#emailInput').val().trim();
+            var phoneInput = $('#phoneInput').val().trim();
+            var uid = $(this).data('uid');
+
+            var validation = validate({ fullNameInput, emailInput, phoneInput }, editUserConstraints);
+            if (validation) {
+                Object.keys(validation).forEach(key => {
+                    var errMsgId = '#err-' + key;
+                    var errMsg = validation[key][0].split(' : ');
+                    $(errMsgId).html(errMsg[1]);
+                    $(errMsgId).show();
+                });
+                return;
+            };
+
+            var url = '/user/change-info/' + uid;
+            var method = 'PUT';
+            var data = {
+                email: emailInput,
+                fullname: fullNameInput,
+                phone: phoneInput
+            };
+
+            $('#mask').show();
+            var addUser = await CallApi(url, data, method).then(function (res) {
+                var status = res.status;
+                if (status == 'success') {
+                    var user = res.userInfo;
+                    $('#fullName').val(fullNameInput);
+                    $('#phone').val(phoneInput);
+                    $('#email').val(emailInput);
+
+                    $('#mask').hide();
+                    $('#userModal').modal('hide');
+                    alertAction(status, 'Sửa thông tin thành công');
+                } else {
+                    $('#mask').hide();
+                    alertAction(status, res.errors[0].msg);
+                }
+            }).catch(function (err) {
+                $('#mask').hide();
+                alertAction('failure', err);
+            }).finally(function () {
+                $('#mask').hide();
+            })
+        }
+    })
 </script>

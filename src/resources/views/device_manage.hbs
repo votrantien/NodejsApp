@@ -15,7 +15,7 @@
     .list-device tr,
     .list-device td,
     .list-device th {
-        border: solid 1px #ddd4d4;
+        border-top: solid 1px #ddd4d4;
     }
 
     .list-device .device-item-td .long-text {
@@ -47,17 +47,6 @@
         border: solid 1px #444040;
         padding: 5px;
         text-align: left;
-    }
-
-
-    .controll-button {
-        background: none;
-        font-weight: bold;
-        color: #fff;
-        border: none;
-        padding: 5px;
-        margin: 0;
-        text-align: center;
     }
 
 
@@ -369,7 +358,7 @@
     var constraints = {
         deviceName: {
             presence: { allowEmpty: false, message: ': Tên thiết bị không được để trống' },
-            length: { minimum: 5, maximum: 20, message: ': Tên thiết bị phải từ 5 đến 25 ký tự' },
+            length: { minimum: 5, maximum: 20, message: ': Tên thiết bị phải từ 5 đến 20 ký tự' },
         },
         deviceType: {
             presence: { allowEmpty: false, message: ': Phải chọn loại thiết bị' },

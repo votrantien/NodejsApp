@@ -73,6 +73,7 @@ $(document).ready(function () {
         }
     })
 
+
     //on realtime value
 
     socket.on('realtime_device_value', function (data) {

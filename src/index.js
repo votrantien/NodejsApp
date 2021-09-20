@@ -176,13 +176,11 @@ io.on("connection", function (Socket) {
                 let room = io.of("/").adapter.rooms.get(idRoom) || {}
 
                 // console.log(room.size)
-                if (room.size == 1) {
+                if (room.size) {
                     console.log(user, ' join room and start real time')
                     Socket.join(idRoom)
                     io.to(idRoom).emit('start_real_time_device')
-                } else if (room.size > 1) {
-                    console.log(user, ' join room')
-                    Socket.join(idRoom)
+                    io.to(Socket.id).emit('device_online', serial)
                 } else if (!room.size) {
                     io.to(Socket.id).emit('device_disconnect', serial)
                 }

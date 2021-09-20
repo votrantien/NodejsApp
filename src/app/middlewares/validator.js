@@ -133,6 +133,32 @@ let validateChangePassword = [
     body('new_password', 'Mật khẩu phải từ 6 ký tự').isLength({ min: 6 }),
 ]
 
+let validateChangeUserInfo = [
+    param('id', 'Id không được để trống').not().isEmpty(),
+    param('id').custom(async (id) => {
+        const user = await User.findOne({ _id: id })
+        if (!user) {
+            return Promise.reject('Id user không tồn tại')
+        } else {
+            return true
+        }
+    }),
+    body('fullname', 'Nhập họ tên user').not().isEmpty(),
+    body('fullname', 'Tên user phải từ 6 ký tự').isLength({ min: 6 }),
+    body('email', 'Sai định dạng email').isEmail().normalizeEmail(),
+    body('email').custom((value, { req }) => {
+        return User.findOne({ email: value }).then(user => {
+            if (user) {
+                if(user._id != req.params.id){
+                    return Promise.reject('email đã tồn tại')
+                }
+            }
+        })
+    }),
+    body('phone', 'phone không được để trống').not().isEmpty(),
+    body('phone', 'phone phải là số').isInt([{ allow_leading_zeroes: true }])
+]
+
 let validateActiveDevice = [
     body('serial', 'serial không được để trống').not().isEmpty(),
     body('serial').custom(async (value) => {
@@ -464,6 +490,7 @@ let validate = {
     validateUpdateDevice: validateUpdateDevice,
     validateSignup: validateSignup,
     validateChangePassword: validateChangePassword,
+    validateChangeUserInfo: validateChangeUserInfo,
     validateRegisterDevice: validateRegisterDevice,
     validateActiveDevice: validateActiveDevice,
     validateActiveNode: validateActiveNode,

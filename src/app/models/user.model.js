@@ -17,7 +17,7 @@ const userSchema = new mongoose.Schema({
     required: [true, 'Please enter an fullname'],
   },
   phone: {
-    type: Number,
+    type: String,
     required: [true, 'Please enter an phone'],
   },
   password: {
@@ -46,9 +46,9 @@ userSchema.statics.login = async function(username, password) {
     if (auth) {
       return user;
     }
-    throw Error('incorrect password');
+    throw Error('Sai mật khẩu');
   }
-  throw Error('incorrect username');
+  throw Error('Tên đăng nhập không tồn tại');
 };
 
 const User = mongoose.model('User', userSchema);

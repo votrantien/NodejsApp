@@ -1,0 +1,415 @@
+<div id="page-wrapper">
+    <h3 class="main-title"><i class="fa fa-users"></i> Danh sách user</h3>
+    <table class="table" id="userTable">
+        <thead>
+            <tr>
+                <th>Login Name</th>
+                <th>Fullname</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Status</th>
+                <th class="text-right"><button class="controll-button fas fa-plus-square add-new"
+                        title="Thêm user"></button></th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each userList}}
+            <tr id="u-{{this._id}}">
+                <td scope="row" class="username">{{this.username}}</td>
+                <td class="fullname">{{this.fullname}}</td>
+                <td class="email">{{this.email}}</td>
+                <td class="phone">{{this.phone}}</td>
+                <td class="status">
+                    {{#if_ this.status '==' '1'}}
+                    <span class="text-success">Active</span>
+                    {{else}}
+                    <span class="text-danger">Lock</span>
+                    {{/if_}}
+                </td>
+                <td class="text-right">
+                    <button class="controll-button fas fa-pen edit" title="Sửa thông tin"
+                        data-uid="{{this._id}}"></button>
+
+                    {{#if_ this.status '==' '1'}}
+                    <button class="controll-button fas fa-lock change-status" title="Khoá tài khoản"
+                        data-status="{{this.status}}" data-uid="{{this._id}}"></button>
+                    {{else}}
+                    <button class="controll-button fas fa-lock-open change-status" title="Mở khoá tài khoản"
+                        data-status="{{this.status}}" data-uid="{{this._id}}"></button>
+                    {{/if_}}
+                    <button class="controll-button fas fa-redo-alt reset-password" title="Reset mật khẩu"
+                        data-uid="{{this._id}}"></button>
+                </td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</div>
+
+
+<!--add and edit user Modal -->
+<div class="modal fade" id="userModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Modal title</h5>
+            </div>
+            <div class="modal-body">
+                <div class="input-group">
+                    <label class="input-group-addon radius-none" for="userNameInput">Tên đăng nhập</label>
+                    <input type="text" class="form-control text-dark radius-none text-bold" id="userNameInput"
+                        placeholder="Tên đăng nhập" autocomplete="off">
+                </div>
+                <p class="err-msg" id="err-userNameInput" style="display: none;"></p>
+                <div class="input-group">
+                    <label class="input-group-addon radius-none" for="fullNameInput">Tên đầy đủ</label>
+                    <input type="text" class="form-control text-dark radius-none text-bold" id="fullNameInput"
+                        placeholder="Họ và tên" autocomplete="off">
+                </div>
+                <p class="err-msg" id="err-fullNameInput" style="display: none;"></p>
+                <div class="input-group">
+                    <label class="input-group-addon radius-none" for="emailInput">Email</label>
+                    <input type="text" class="form-control text-dark radius-none text-bold" id="emailInput"
+                        placeholder="Email" autocomplete="off">
+                </div>
+                <p class="err-msg" id="err-emailInput" style="display: none;"></p>
+                <div class="input-group">
+                    <label class="input-group-addon radius-none" for="phoneInput">Số điện thoại</label>
+                    <input type="number" class="form-control text-dark radius-none text-bold" id="phoneInput"
+                        placeholder="Số điện thoại" autocomplete="off">
+                </div>
+                <p class="err-msg" id="err-phoneInput" style="display: none;"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal" id="userModalCancel">Đóng</button>
+                <button type="button" class="btn btn-primary" id="userModalSubmit" data-action="add">Xác nhận</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal active and inactive -->
+<div class="modal fade" id="changeStatusModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Body
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal"
+                    id="changeStatusModalCancel">Đóng</button>
+                <button type="button" class="btn btn-primary" id="changeStatusModalSubmit">Xác nhận</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var addUserConstraints = {
+        userNameInput: {
+            presence: { allowEmpty: false, message: ': Tên đăng nhập không được để trống' },
+            length: { minimum: 6, maximum: 20, message: ': Tên đăng nhập phải từ 6 đến 20 ký tự' },
+        },
+        fullNameInput: {
+            presence: { allowEmpty: false, message: ': Tên user không được để trống' },
+            length: { minimum: 6, maximum: 30, message: ': Tên user phải từ 6 đến 30 ký tự' },
+        },
+        emailInput: {
+            presence: { allowEmpty: false, message: ' : Email không được để trống' },
+            email: { message: ": Sai định dạng email" }
+        },
+        phoneInput: {
+            presence: { allowEmpty: false, message: ' : Số điện thoại không được để trống' },
+            length: { minimum: 9, message: ': Số điện thoại phải từ 9 số' },
+            format: {
+                pattern: "[0-9]+",
+                flags: "i",
+                message: "Số điện thoại phải là số từ 0-9"
+            }
+        },
+    };
+
+    var editUserConstraints = {
+        fullNameInput: {
+            presence: { allowEmpty: false, message: ': Tên user không được để trống' },
+            length: { minimum: 6, maximum: 30, message: ': Tên user phải từ 6 đến 30 ký tự' },
+        },
+        emailInput: {
+            presence: { allowEmpty: false, message: ' : Email không được để trống' },
+            email: { message: ": Sai định dạng email" }
+        },
+        phoneInput: {
+            presence: { allowEmpty: false, message: ' : Số điện thoại không được để trống' },
+            length: { minimum: 9, message: ': Số điện thoại phải từ 9 số' },
+            format: {
+                pattern: "[0-9]+",
+                flags: "i",
+                message: "Số điện thoại phải là số từ 0-9"
+            }
+        },
+    };
+
+    $('.add-new').on('click', function () {
+        $('#userModalSubmit').data('action', 'add');
+        $('#userModal .modal-title').html('Thêm mới user');
+        $('#userModal input').val('');
+        $('#userModal input').removeAttr('readonly');
+        $('#userModal').modal('show');
+    })
+
+    $(document).on('click', '.edit', function () {
+        var uid = $(this).data('uid');
+        var currFullName = $('#u-' + uid + ' .fullname').text();
+        var currEmail = $('#u-' + uid + ' .email').text();
+        var currPhone = $('#u-' + uid + ' .phone').text();
+        var userName = $('#u-' + uid + ' .username').text();
+
+        $('#fullNameInput').val(currFullName);
+        $('#emailInput').val(currEmail);
+        $('#phoneInput').val(currPhone);
+        $('#userNameInput').val(userName);
+
+        $('#userNameInput').attr('readonly', 'readonly')
+        $('#userModalSubmit').data('action', 'edit');
+        $('#userModalSubmit').data('uid', uid);
+        $('#userModal .modal-title').html('Sửa thông tin user');
+        $('#userModal').modal('show');
+    })
+
+
+    $('#userModalSubmit').on('click', async function () {
+        $('#userModal .err-msg').hide();
+
+        var action = $(this).data('action');
+        if (action == 'add') {
+            var userNameInput = $('#userNameInput').val().trim();
+            var fullNameInput = $('#fullNameInput').val().trim();
+            var emailInput = $('#emailInput').val().trim();
+            var phoneInput = $('#phoneInput').val().trim();
+            var validation = validate({ userNameInput, fullNameInput, emailInput, phoneInput }, addUserConstraints);
+            if (validation) {
+                Object.keys(validation).forEach(key => {
+                    var errMsgId = '#err-' + key;
+                    var errMsg = validation[key][0].split(' : ');
+                    $(errMsgId).html(errMsg[1]);
+                    $(errMsgId).show();
+                });
+                return;
+            };
+
+            var url = '/auth/signup';
+            var method = 'POST';
+            var data = {
+                username: userNameInput,
+                email: emailInput,
+                password: "teficod",
+                fullname: fullNameInput,
+                phone: phoneInput,
+                groupname: "Default Group"
+            };
+
+            $('#mask').show();
+            var addUser = await CallApi(url, data, method).then(function (res) {
+                var status = res.status;
+                if (status == 'success') {
+                    var user = res.user;
+                    var html = `
+                        <tr id="u-${user._id}">
+                            <td scope="row" class="username">${user.username}</td>
+                            <td class="fullname">${user.fullname}</td>
+                            <td class="email">${user.email}</td>
+                            <td class="phone">${user.phone}</td>
+                            <td class="status">
+                                <span class="text-success">Active</span>
+                            </td>
+                            <td class="text-right">
+                                <button class="controll-button fas fa-pen edit" title="Sửa thông tin"
+                                    data-uid="${user._id}"></button>
+                                <button class="controll-button fas fa-times inactive" title="Inactive user"
+                                    data-status="${user.status}" data-uid="${user._id}"></button>
+                            </td>
+                        </tr>
+                    `;
+                    $('#userTable tbody').append(html);
+                    $('#mask').hide();
+                    $('#userModal').modal('hide');
+                    alertAction(status, 'Thêm user thành công');
+                } else {
+                    $('#mask').hide();
+                    alertAction(status, res.errors[0].msg);
+                }
+            }).catch(function (err) {
+                $('#mask').hide();
+                alertAction('failure', err);
+            }).finally(function () {
+                $('#mask').hide();
+            })
+        } else if (action == 'edit') {
+            var fullNameInput = $('#fullNameInput').val().trim();
+            var emailInput = $('#emailInput').val().trim();
+            var phoneInput = $('#phoneInput').val().trim();
+            var uid = $(this).data('uid');
+
+            var validation = validate({ fullNameInput, emailInput, phoneInput }, editUserConstraints);
+            if (validation) {
+                Object.keys(validation).forEach(key => {
+                    var errMsgId = '#err-' + key;
+                    var errMsg = validation[key][0].split(' : ');
+                    $(errMsgId).html(errMsg[1]);
+                    $(errMsgId).show();
+                });
+                return;
+            };
+
+            var url = '/user/change-info/' + uid;
+            var method = 'PUT';
+            var data = {
+                email: emailInput,
+                fullname: fullNameInput,
+                phone: phoneInput
+            };
+
+            $('#mask').show();
+            var addUser = await CallApi(url, data, method).then(function (res) {
+                var status = res.status;
+                if (status == 'success') {
+                    var user = res.userInfo;
+                    $('#u-' + uid + ' .fullname').text(fullNameInput);
+                    $('#u-' + uid + ' .phone').text(phoneInput);
+                    $('#u-' + uid + ' .email').text(emailInput);
+
+                    $('#mask').hide();
+                    $('#userModal').modal('hide');
+                    alertAction(status, 'Sửa thông tin thành công');
+                } else {
+                    $('#mask').hide();
+                    alertAction(status, res.errors[0].msg);
+                }
+            }).catch(function (err) {
+                $('#mask').hide();
+                alertAction('failure', err);
+            }).finally(function () {
+                $('#mask').hide();
+            })
+        }
+    })
+
+    $(document).on('click', '.change-status', function () {
+        var status = $(this).data('status');
+        var uid = $(this).data('uid');
+        if (status == 1) {
+            $('#changeStatusModal .modal-title').html('Khoá tài khoản');
+            $('#changeStatusModal .modal-body').html('Xác nhận khoá tài khoản');
+            $('#changeStatusModalSubmit').data({ action: 'lock', uid: uid });
+            $('#changeStatusModal').modal('show');
+        } else {
+            $('#changeStatusModal .modal-title').html('Mở khoá tài khoản');
+            $('#changeStatusModal .modal-body').html('Xác nhận mở khoá tài khoản');
+            $('#changeStatusModalSubmit').data({ action: 'unlock', uid: uid });
+            $('#changeStatusModal').modal('show');
+        }
+    })
+
+    $(document).on('click', '.reset-password', function () {
+        var uid = $(this).data('uid');
+
+        $('#changeStatusModal .modal-title').html('Reset mật khẩu');
+        $('#changeStatusModal .modal-body').html('Xác nhận reset mật khẩu');
+        $('#changeStatusModalSubmit').data({ action: 'reset-pass', uid: uid });
+        $('#changeStatusModal').modal('show');
+    })
+
+
+    $('#changeStatusModalSubmit').on('click', async function () {
+        var uid = $(this).data('uid');
+        var action = $(this).data('action');
+
+        if (action == 'lock') {
+            var url = '/user/in-active/' + uid;
+            var method = 'PUT';
+            var data = {};
+
+            $('#mask').show();
+            var addUser = await CallApi(url, data, method).then(function (res) {
+                var status = res.status;
+                if (status == 'success') {
+                    var user = res.userInfo;
+                    $('#u-' + uid + ' .status').html('<span class="text-danger">Lock</span>');
+                    $('#u-' + uid + ' .change-status').data('status', '0');
+                    $('#u-' + uid + ' .change-status').toggleClass('fa-lock fa-lock-open');
+                    $('#u-' + uid + ' .change-status').attr('title', 'Mở khoá tài khoản');
+
+                    $('#mask').hide();
+                    $('#changeStatusModal').modal('hide');
+                    alertAction(status, 'Khoá user thành công');
+                } else {
+                    $('#mask').hide();
+                    alertAction(status, res.errors[0].msg);
+                }
+            }).catch(function (err) {
+                $('#mask').hide();
+                alertAction('failure', err);
+            }).finally(function () {
+                $('#mask').hide();
+            })
+        } else if (action == 'unlock') {
+            var url = '/user/active/' + uid;
+            var method = 'PUT';
+            var data = {};
+
+            $('#mask').show();
+            var addUser = await CallApi(url, data, method).then(function (res) {
+                var status = res.status;
+                if (status == 'success') {
+                    var user = res.userInfo;
+                    $('#u-' + uid + ' .status').html('<span class="text-success">Active</span>');
+                    $('#u-' + uid + ' .change-status').data('status', '1');
+                    $('#u-' + uid + ' .change-status').toggleClass('fa-lock fa-lock-open');
+                    $('#u-' + uid + ' .change-status').attr('title', 'Khoá tài khoản');
+
+                    $('#mask').hide();
+                    $('#changeStatusModal').modal('hide');
+                    alertAction(status, 'Mở khoá user thành công');
+                } else {
+                    $('#mask').hide();
+                    alertAction(status, res.errors[0].msg);
+                }
+            }).catch(function (err) {
+                $('#mask').hide();
+                alertAction('failure', err);
+            }).finally(function () {
+                $('#mask').hide();
+            })
+        } else if (action == 'reset-pass') {
+            var url = '/user/reset-password/' + uid;
+            var method = 'PUT';
+            var data = {};
+
+            $('#mask').show();
+            var addUser = await CallApi(url, data, method).then(function (res) {
+                var status = res.status;
+                if (status == 'success') {
+                    $('#mask').hide();
+                    $('#changeStatusModal').modal('hide');
+                    alertAction(status, 'Reset password thành công');
+                } else {
+                    $('#mask').hide();
+                    alertAction(status, res.errors[0].msg);
+                }
+            }).catch(function (err) {
+                $('#mask').hide();
+                alertAction('failure', err);
+            }).finally(function () {
+                $('#mask').hide();
+            })
+        }
+    })
+
+</script>

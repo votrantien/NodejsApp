@@ -6,7 +6,7 @@ var { validationResult } = require('express-validator')
 
 // handle errors
 const handleErrors = (err) => {
-    console.log(err.message, err.code)
+    // console.log(err.message, err.code)
     let errors = { username: '', password: '' }
 
     // incorrect email
@@ -86,13 +86,17 @@ module.exports.login_post = async (req, res) => {
 
     try {
         const user = await User.login(username, password)
-        const token = createToken(user._id)
-        res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000 })
-        res.status(200).json({status: 'success', user: user._id, token: token })
+        if(user.status == 1){
+            const token = createToken(user._id)
+            res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000 })
+            res.status(200).json({status: 'success', user: user._id, token: token })
+        }else if (user.status == 0){
+            res.status(422).json({status: 'failure', errors:[{msg:'Tài khoản đã bị khoá' }]})
+        }
     }
     catch (err) {
         const errors = handleErrors(err)
-        res.status(400).json({status: 'failure', errors })
+        res.status(400).json({status: 'failure', errors:[{msg: 'Sai tên đăng nhập hoặc mật khẩu'}] })
     }
 
 }

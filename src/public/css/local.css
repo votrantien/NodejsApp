@@ -6888,6 +6888,16 @@ input:checked+.slider:before {
     outline: none;
 }
 
+.controll-button {
+    background: none;
+    font-weight: bold;
+    color: #fff;
+    border: none;
+    padding: 5px;
+    margin: 0;
+    text-align: center;
+}
+
 /* device value page  */
 
 .uom-wrapper {
@@ -6992,7 +7002,7 @@ input:checked+.slider:before {
 }
 
 .tab-active {
-    background-color: #039666;
+    background-color: #29c17f;
 }
 
 .tab-content {

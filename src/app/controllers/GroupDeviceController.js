@@ -31,7 +31,7 @@ class GroupDeviceController {
             listGroupShare = await GroupDevice.find({ access_user: userId }).populate('access_user').lean()
         }
 
-        res.render('device_group_manage', { username: user.username, listGroup, listGroupShare, title: "Quản lý thiết bị" })
+        res.render('device_group_manage', { username: user.username, listGroup, listGroupShare, title: "Quản lý nhóm thiết bị" })
     }
 
     async put_UpdateGroup(req, res) {

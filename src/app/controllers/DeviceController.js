@@ -75,7 +75,7 @@ class DeviceController {
         //     return a.device_model.localeCompare(b.device_model);
         // });
         // console.log(devices)
-        res.render('device_value_gateway', { username, devices, listGroups, userGroups, listGroupShare, device_types, gateways, title: "Giá trị cảm biến" })
+        res.render('device_value_gateway', { username, devices, listGroups, userGroups, listGroupShare, device_types, gateways, title: "Thông số môi trường" })
     }
 
     // test
@@ -125,7 +125,7 @@ class DeviceController {
         //     return a.device_model.localeCompare(b.device_model);
         // });
         // console.log(devices)
-        res.render('device_value_ahsd', { username, devices, listGroups, userGroups, listGroupShare, device_types, title: "Automatic Hydrobonic System" })
+        res.render('device_value_ahsd', { username, devices, listGroups, userGroups, listGroupShare, device_types, title: "Thông số dinh dưỡng" })
     }
 
     async post_AddDeviceValue(req, res) {
