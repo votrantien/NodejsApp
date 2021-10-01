@@ -112,21 +112,24 @@
                                     dev-type="{{dev_type.prefix}}" on-chart="false" dev-name="{{device.device_name}}"
                                     type-name="{{dev_type.device_type}}" color-idx="{{@index}}">
                                     <p class="device-item-dynamic-value">
+                                    <span class="device-info">
                                         <span class="device-item-battery">
-                                            <i class="fas fa-battery-three-quarters"><span class="value">N/a</span></i>
+                                            <i class="battery-status icon-bat4"></i>
+                                            <span class="value">N/a</span>
                                         </span>
                                         <span class="device-item-rssi">
-                                            <i class="fas fa-wifi"><span class="value">N/a</span></i>
+                                            <i class="fas fa-wifi"></i>
+                                            <span class="value">N/a</span>
                                         </span>
-                                        <br>
-                                        <span class="device-item-value">
-                                            {{#each device.device_type.uom_values}}
-                                            <span class="value-wrapper">
-                                                <i class="value" id="{{@key}}-{{device.sn_number}}">N/a</i>
-                                                <sub class="uom">{{this.uom}}</sub>
-                                            </span>
-                                            {{/each}}
+                                    </span>
+                                    <span class="device-item-value">
+                                        {{#each device.device_type.uom_values}}
+                                        <span class="value-wrapper">
+                                            <i class="value" id="{{@key}}-{{device.sn_number}}">N/a</i>
+                                            <sub class="uom">{{this.uom}}</sub>
                                         </span>
+                                        {{/each}}
+                                    </span>
                                     </p>
                                     <p class="device-item-name">{{device.device_name}}</p>
                                 </button>

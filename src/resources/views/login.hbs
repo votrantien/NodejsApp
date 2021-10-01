@@ -21,15 +21,16 @@
 </style>
 <div id="page-wrapper" style="padding: 30px;">
     <div class="row">
-        <div class="col-lg-12 text-center v-center">
+        <div class="col-lg-12 col-xs-12 text-center v-center">
 
             <div>
                 <i class="icon-logo"></i>
                 <h1 class="web-title">Teficod System</h1>
             </div>
             <br>
-            <form class="col-lg-12" method="POST" action="/auth/login">
-                <div style="width: 340px; text-align: center; margin: 0 auto;">
+            <form class="col-lg-12 col-xs-12" method="POST" action="/auth/login" >
+                <div class="col-lg-4"></div>
+                <div class="col-lg-4" >
                     <p id="err_msg" class="err-msg" style="display: none;"></p>
                     <br>
                     <input class="form-control input-lg" title="User name" placeholder="User name" type="text"
@@ -42,6 +43,7 @@
                         <button class="btn btn-lg btn-primary" type="submit" id="signin">Đăng nhập</button>
                     </span>
                 </div>
+                <div class="col-lg-4"></div>
             </form>
         </div>
     </div>

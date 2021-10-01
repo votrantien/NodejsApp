@@ -96,6 +96,8 @@ $(document).ready(function () {
         var data = data?.data;
         var rssi = data?.rssi;
         var battery = data?.battery;
+        var batteryCapacity = battery?.cap;
+        var batteryStatus = battery?.status;
         var idGateway = $(`#dev-${serial}`).attr('gateway');
         // console.log(idGateway);
         if (data.val) {
@@ -111,7 +113,20 @@ $(document).ready(function () {
             $(`#tab-control-${idGateway}`).addClass('status-1');
         }
 
-        $(`#dev-${serial} .device-item-battery .value`).html(battery);
+        if (batteryStatus == 0) {
+            $(`#dev-${serial} .device-item-battery .battery-status`).removeClass('icon-bat-charge-1 icon-bat-not-1 icon-bat4 icon-bat3 icon-bat2 icon-bat1');
+            $(`#dev-${serial} .device-item-battery .battery-status`).data('status', 0);
+            $(`#dev-${serial} .device-item-battery .battery-status`).addClass('icon-bat-not-1');
+        } else if (batteryStatus == 2) {
+            $(`#dev-${serial} .device-item-battery .battery-status`).removeClass('icon-bat-charge-1 icon-bat-not-1 icon-bat4 icon-bat3 icon-bat2 icon-bat1');
+            $(`#dev-${serial} .device-item-battery .battery-status`).data('status', 2);
+            $(`#dev-${serial} .device-item-battery .battery-status`).addClass('icon-bat-charge-1');
+        } else if (batteryStatus == 1) {
+            $(`#dev-${serial} .device-item-battery .battery-status`).removeClass('icon-bat-charge-1 icon-bat-not-1 icon-bat4 icon-bat3 icon-bat2 icon-bat1');
+            $(`#dev-${serial} .device-item-battery .battery-status`).data('status', 1);
+        }
+
+        $(`#dev-${serial} .device-item-battery .value`).html(batteryCapacity);
         $(`#dev-${serial} .device-item-rssi .value`).html(rssi);
         //console.log(serial, data)
     });
@@ -493,13 +508,35 @@ $(document).ready(function () {
     //battery
     $(document).on('DOMSubtreeModified', '.device-item-battery .value', function () {
         var value = $(this).text();
-        if (value < 10) {
-            if (!$(this).parent().hasClass('status-low')) {
-                $(this).parent().toggleClass('status-low')
+        var batteryStatus = $(this).siblings('.battery-status').data('status');
+        if (batteryStatus == 1) {
+            if (value < 10) {
+                if (!$(this).parent().hasClass('status-low')) {
+                    $(this).parent().toggleClass('status-low')
+                }
+            } else {
+                if ($(this).parent().hasClass('status-low')) {
+                    $(this).parent().toggleClass('status-low')
+                }
             }
-        } else {
-            if ($(this).parent().hasClass('status-low')) {
-                $(this).parent().toggleClass('status-low')
+
+            // change icon
+            if (value < 10) {
+                $(this).siblings('.battery-status').removeClass('icon-bat-charge-1 icon-bat-not-1 icon-bat4 icon-bat3 icon-bat2 icon-bat1');
+                $(this).siblings('.battery-status').addClass('icon-bat1');
+
+            } else if (value < 51) {
+                $(this).siblings('.battery-status').removeClass('icon-bat-charge-1 icon-bat-not-1 icon-bat4 icon-bat3 icon-bat2 icon-bat1');
+                $(this).siblings('.battery-status').addClass('icon-bat2');
+
+            } else if (value < 76) {
+                $(this).siblings('.battery-status').removeClass('icon-bat-charge-1 icon-bat-not-1 icon-bat4 icon-bat3 icon-bat2 icon-bat1');
+                $(this).siblings('.battery-status').addClass('icon-bat3');
+
+            } else if (value > 75) {
+                $(this).siblings('.battery-status').removeClass('icon-bat-charge-1 icon-bat-not-1 icon-bat4 icon-bat3 icon-bat2 icon-bat1');
+                $(this).siblings('.battery-status').addClass('icon-bat4');
+
             }
         }
     })
